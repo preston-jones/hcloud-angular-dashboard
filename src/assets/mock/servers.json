@@ -1,0 +1,56 @@
+{
+  "servers": [
+    {
+      "id": 101,
+      "name": "web-node-01",
+      "status": "running",
+      "created": "2025-01-20T10:15:00+00:00",
+      "server_type": { "id": 25, "name": "cx22" },
+      "image": { "id": 2001, "name": "ubuntu-22.04" },
+      "datacenter": {
+        "id": 4,
+        "name": "nbg1-dc3",
+        "location": { "id": 1, "name": "nbg1", "city": "Nuremberg", "country": "DE" }
+      },
+      "public_net": {
+        "ipv4": { "ip": "203.0.113.10", "blocked": false, "dns_ptr": "web-node-01.example.com" },
+        "ipv6": { "ip": "2001:db8::10", "blocked": false, "dns_ptr": [{ "ip": "2001:db8::10", "dns_ptr": "web-node-01.example.com" }] }
+      },
+      "private_net": [],
+      "labels": { "env": "prod", "tier": "web" },
+      "protection": { "delete": false, "rebuild": false },
+      "locked": false
+    },
+    {
+      "id": 102,
+      "name": "api-stage-01",
+      "status": "off",
+      "created": "2025-01-21T09:05:00+00:00",
+      "server_type": { "id": 26, "name": "cx32" },
+      "image": { "id": 2002, "name": "debian-12" },
+      "datacenter": {
+        "id": 5,
+        "name": "fsn1-dc14",
+        "location": { "id": 2, "name": "fsn1", "city": "Falkenstein", "country": "DE" }
+      },
+      "public_net": {
+        "ipv4": { "ip": "203.0.113.11", "blocked": false, "dns_ptr": null },
+        "ipv6": { "ip": "2001:db8::11", "blocked": false, "dns_ptr": [] }
+      },
+      "private_net": [],
+      "labels": { "env": "stage" },
+      "protection": { "delete": true, "rebuild": false },
+      "locked": false
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 2
+    }
+  }
+}

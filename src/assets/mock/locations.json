@@ -1,0 +1,44 @@
+{
+  "locations": [
+    {
+      "id": 1,
+      "name": "nbg1",
+      "description": "Nuremberg DC",
+      "country": "DE",
+      "city": "Nuremberg",
+      "latitude": 49.4521,
+      "longitude": 11.0767,
+      "network_zone": "eu-central"
+    },
+    {
+      "id": 2,
+      "name": "fsn1",
+      "description": "Falkenstein DC",
+      "country": "DE",
+      "city": "Falkenstein",
+      "latitude": 50.4779,
+      "longitude": 12.3713,
+      "network_zone": "eu-central"
+    },
+    {
+      "id": 3,
+      "name": "hel1",
+      "description": "Helsinki DC",
+      "country": "FI",
+      "city": "Helsinki",
+      "latitude": 60.1699,
+      "longitude": 24.9384,
+      "network_zone": "eu-central"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 3
+    }
+  }
+}
