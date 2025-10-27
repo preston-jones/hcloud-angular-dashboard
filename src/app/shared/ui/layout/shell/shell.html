@@ -1,9 +1,9 @@
 <div class="h-screen w-full grid"
      [class]="collapsed() ? 'grid-cols-[72px_1fr]' : 'grid-cols-[280px_1fr]'">
-  <app-sidebar [collapsed]="collapsed()"></app-sidebar>
+  <app-sidebar [collapsed]="collapsed()" (menu)="toggleSidebar()"></app-sidebar>
 
   <div class="flex flex-col overflow-hidden">
-    <app-topbar (menu)="toggleSidebar()"></app-topbar>
+    <app-topbar (search)="onSearch($event)"></app-topbar>
     <main class="p-6 overflow-auto bg-surface">
       <router-outlet></router-outlet>
     </main>

@@ -29,10 +29,16 @@ export class HetznerApiService {
   locations = signal<any[] | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  searchQuery = signal('');
 
   /** Mock-Modus? (assets/mock vs echte API) */
   private isMockMode(): boolean {
     return !environment.apiBase.startsWith('http') || environment.apiBase.includes('assets');
+  }
+
+  /** Set search query from topbar */
+  setSearchQuery(query: string) {
+    this.searchQuery.set(query);
   }
 
   /** Auth-Headers für echte API */

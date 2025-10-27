@@ -14,7 +14,6 @@ export class ServersPage implements OnInit {
   private api = inject(HetznerApiService);
 
   // UI state
-  q = signal('');
   status = signal<'all' | 'running' | 'stopped'>('all');
 
   // API state von Service
@@ -22,6 +21,7 @@ export class ServersPage implements OnInit {
   get servers() { return this.api.servers; }
   get error() { return this.api.error; }
   get isUsingMockData() { return this.api.isUsingMockData; }
+  get searchQuery() { return this.api.searchQuery; }
 
   ngOnInit() {
     // Server beim Laden der Komponente laden
@@ -33,7 +33,7 @@ export class ServersPage implements OnInit {
     const serverList = this.servers();
     if (!serverList) return [];
     
-    const term = this.q().toLowerCase();
+    const term = this.searchQuery().toLowerCase();
     const st = this.status();
     return serverList.filter(s => {
       const matchesQuery =
@@ -46,10 +46,6 @@ export class ServersPage implements OnInit {
   });
 
   // Handlers
-  onSearchInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.q.set(input.value);
-  }
   onStatusChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.status.set(select.value as 'all' | 'running' | 'stopped');

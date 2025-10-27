@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TopbarComponent } from '../topbar/topbar';
 import { SidebarComponent } from '../sidebar/sidebar';
+import { HetznerApiService } from '../../../../core/hetzner-api.service';
 
 @Component({
   selector: 'app-shell',
@@ -13,5 +14,11 @@ import { SidebarComponent } from '../sidebar/sidebar';
 })
 export class ShellComponent {
   collapsed = signal(false);
+  private api = inject(HetznerApiService);
+
   toggleSidebar = () => this.collapsed.update(v => !v);
+
+  onSearch(query: string) {
+    this.api.setSearchQuery(query);
+  }
 }

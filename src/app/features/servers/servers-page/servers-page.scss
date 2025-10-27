@@ -21,6 +21,10 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem;
+  transition: background-color 0.2s ease;
+}
+.server-card:hover {
+  background: color-mix(in oklab, var(--surface-elev) 95%, black);
 }
 .server-card .name { color: var(--primary); font-weight: 600; }
 .server-card .meta { color: var(--text-soft); font-size: 0.875rem; }
