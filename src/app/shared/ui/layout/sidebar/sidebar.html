@@ -1,0 +1,25 @@
+<aside class="sidebar h-screen">
+  <!-- Brand -->
+  <div class="brand">
+    <div class="logo">H</div>
+    <span class="brand-text">HETZNER</span>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a *ngFor="let item of nav"
+       [routerLink]="item.path"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="nav-link"
+       [attr.aria-label]="item.label">
+      <span class="icon">{{ item.icon }}</span>
+      <span class="label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <!-- Footer / Version -->
+  <div class="footer">
+    <span class="muted">v0.1.0</span>
+  </div>
+</aside>

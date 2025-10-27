@@ -6,6 +6,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Inter';
   src: url('./assets/fonts/inter/inter-v20-latin-500.woff2') format('woff2');
@@ -13,6 +14,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Inter';
   src: url('./assets/fonts/inter/inter-v20-latin-600.woff2') format('woff2');
@@ -20,6 +22,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Inter';
   src: url('./assets/fonts/inter/inter-v20-latin-700.woff2') format('woff2');
@@ -35,6 +38,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('./assets/fonts/roboto/roboto-v49-latin-500.woff2') format('woff2');
@@ -42,6 +46,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('./assets/fonts/roboto/roboto-v49-latin-700.woff2') format('woff2');
@@ -59,11 +64,16 @@
 /* ===== Theme Tokens ===== */
 :root {
   /* Surfaces & Text */
-  --surface: #F8FAFC;           /* Light BG */
-  --surface-elev: #FFFFFF;      /* Cards */
-  --text: #0F172A;              /* slate-900 */
-  --text-soft: #334155;         /* slate-600 */
-  --border: #E2E8F0;            /* slate-200 */
+  --surface: #F8FAFC;
+  /* Light BG */
+  --surface-elev: #FFFFFF;
+  /* Cards */
+  --text: #0F172A;
+  /* slate-900 */
+  --text-soft: #334155;
+  /* slate-600 */
+  --border: #E2E8F0;
+  /* slate-200 */
 
   /* Brand */
   --primary: #E40046;
@@ -76,19 +86,39 @@
 }
 
 :root.dark {
-  --surface: #0B1220;           /* Dark BG (leicht bläulich, angenehm) */
-  --surface-elev: #0F172A;      /* Elevated Cards */
-  --text: #E5E7EB;              /* slate-200 */
-  --text-soft: #94A3B8;         /* slate-400 */
-  --border: #1F2A37;            /* dunkle Border */
+  /* Backdrops & Surfaces */
+  --surface: #0b0f14;
+  /* Page background */
+  --surface-elev: #161b22;
+  /* Cards/Panels */
+  --surface-muted: #1b222c;
+  /* Hover/active Panels */
 
-  --sidebar: #0B1220;
-  --sidebar-text: #CBD5E1;
+  /* Text */
+  --text: #e6e9ef;
+  --text-soft: #9aa4b2;
+
+  /* Borders */
+  --border: #2a2f3a;
+
+  /* Brand / Accent */
+  --primary: #e40046;
+  /* Hetzner Rot */
+  --accent: #2563eb;
+  --success: #16a34a;
+
+  /* Navigation / Sidebar / Toolbar */
+  --sidebar: #0b0f14;
+  --sidebar-text: #cbd5e1;
+  --toolbar: #2b303b;
+  --surface-muted: #1b222c;
 }
 
 /* ===== Minimal Utility Bridge (Tailwind-friendly) ===== */
 @layer base {
-  html, body {
+
+  html,
+  body {
     height: 100%;
     background: var(--surface);
     color: var(--text);
@@ -97,19 +127,64 @@
 }
 
 @layer components {
-  .card { @apply rounded-2xl p-5 shadow; background: var(--surface-elev); }
-  .badge { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold; }
-  .badge--ok   { @apply text-green-700; background: color-mix(in oklab, #16A34A 12%, transparent); }
-  .badge--warn { @apply text-amber-800; background: color-mix(in oklab, #F59E0B 18%, transparent); }
-  .badge--err  { @apply text-rose-800;  background: color-mix(in oklab, #E11D48 15%, transparent); }
+
+  /* Panels/Card: kaum Schatten, feine Border */
+  .card {
+    @apply rounded-xl p-5;
+    background: var(--surface-elev);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  /* Topbar */
+  .topbar {
+    background: var(--toolbar);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(120%) blur(6px);
+    color: var(--text);
+  }
+
+  .topbar button {
+    color: var(--text);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .topbar .text-primary {
+    color: var(--primary);
+  }
+
+  /* Links im Darkmode */
+  a {
+    color: var(--accent);
+  }
+
+  a:hover {
+    color: color-mix(in oklab, var(--accent) 85%, white);
+  }
 }
 
 @layer utilities {
-  .bg-surface       { background: var(--surface); }
-  .bg-surface-elev  { background: var(--surface-elev); }
-  .text-ink         { color: var(--text); }
-  .text-soft        { color: var(--text-soft); }
-  .border-ui        { border-color: var(--border); }
-  .bg-sidebar       { background: var(--sidebar); }
-  .text-sidebar     { color: var(--sidebar-text); }
+  .bg-panel {
+    background: var(--surface-elev);
+  }
+
+  .bg-muted {
+    background: var(--surface-muted);
+  }
+
+  .text-ink {
+    color: var(--text);
+  }
+
+  .text-soft {
+    color: var(--text-soft);
+  }
+
+  .border-ui {
+    border-color: var(--border);
+  }
+
+  .link {
+    color: var(--accent);
+  }
 }

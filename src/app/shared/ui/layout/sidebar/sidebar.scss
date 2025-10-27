@@ -1,0 +1,69 @@
+/* Grundfläche im Hetzner-Dark-Look */
+.sidebar {
+  background: var(--sidebar);
+  color: var(--sidebar-text);
+  width: 280px;
+  display: grid;
+  grid-template-rows: 56px 1fr 44px;
+  border-right: 1px solid var(--border);
+}
+
+/* Collapsed Variante */
+:host.collapsed .sidebar { width: 72px; }
+:host.collapsed .brand-text,
+:host.collapsed .label { display: none; }
+:host.collapsed .logo { margin-inline: auto; }
+
+/* Brand-Zeile */
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  height: 56px; padding: 0 12px;
+}
+.logo {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: color-mix(in oklab, var(--primary) 20%, transparent);
+  color: var(--primary); font-weight: 800;
+}
+.brand-text {
+  font-weight: 800; letter-spacing: .06em;
+  color: var(--primary);
+}
+
+/* Navigation */
+.nav { padding: 8px; display: grid; gap: 4px; }
+.nav-link {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  height: 40px; padding: 0 10px;
+  border-radius: 10px;
+  color: var(--sidebar-text);
+  transition: background .15s ease, color .15s ease;
+}
+.nav-link:hover {
+  background: var(--surface-muted, #1b222c);
+}
+
+/* aktiver roter Indikator links, wie in Hetzner */
+.nav-link.active {
+  background: var(--surface-muted, #1b222c);
+  color: #ffffff;
+}
+.nav-link.active::before {
+  content: '';
+  position: absolute; inset: 6px auto 6px 0;
+  width: 3px; border-radius: 2px;
+  background: var(--primary);
+}
+
+/* Icon/Label */
+.icon { width: 22px; text-align: center; opacity: .9; }
+.label { font-weight: 600; }
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.muted { opacity: .6; }

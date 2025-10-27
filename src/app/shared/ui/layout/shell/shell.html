@@ -1,5 +1,7 @@
-<div class="h-screen w-full grid grid-cols-[1fr]">
-  <!-- Sidebar könntest du später ergänzen -->
+<div class="h-screen w-full grid"
+     [class]="collapsed() ? 'grid-cols-[72px_1fr]' : 'grid-cols-[280px_1fr]'">
+  <app-sidebar [collapsed]="collapsed()"></app-sidebar>
+
   <div class="flex flex-col overflow-hidden">
     <app-topbar (menu)="toggleSidebar()"></app-topbar>
     <main class="p-6 overflow-auto bg-surface">

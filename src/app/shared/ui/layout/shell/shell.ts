@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TopbarComponent } from '../topbar/topbar';
+import { SidebarComponent } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, TopbarComponent],
+  standalone: true,
+  imports: [RouterOutlet, TopbarComponent, SidebarComponent],
   templateUrl: './shell.html',
-  styleUrl: './shell.scss',
+  styleUrls: ['./shell.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellComponent {
