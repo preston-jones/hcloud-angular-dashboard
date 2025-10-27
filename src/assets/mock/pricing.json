@@ -1,0 +1,117 @@
+{
+  "pricing": {
+    "currency": "EUR",
+    "vat_rate": 19,
+    "image": {
+      "price_per_gb_month": {
+        "net": "0.01",
+        "gross": "0.0119"
+      }
+    },
+    "floating_ip": {
+      "price_monthly": {
+        "net": "0.50",
+        "gross": "0.595"
+      }
+    },
+    "load_balancer": {
+      "price_monthly": {
+        "net": "4.90",
+        "gross": "5.831"
+      }
+    },
+    "traffic": {
+      "included_per_server": "20 TB",
+      "price_per_tb": {
+        "net": "1.00",
+        "gross": "1.19"
+      }
+    },
+    "server_types": [
+      {
+        "id": 25,
+        "name": "cx22",
+        "description": "CX22 – 2 vCPU, 4 GB RAM, 40 GB Disk",
+        "prices": [
+          {
+            "location": "nbg1",
+            "price_hourly": {
+              "net": "0.007",
+              "gross": "0.00833"
+            },
+            "price_monthly": {
+              "net": "3.90",
+              "gross": "4.641"
+            },
+            "co2_per_hour_g": 0.45
+          },
+          {
+            "location": "hel1",
+            "price_hourly": {
+              "net": "0.007",
+              "gross": "0.00833"
+            },
+            "price_monthly": {
+              "net": "3.90",
+              "gross": "4.641"
+            },
+            "co2_per_hour_g": 0.28
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "name": "cx32",
+        "description": "CX32 – 4 vCPU, 8 GB RAM, 80 GB Disk",
+        "prices": [
+          {
+            "location": "nbg1",
+            "price_hourly": {
+              "net": "0.013",
+              "gross": "0.01547"
+            },
+            "price_monthly": {
+              "net": "6.90",
+              "gross": "8.211"
+            },
+            "co2_per_hour_g": 0.72
+          },
+          {
+            "location": "hel1",
+            "price_hourly": {
+              "net": "0.013",
+              "gross": "0.01547"
+            },
+            "price_monthly": {
+              "net": "6.90",
+              "gross": "8.211"
+            },
+            "co2_per_hour_g": 0.36
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "name": "cx42",
+        "description": "CX42 – 8 vCPU, 16 GB RAM, 160 GB Disk",
+        "prices": [
+          {
+            "location": "fsn1",
+            "price_hourly": {
+              "net": "0.026",
+              "gross": "0.03094"
+            },
+            "price_monthly": {
+              "net": "13.90",
+              "gross": "16.541"
+            },
+            "co2_per_hour_g": 1.05
+          }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "pagination": null
+  }
+}
