@@ -22,10 +22,13 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^20.3.7",
+    "@angular/cdk": "^20.2.10",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
     "@angular/forms": "^20.3.0",
+    "@angular/material": "^20.2.10",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "rxjs": "~7.8.0",
@@ -33,16 +36,27 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "^20.5.0",
+    "@angular-eslint/eslint-plugin": "^20.5.0",
+    "@angular-eslint/schematics": "^20.5.0",
     "@angular/build": "^20.3.7",
     "@angular/cli": "^20.3.7",
     "@angular/compiler-cli": "^20.3.0",
+    "@tailwindcss/postcss": "^4.1.16",
     "@types/jasmine": "~5.1.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^3.4.18",
     "typescript": "~5.9.2"
   }
 }
