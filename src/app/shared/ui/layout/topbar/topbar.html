@@ -1,15 +1,31 @@
-<header class="h-14 border-b bg-[var(--surface-elev)] border-ui backdrop-blur flex items-center justify-between px-4">
-  <button class="rounded-lg px-3 py-2 hover:bg-[color-mix(in_oklab,_var(--text)_5%,_transparent)]"
-          aria-label="Toggle sidebar" (click)="menu.emit()">☰</button>
+<header class="topbar h-14 flex items-center justify-between px-4">
+  <!-- Left: Brand / Menu -->
+  <div class="flex items-center gap-3">
+    <button
+      class="rounded-lg px-3 py-2 hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)]"
+      aria-label="Toggle sidebar"
+      (click)="menu.emit()">
+      ☰
+    </button>
 
-  <div class="flex items-center gap-2">
-    <button class="rounded-lg px-3 py-2 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_5%,_transparent)]"
-            (click)="toggleTheme()"
-            [attr.aria-pressed]="isDark()"
-            aria-label="Toggle dark mode">
+    <!-- Hetzner Logo -->
+    <span class="text-primary font-bold tracking-wide text-lg select-none">
+      HETZNER<span class="text-ink"> Dashboard</span>
+    </span>
+  </div>
+
+  <!-- Right: Theme Toggle + Avatar -->
+  <div class="flex items-center gap-3">
+    <button
+      class="rounded-lg px-3 py-2 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors"
+      (click)="toggleTheme()"
+      [attr.aria-pressed]="isDark()"
+      aria-label="Toggle dark mode">
       <span *ngIf="!isDark()">🌙</span>
       <span *ngIf="isDark()">☀️</span>
     </button>
-    <div class="w-8 h-8 rounded-full bg-[color-mix(in_oklab,_var(--text)_15%,_transparent)]"></div>
+
+    <!-- Avatar / User Circle -->
+    <div class="w-8 h-8 rounded-full bg-[color-mix(in_oklab,_var(--text)_20%,_transparent)]"></div>
   </div>
 </header>
