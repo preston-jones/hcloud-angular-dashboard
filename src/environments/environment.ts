@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBase: 'https://api.hetzner.cloud/v1', // echte API (über Proxy empfohlen)
-  useMockFallback: true
+  apiBase: '/api/v1', // Production: Backend-Proxy (später 'https://api.hetzner.cloud/v1')
+  useMockFallback: false // Production: kein Mock-Fallback
 };

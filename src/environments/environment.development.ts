@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiBase: 'assets/mock',        // Mock-Default
-  useMockFallback: true          // bei Fehlern auf Mock fallen
+  apiBase: 'assets/mock', // Development: Mock-Daten (relativer Pfad)
+  useMockFallback: true
 };

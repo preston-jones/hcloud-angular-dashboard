@@ -1,117 +1,95 @@
 {
   "pricing": {
     "currency": "EUR",
-    "vat_rate": 19,
-    "image": {
-      "price_per_gb_month": {
-        "net": "0.01",
-        "gross": "0.0119"
-      }
-    },
-    "floating_ip": {
-      "price_monthly": {
-        "net": "0.50",
-        "gross": "0.595"
-      }
-    },
-    "load_balancer": {
-      "price_monthly": {
-        "net": "4.90",
-        "gross": "5.831"
-      }
-    },
-    "traffic": {
-      "included_per_server": "20 TB",
-      "price_per_tb": {
-        "net": "1.00",
-        "gross": "1.19"
-      }
-    },
+    "vat_rate": 0.19,
     "server_types": [
       {
         "id": 25,
         "name": "cx22",
-        "description": "CX22 – 2 vCPU, 4 GB RAM, 40 GB Disk",
+        "description": "2 vCPU, 4 GB RAM, 40 GB SSD",
+        "energy_kwh_per_month": 7.2,
+        "co2_kg_per_month": 2.4,
         "prices": [
-          {
-            "location": "nbg1",
-            "price_hourly": {
-              "net": "0.007",
-              "gross": "0.00833"
-            },
-            "price_monthly": {
-              "net": "3.90",
-              "gross": "4.641"
-            },
-            "co2_per_hour_g": 0.45
-          },
-          {
-            "location": "hel1",
-            "price_hourly": {
-              "net": "0.007",
-              "gross": "0.00833"
-            },
-            "price_monthly": {
-              "net": "3.90",
-              "gross": "4.641"
-            },
-            "co2_per_hour_g": 0.28
-          }
+          { "location": "fsn1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0046, "gross": 0.0055 },
+            "price_monthly": { "net": 2.96, "gross": 3.52 } },
+          { "location": "nbg1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0046, "gross": 0.0055 },
+            "price_monthly": { "net": 2.96, "gross": 3.52 } },
+          { "location": "hel1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0046, "gross": 0.0055 },
+            "price_monthly": { "net": 2.96, "gross": 3.52 } },
+          { "location": "ash", "zone": "us-east",
+            "price_hourly": { "net": 0.00575, "gross": 0.00688 },
+            "price_monthly": { "net": 3.70, "gross": 4.40 } },
+          { "location": "hil", "zone": "us-west",
+            "price_hourly": { "net": 0.00575, "gross": 0.00688 },
+            "price_monthly": { "net": 3.70, "gross": 4.40 } },
+          { "location": "sin", "zone": "ap-southeast",
+            "price_hourly": { "net": 0.00621, "gross": 0.00743 },
+            "price_monthly": { "net": 4.00, "gross": 4.75 } }
         ]
       },
       {
         "id": 26,
         "name": "cx32",
-        "description": "CX32 – 4 vCPU, 8 GB RAM, 80 GB Disk",
+        "description": "4 vCPU, 8 GB RAM, 80 GB SSD",
+        "energy_kwh_per_month": 13.5,
+        "co2_kg_per_month": 4.5,
         "prices": [
-          {
-            "location": "nbg1",
-            "price_hourly": {
-              "net": "0.013",
-              "gross": "0.01547"
-            },
-            "price_monthly": {
-              "net": "6.90",
-              "gross": "8.211"
-            },
-            "co2_per_hour_g": 0.72
-          },
-          {
-            "location": "hel1",
-            "price_hourly": {
-              "net": "0.013",
-              "gross": "0.01547"
-            },
-            "price_monthly": {
-              "net": "6.90",
-              "gross": "8.211"
-            },
-            "co2_per_hour_g": 0.36
-          }
+          { "location": "fsn1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0085, "gross": 0.0101 },
+            "price_monthly": { "net": 5.52, "gross": 6.56 } },
+          { "location": "nbg1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0085, "gross": 0.0101 },
+            "price_monthly": { "net": 5.52, "gross": 6.56 } },
+          { "location": "hel1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0085, "gross": 0.0101 },
+            "price_monthly": { "net": 5.52, "gross": 6.56 } },
+          { "location": "ash", "zone": "us-east",
+            "price_hourly": { "net": 0.01063, "gross": 0.01263 },
+            "price_monthly": { "net": 6.90, "gross": 8.20 } },
+          { "location": "hil", "zone": "us-west",
+            "price_hourly": { "net": 0.01063, "gross": 0.01263 },
+            "price_monthly": { "net": 6.90, "gross": 8.20 } },
+          { "location": "sin", "zone": "ap-southeast",
+            "price_hourly": { "net": 0.01148, "gross": 0.01364 },
+            "price_monthly": { "net": 7.45, "gross": 8.86 } }
         ]
       },
       {
         "id": 27,
         "name": "cx42",
-        "description": "CX42 – 8 vCPU, 16 GB RAM, 160 GB Disk",
+        "description": "8 vCPU, 16 GB RAM, 160 GB SSD",
+        "energy_kwh_per_month": 24.0,
+        "co2_kg_per_month": 8.0,
         "prices": [
-          {
-            "location": "fsn1",
-            "price_hourly": {
-              "net": "0.026",
-              "gross": "0.03094"
-            },
-            "price_monthly": {
-              "net": "13.90",
-              "gross": "16.541"
-            },
-            "co2_per_hour_g": 1.05
-          }
+          { "location": "fsn1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0155, "gross": 0.0185 },
+            "price_monthly": { "net": 9.95, "gross": 11.87 } },
+          { "location": "nbg1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0155, "gross": 0.0185 },
+            "price_monthly": { "net": 9.95, "gross": 11.87 } },
+          { "location": "hel1", "zone": "eu-central",
+            "price_hourly": { "net": 0.0155, "gross": 0.0185 },
+            "price_monthly": { "net": 9.95, "gross": 11.87 } },
+          { "location": "ash", "zone": "us-east",
+            "price_hourly": { "net": 0.01938, "gross": 0.02313 },
+            "price_monthly": { "net": 12.44, "gross": 14.84 } },
+          { "location": "hil", "zone": "us-west",
+            "price_hourly": { "net": 0.01938, "gross": 0.02313 },
+            "price_monthly": { "net": 12.44, "gross": 14.84 } },
+          { "location": "sin", "zone": "ap-southeast",
+            "price_hourly": { "net": 0.02093, "gross": 0.02498 },
+            "price_monthly": { "net": 13.43, "gross": 16.02 } }
         ]
       }
-    ]
+    ],
+    "additional_costs": {
+      "traffic_per_tb": { "net": 0.85, "gross": 1.01 },
+      "backup_storage_per_gb": { "net": 0.02, "gross": 0.024 },
+      "snapshot_per_gb": { "net": 0.024, "gross": 0.0286 }
+    }
   },
-  "meta": {
-    "pagination": null
-  }
+  "meta": { "source": "mock", "version": "1.1.0" }
 }

@@ -1,14 +1,6 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-
-interface Server {
-  id: string;
-  name: string;
-  type: string;
-  location: string;
-  status: 'running' | 'stopped' | 'error';
-  priceEur: number;
-}
+import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
+import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
 
 @Component({
   selector: 'app-servers-page',
@@ -18,42 +10,32 @@ interface Server {
   styleUrls: ['./servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServersPage {
+export class ServersPage implements OnInit {
+  private api = inject(HetznerApiService);
+
   // UI state
   q = signal('');
   status = signal<'all' | 'running' | 'stopped'>('all');
-  loading = signal(true); // Show skeleton loader initially
 
-  // Mock data (loaded from JSON and transformed)
-  servers = signal<Server[]>([
-    {
-      id: '101',
-      name: 'web-node-01',
-      type: 'cx22',
-      location: 'nbg1',
-      status: 'running',
-      priceEur: 8.50
-    },
-    {
-      id: '102',
-      name: 'api-stage-01',
-      type: 'cx32',
-      location: 'fsn1',
-      status: 'stopped',
-      priceEur: 15.20
-    }
-  ]);
+  // API state von Service
+  get loading() { return this.api.loading; }
+  get servers() { return this.api.servers; }
+  get error() { return this.api.error; }
+  get isUsingMockData() { return this.api.isUsingMockData; }
 
-  // Simulierter Load (Skeleton sichtbar)
-  constructor() {
-    setTimeout(() => this.loading.set(false), 600);
+  ngOnInit() {
+    // Server beim Laden der Komponente laden
+    this.api.loadServers();
   }
 
   // Gefilterter View
   view = computed(() => {
+    const serverList = this.servers();
+    if (!serverList) return [];
+    
     const term = this.q().toLowerCase();
     const st = this.status();
-    return this.servers().filter(s => {
+    return serverList.filter(s => {
       const matchesQuery =
         s.name.toLowerCase().includes(term) ||
         s.type.toLowerCase().includes(term) ||
@@ -75,6 +57,47 @@ export class ServersPage {
 
   // TrackBy
   trackRow = (_: number, s: Server) => s.id;
+
+  // Country helpers
+  getCountryFlag(server: Server): string {
+    return this.api.getCountryFlag(server.country || '');
+  }
+
+  hasCountryData(server: Server): boolean {
+    return this.api.hasCountryData(server);
+  }
+
+  getLocationWithFlag(server: Server): string {
+    const city = server.datacenter?.location?.city || server.location;
+    if (this.hasCountryData(server)) {
+      return `${this.getCountryFlag(server)} ${city}`;
+    }
+    return city;
+  }
+
+  // Helper to get clean city name (removes state abbreviations)
+  getCleanCityName(server: Server): string {
+    const fullCity = server.datacenter?.location?.city || server.location;
+    // Remove state abbreviations like ", VA", ", OR", etc.
+    return fullCity.replace(/,\s*[A-Z]{2}$/, '');
+  }
+
+  // Hardware specs helpers - using structured data only
+  getCpuCount(server: Server): string {
+    return server.server_type?.cores ? `${server.server_type.cores}` : '0';
+  }
+
+  getRamSize(server: Server): string {
+    return server.server_type?.memory ? `${server.server_type.memory} GB` : '0 GB';
+  }
+
+  getDiskSize(server: Server): string {
+    return server.server_type?.disk ? `${server.server_type.disk} GB` : '0 GB';
+  }
+
+  getHardwareSpecs(server: Server): string {
+    return `${this.getCpuCount(server)} vCPU • ${this.getRamSize(server)} • ${this.getDiskSize(server)} SSD`;
+  }
 
   // Für Skeleton-Schleifen
   skeletonRows = Array.from({ length: 6 });
