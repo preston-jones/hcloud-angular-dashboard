@@ -1,10 +1,11 @@
-<div class="h-screen w-full grid"
-     [class]="collapsed() ? 'grid-cols-[72px_1fr]' : 'grid-cols-[280px_1fr]'">
-  <app-sidebar [collapsed]="collapsed()" (menu)="toggleSidebar()"></app-sidebar>
-
-  <div class="flex flex-col overflow-hidden">
-    <app-topbar (search)="onSearch($event)"></app-topbar>
-    <main class="p-6 overflow-auto bg-surface">
+<div class="h-screen w-full flex flex-col">
+  <!-- Global Header -->
+  <app-topbar (search)="onSearch($event)"></app-topbar>
+  
+  <!-- Content Area with Sidebar -->
+  <div class="flex-1 flex overflow-hidden">
+    <app-sidebar [collapsed]="collapsed()" (menu)="toggleSidebar()"></app-sidebar>
+    <main class="flex-1 p-6 overflow-auto bg-surface">
       <router-outlet></router-outlet>
     </main>
   </div>
