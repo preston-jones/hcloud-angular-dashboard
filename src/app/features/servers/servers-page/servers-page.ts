@@ -1,5 +1,6 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
 
 @Component({
@@ -12,6 +13,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
 })
 export class ServersPage implements OnInit {
   private api = inject(HetznerApiService);
+  private router = inject(Router);
 
   // UI state
   status = signal<'all' | 'running' | 'stopped'>('all');
@@ -49,6 +51,11 @@ export class ServersPage implements OnInit {
   onStatusChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.status.set(select.value as 'all' | 'running' | 'stopped');
+  }
+
+  // Navigation
+  viewServerDetails(server: Server) {
+    this.router.navigate(['/servers', server.id]);
   }
 
   // TrackBy

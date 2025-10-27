@@ -89,7 +89,7 @@
       <!-- Table Rows as Cards -->
       <div class="space-y-3">
         @for (s of view(); track trackRow($index, s)) {
-          <div class="server-card cursor-pointer">
+          <div class="server-card cursor-pointer" (click)="viewServerDetails(s)">
             <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center text-sm">
               <div class="font-medium text-primary">{{ s.name }}</div>
               <div class="text-soft">{{ s.type }}</div>
@@ -126,7 +126,7 @@
   @if (!loading()) {
     <div class="md:hidden space-y-3">
       @for (s of view(); track trackRow($index, s)) {
-        <div class="server-card">
+        <div class="server-card" (click)="viewServerDetails(s)">
           <div class="flex items-center justify-between">
             <div class="name">{{ s.name }}</div>
             <div class="status-dot" [ngClass]="s.status"></div>

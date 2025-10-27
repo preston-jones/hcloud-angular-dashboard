@@ -1,0 +1,185 @@
+/* Server Detail Card */
+.server-detail-card {
+  background: var(--surface-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.server-detail-card:hover {
+  border-color: var(--border-hover);
+  background: color-mix(in oklab, var(--surface-elev) 98%, var(--text) 2%);
+}
+
+/* Hardware Specification Cards */
+.spec-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.spec-card:hover {
+  background: color-mix(in oklab, var(--surface) 96%, var(--text) 4%);
+  border-color: var(--border-hover);
+}
+
+.spec-icon {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.spec-content {
+  flex: 1;
+}
+
+.spec-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-soft);
+  margin-bottom: 2px;
+}
+
+.spec-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Information Rows */
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.action-btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.action-btn-primary:hover {
+  background: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.action-btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.action-btn-secondary:hover {
+  background: color-mix(in oklab, var(--surface) 92%, var(--text) 8%);
+  border-color: var(--border-hover);
+}
+
+.action-btn-danger {
+  background: var(--surface);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.action-btn-danger:hover {
+  background: color-mix(in oklab, #ef4444 10%, var(--surface) 90%);
+  border-color: #dc2626;
+}
+
+/* Status Dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.running {
+  background: #10b981;
+}
+
+.status-dot.stopped {
+  background: #6b7280;
+}
+
+.status-dot.error {
+  background: #ef4444;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--surface) 85%, var(--text) 15%) 0%,
+    color-mix(in oklab, var(--surface) 75%, var(--text) 25%) 50%,
+    color-mix(in oklab, var(--surface) 85%, var(--text) 15%) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .server-detail-card {
+    padding: 16px;
+  }
+  
+  .spec-card {
+    padding: 12px;
+  }
+  
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
