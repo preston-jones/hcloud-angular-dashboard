@@ -1,1 +1,115 @@
-/* You can add global styles to this file, and also import other style files */
+/* === Local Fonts === */
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/inter/inter-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/inter/inter-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/inter/inter-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/inter/inter-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/assets/fonts/roboto/roboto-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/assets/fonts/roboto/roboto-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/assets/fonts/roboto/roboto-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* Tailwind Direktiven */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Theme Tokens ===== */
+:root {
+  /* Surfaces & Text */
+  --surface: #F8FAFC;           /* Light BG */
+  --surface-elev: #FFFFFF;      /* Cards */
+  --text: #0F172A;              /* slate-900 */
+  --text-soft: #334155;         /* slate-600 */
+  --border: #E2E8F0;            /* slate-200 */
+
+  /* Brand */
+  --primary: #E40046;
+  --accent: #2563EB;
+  --success: #16A34A;
+
+  /* Sidebar */
+  --sidebar: #1E293B;
+  --sidebar-text: #E5E7EB;
+}
+
+:root.dark {
+  --surface: #0B1220;           /* Dark BG (leicht bläulich, angenehm) */
+  --surface-elev: #0F172A;      /* Elevated Cards */
+  --text: #E5E7EB;              /* slate-200 */
+  --text-soft: #94A3B8;         /* slate-400 */
+  --border: #1F2A37;            /* dunkle Border */
+
+  --sidebar: #0B1220;
+  --sidebar-text: #CBD5E1;
+}
+
+/* ===== Minimal Utility Bridge (Tailwind-friendly) ===== */
+@layer base {
+  html, body {
+    height: 100%;
+    background: var(--surface);
+    color: var(--text);
+    font-family: theme('fontFamily.sans');
+  }
+}
+
+@layer components {
+  .card { @apply rounded-2xl p-5 shadow; background: var(--surface-elev); }
+  .badge { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .badge--ok   { @apply text-green-700; background: color-mix(in oklab, #16A34A 12%, transparent); }
+  .badge--warn { @apply text-amber-800; background: color-mix(in oklab, #F59E0B 18%, transparent); }
+  .badge--err  { @apply text-rose-800;  background: color-mix(in oklab, #E11D48 15%, transparent); }
+}
+
+@layer utilities {
+  .bg-surface       { background: var(--surface); }
+  .bg-surface-elev  { background: var(--surface-elev); }
+  .text-ink         { color: var(--text); }
+  .text-soft        { color: var(--text-soft); }
+  .border-ui        { border-color: var(--border); }
+  .bg-sidebar       { background: var(--sidebar); }
+  .text-sidebar     { color: var(--sidebar-text); }
+}
