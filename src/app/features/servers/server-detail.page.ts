@@ -2,6 +2,7 @@ import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HetznerApiService } from '../../core/hetzner-api.service';
+import { DeleteConfirmationDialogComponent } from '../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 
 type Status = 'running' | 'stopped' | 'migrating' | 'initializing' | 'error';
 
@@ -26,7 +27,7 @@ interface ServerDetail {
 @Component({
   selector: 'app-server-detail',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, DeleteConfirmationDialogComponent],
   templateUrl: './server-detail.page.html',
   styleUrls: ['./server-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,6 +40,7 @@ export class ServerDetailPage {
   loading = signal(true);
   id = signal(this.route.snapshot.paramMap.get('id') ?? '');
   data = signal<ServerDetail | null>(null);
+  showDeleteDialog = signal(false);
 
   constructor() {
     // Initialize user servers first, then load server data
@@ -99,8 +101,13 @@ export class ServerDetailPage {
   }
 
   deleteServer(): void {
+    // Show confirmation dialog
+    this.showDeleteDialog.set(true);
+  }
+
+  confirmDelete(): void {
     const currentData = this.data();
-    console.log('Delete server clicked:', currentData?.id);
+    console.log('Delete server confirmed:', currentData?.id);
     
     if (currentData) {
       // Check if we're in mock mode first
@@ -114,6 +121,13 @@ export class ServerDetailPage {
       }
       // In API mode, the demo dialog will show and user stays on the page
     }
+    
+    // Close the confirmation dialog
+    this.showDeleteDialog.set(false);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog.set(false);
   }
 
   rebootServer(): void {

@@ -149,3 +149,12 @@
     </div>
   }
 </section>
+
+<!-- Delete Confirmation Dialog -->
+@if (showDeleteDialog()) {
+  <app-delete-confirmation-dialog 
+    [serverName]="data()?.name || 'Server'"
+    (cancel)="cancelDelete()"
+    (confirm)="confirmDelete()">
+  </app-delete-confirmation-dialog>
+}
