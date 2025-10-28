@@ -7,7 +7,7 @@ export const routes: Routes = [
     path: '',
     component: ShellComponent,  // or loadComponent for lazy loading
     children: [
-      { path: 'servers', loadComponent: () => import('./features/servers/servers-page/servers-page').then(m => m.ServersPage) },
+      { path: 'servers', loadChildren: () => import('./features/servers/servers.routes').then(m => m.SERVERS_ROUTES) },
       { path: '', redirectTo: 'servers', pathMatch: 'full' },
       { path: '**', redirectTo: 'servers' }
     ]

@@ -1,0 +1,130 @@
+<section class="space-y-4">
+  <!-- Actions/Title Bar -->
+  <div class="card p-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a routerLink="/servers" class="text-soft hover:underline">← Servers</a>
+      <div class="divider"></div>
+      <h1 class="text-ink text-xl font-semibold">{{ data()?.name || 'Server' }}</h1>
+      <span class="chip">{{ data()?.type }}</span>
+      <span class="chip">{{ data()?.image }}</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button class="btn ghost">Reboot</button>
+      <button class="btn ghost">Console</button>
+      <button class="btn primary">{{ isRunning() ? 'Disable' : 'Enable' }}</button>
+    </div>
+  </div>
+
+  <!-- Skeleton während Laden -->
+  @if (loading()) {
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="card p-4 space-y-3 md:col-span-2">
+        <div class="skeleton h-6 w-48"></div>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="skeleton h-16"></div>
+          <div class="skeleton h-16"></div>
+          <div class="skeleton h-16"></div>
+          <div class="skeleton h-16"></div>
+        </div>
+        <div class="skeleton h-40"></div>
+      </div>
+      <div class="card p-4 space-y-3">
+        <div class="skeleton h-6 w-32"></div>
+        <div class="skeleton h-5"></div>
+        <div class="skeleton h-5 w-2/3"></div>
+        <div class="skeleton h-5 w-1/2"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading()) {
+    <div class="grid gap-4 md:grid-cols-3">
+      <!-- Overview -->
+      <div class="card p-4 md:col-span-2">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="section-title">CX Overview</h2>
+          <span class="status-dot" [ngClass]="data()?.status"></span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="kpi">
+            <div class="kpi-title">VCPU</div>
+            <div class="kpi-value">{{ data()?.vcpu }}</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">RAM</div>
+            <div class="kpi-value">{{ data()?.ramGB }} GB</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">Disk</div>
+            <div class="kpi-value">{{ data()?.diskGB }} GB</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">Price</div>
+            <div class="kpi-value">€{{ data()?.priceEur?.toFixed(2) }}/mo</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="sub-title">Server Activities</h3>
+          <ul class="timeline">
+            <li>
+              <span class="dot ok"></span>
+              <span>Server created</span>
+              <span class="when">6 minutes ago</span>
+            </li>
+            <li>
+              <span class="dot ok"></span>
+              <span>Image installed ({{ data()?.image }})</span>
+              <span class="when">5 minutes ago</span>
+            </li>
+            <li>
+              <span class="dot warn"></span>
+              <span>Public network enabled</span>
+              <span class="when">2 minutes ago</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Location / Networking -->
+      <div class="card p-4">
+        <h2 class="section-title">Server Location</h2>
+        <div class="stack">
+          <div class="row">
+            <span class="label">Datacenter</span>
+            <span class="value">{{ data()?.datacenter }}</span>
+          </div>
+          <div class="row">
+            <span class="label">City</span>
+            <span class="value">
+              {{ data()?.location === 'fsn1' ? 'Falkenstein' : data()?.location === 'hel1' ? 'Helsinki' : data()?.location }}
+            </span>
+          </div>
+          <div class="row">
+            <span class="label">Country</span>
+            <span class="value">{{ data()?.country }}</span>
+          </div>
+          <div class="row">
+            <span class="label">Zone</span>
+            <span class="value">{{ data()?.zone }}</span>
+          </div>
+        </div>
+
+        <h3 class="sub-title mt-4">Networking</h3>
+        <div class="stack">
+          <div class="row">
+            <span class="label">IPv4</span>
+            <span class="value mono">{{ data()?.ipv4 }}</span>
+          </div>
+          <div class="row">
+            <span class="label">IPv6</span>
+            <span class="value mono">{{ data()?.ipv6 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>
