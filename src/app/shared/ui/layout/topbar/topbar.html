@@ -43,5 +43,8 @@
 
 <!-- Settings Dialog -->
 @if (showSettings()) {
-  <app-settings-dialog (close)="closeSettings()"></app-settings-dialog>
+  <app-settings-dialog 
+    (close)="closeSettings()" 
+    (saveAndClose)="saveSettings()">
+  </app-settings-dialog>
 }

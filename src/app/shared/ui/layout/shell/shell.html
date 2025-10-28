@@ -9,4 +9,9 @@
       <router-outlet></router-outlet>
     </main>
   </div>
+  
+  <!-- Demo Restriction Dialog -->
+  @if (api.showDemoRestrictionDialog()) {
+    <app-demo-restriction-dialog (close)="api.closeDemoRestrictionDialog()"></app-demo-restriction-dialog>
+  }
 </div>

@@ -104,6 +104,7 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
 })
 export class SettingsDialogComponent {
   @Output() close = new EventEmitter<void>();
+  @Output() saveAndClose = new EventEmitter<void>();
   
   private apiService = inject(HetznerApiService);
   
@@ -132,7 +133,7 @@ export class SettingsDialogComponent {
     }
     
     console.log('Settings saved successfully');
-    this.close.emit();
+    this.saveAndClose.emit();
   }
 
   onBackdropClick(event: Event): void {

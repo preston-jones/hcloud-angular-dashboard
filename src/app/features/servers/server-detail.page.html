@@ -2,7 +2,11 @@
   <!-- Actions/Title Bar -->
   <div class="card p-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a routerLink="/servers" class="text-soft hover:underline">← Servers</a>
+      <button 
+        (click)="goBackToMyServers()" 
+        class="text-soft hover:underline cursor-pointer bg-none border-none">
+        ← My Servers
+      </button>
       <div class="divider"></div>
       <h1 class="text-ink text-xl font-semibold">{{ data()?.name || 'Server' }}</h1>
       <span class="chip">{{ data()?.type }}</span>
@@ -10,9 +14,26 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <button class="btn ghost">Reboot</button>
-      <button class="btn ghost">Console</button>
-      <button class="btn primary">{{ isRunning() ? 'Disable' : 'Enable' }}</button>
+      <button 
+        (click)="deleteServer()" 
+        class="text-red-600 hover:text-red-800 font-bold underline bg-none border-none cursor-pointer">
+        Delete
+      </button>
+      <button 
+        (click)="rebootServer()" 
+        class="btn ghost">
+        Reboot
+      </button>
+      <button 
+        (click)="openConsole()" 
+        class="btn ghost">
+        Console
+      </button>
+      <button 
+        class="btn primary" 
+        (click)="toggleServerStatus()">
+        {{ isRunning() ? 'Disable' : 'Enable' }}
+      </button>
     </div>
   </div>
 

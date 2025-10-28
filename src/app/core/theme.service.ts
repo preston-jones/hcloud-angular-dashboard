@@ -10,7 +10,7 @@ export class ThemeService {
   set(theme: Theme) {
     this.theme.set(theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem(STORAGE_KEY, theme);
+    sessionStorage.setItem(STORAGE_KEY, theme);
   }
 
   toggle() {

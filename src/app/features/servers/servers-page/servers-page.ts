@@ -18,6 +18,9 @@ export class ServersPage implements OnInit {
   // UI state
   status = signal<'all' | 'running' | 'stopped'>('all');
   
+  // Selection state for server creation
+  selectedServerId = signal<string | null>(null);
+  
   // Sorting state
   sortColumn = signal<string | null>(null);
   sortDirection = signal<'asc' | 'desc' | 'none'>('none');
@@ -30,30 +33,34 @@ export class ServersPage implements OnInit {
   get searchQuery() { return this.api.searchQuery; }
 
   ngOnInit() {
-    // Server beim Laden der Komponente laden
-    this.api.loadServers();
+    // Load server types (available configurations) for this page
+    this.api.loadServerTypes();
   }
 
   retry(): void {
-    this.api.loadServers();
+    this.api.loadServerTypes();
   }
 
-  // Gefilterter View
+  // Only show available server types (not actual servers)
+  availableServers = computed(() => {
+    const servers = this.servers() || [];
+    return servers.filter(s => s.status === 'available');
+  });
+
+  // Gefilterter View for available servers
   view = computed(() => {
-    const serverList = this.servers();
+    const serverList = this.availableServers();
     if (!serverList) return [];
     
     const term = this.searchQuery().toLowerCase();
-    const st = this.status();
     
-    // Filter first
+    // Filter first - remove status filter since all are 'available'
     const filtered = serverList.filter(s => {
       const matchesQuery =
         s.name.toLowerCase().includes(term) ||
         s.type.toLowerCase().includes(term) ||
         s.location.toLowerCase().includes(term);
-      const matchesStatus = st === 'all' || s.status === st;
-      return matchesQuery && matchesStatus;
+      return matchesQuery;
     });
 
     // Then apply sorting
@@ -141,9 +148,49 @@ export class ServersPage implements OnInit {
     });
   }
 
-  // Navigation
+  // Navigation - for server types, we might want to show creation flow
   viewServerDetails(server: Server) {
+    // For available server types, we could navigate to create server with this type
+    // For now, navigate to the same detail page but it will show as "available"
     this.router.navigate(['/servers', server.id]);
+  }
+
+  // Selection methods
+  selectServer(server: Server): void {
+    this.selectedServerId.set(server.id);
+  }
+
+  isSelected(server: Server): boolean {
+    return this.selectedServerId() === server.id;
+  }
+
+  hasSelection(): boolean {
+    return this.selectedServerId() !== null;
+  }
+
+  getSelectedServer(): Server | null {
+    const selectedId = this.selectedServerId();
+    if (!selectedId) return null;
+    
+    const servers = this.availableServers();
+    return servers.find(s => s.id === selectedId) || null;
+  }
+
+  createSelectedServer(): void {
+    const selected = this.getSelectedServer();
+    if (selected) {
+      // Check if we're in mock mode first
+      const mode = sessionStorage.getItem('hz.mode') ?? 'mock';
+      
+      this.api.createServerFromType(selected);
+      
+      // Only navigate back if we're in mock mode (actual creation happened)
+      if (mode === 'mock') {
+        // Navigate back to my servers
+        this.router.navigate(['/my-servers']);
+      }
+      // In API mode, the demo dialog will show and user stays on the current page
+    }
   }
 
   // TrackBy
@@ -196,17 +243,33 @@ export class ServersPage implements OnInit {
   // Get sort indicator for column header
   getSortIndicator(column: string): string {
     if (this.sortColumn() !== column) {
-      return '⇅'; // Default sort icon when not sorted
+      return '▲▼'; // Default: both arrows when not sorted
     }
     
     switch (this.sortDirection()) {
       case 'asc':
-        return '▲'; // Ascending arrow
+        return '▲'; // Ascending arrow only
       case 'desc':
-        return '▼'; // Descending arrow
+        return '▼'; // Descending arrow only
       default:
-        return '⇅'; // Default sort icon
+        return '▲▼'; // Default: both arrows
     }
+  }
+
+  // Check if up arrow should be visible
+  showUpArrow(column: string): boolean {
+    if (this.sortColumn() !== column) {
+      return true; // Show both arrows when not sorted
+    }
+    return this.sortDirection() === 'asc' || this.sortDirection() === 'none';
+  }
+
+  // Check if down arrow should be visible
+  showDownArrow(column: string): boolean {
+    if (this.sortColumn() !== column) {
+      return true; // Show both arrows when not sorted
+    }
+    return this.sortDirection() === 'desc' || this.sortDirection() === 'none';
   }
 
   // Check if column is currently being sorted

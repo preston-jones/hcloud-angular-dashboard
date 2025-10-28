@@ -17,7 +17,7 @@ export class SidebarComponent {
   @Output() menu = new EventEmitter<void>();
 
   nav: NavItem[] = [
-    { label: 'Servers',   path: '/servers',   icon: '🖥️' },
+    { label: 'Servers', path: '/my-servers', icon: '🖥️' },
     { label: 'Locations', path: '/locations', icon: '📍' },
     { label: 'Analyzer',  path: '/analyzer',  icon: '🌿' },
   ];

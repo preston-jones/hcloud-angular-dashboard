@@ -3,103 +3,66 @@
     {
       "id": 1,
       "name": "fsn1",
-      "city": "Falkenstein",
+      "description": "Falkenstein 1 - DC 2",
       "country": "DE",
-      "description": "Falkenstein Datacenter Park – eu-central zone",
-      "network_zone": "eu-central",
-      "datacenter": {
-        "id": 1,
-        "name": "fsn1-dc14",
-        "country": "DE",
-        "region": "Saxony",
-        "latitude": 50.478,
-        "longitude": 12.371
-      }
+      "city": "Falkenstein",
+      "latitude": 50.478,
+      "longitude": 12.370
     },
     {
       "id": 2,
       "name": "nbg1",
-      "city": "Nürnberg",
+      "description": "Nuremberg 1 - DC 3",
       "country": "DE",
-      "description": "Nuremberg Datacenter Park – eu-central zone",
-      "network_zone": "eu-central",
-      "datacenter": {
-        "id": 2,
-        "name": "nbg1-dc3",
-        "country": "DE",
-        "region": "Bavaria",
-        "latitude": 49.452,
-        "longitude": 11.076
-      }
+      "city": "Nuremberg",
+      "latitude": 49.452,
+      "longitude": 11.077
     },
     {
       "id": 3,
       "name": "hel1",
-      "city": "Helsinki",
+      "description": "Helsinki 1 - DC 2",
       "country": "FI",
-      "description": "Helsinki Datacenter – eu-central zone",
-      "network_zone": "eu-central",
-      "datacenter": {
-        "id": 3,
-        "name": "hel1-dc2",
-        "country": "FI",
-        "region": "Uusimaa",
-        "latitude": 60.169,
-        "longitude": 24.938
-      }
+      "city": "Helsinki",
+      "latitude": 60.169,
+      "longitude": 24.938
     },
     {
       "id": 4,
       "name": "ash",
-      "city": "Ashburn, VA",
+      "description": "Ashburn, VA",
       "country": "US",
-      "description": "US-East Region – Ashburn Datacenter",
-      "network_zone": "us-east",
-      "datacenter": {
-        "id": 4,
-        "name": "ash-dc1",
-        "country": "US",
-        "region": "Virginia",
-        "latitude": 39.043,
-        "longitude": -77.487
-      }
+      "city": "Ashburn",
+      "latitude": 39.021,
+      "longitude": -77.489
     },
     {
       "id": 5,
       "name": "hil",
-      "city": "Hillsboro, OR",
+      "description": "Hillsboro, OR",
       "country": "US",
-      "description": "US-West Region – Hillsboro Datacenter",
-      "network_zone": "us-west",
-      "datacenter": {
-        "id": 5,
-        "name": "hil-dc1",
-        "country": "US",
-        "region": "Oregon",
-        "latitude": 45.523,
-        "longitude": -122.989
-      }
+      "city": "Hillsboro",
+      "latitude": 45.523,
+      "longitude": -122.989
     },
     {
       "id": 6,
       "name": "sin",
-      "city": "Singapur",
+      "description": "Singapore",
       "country": "SG",
-      "description": "Asia-Pacific Region – Singapore Datacenter",
-      "network_zone": "ap-southeast",
-      "datacenter": {
-        "id": 6,
-        "name": "sin-dc1",
-        "country": "SG",
-        "region": "Singapore",
-        "latitude": 1.352,
-        "longitude": 103.820
-      }
+      "city": "Singapore",
+      "latitude": 1.290,
+      "longitude": 103.851
     }
   ],
   "meta": {
-    "version": "1.0.0",
-    "source": "mock",
-    "generated": "2025-10-27T13:00:00Z"
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 6
+    }
   }
 }

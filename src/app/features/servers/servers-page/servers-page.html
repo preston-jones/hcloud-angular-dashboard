@@ -1,19 +1,17 @@
 <section class="space-y-4">
   <!-- Toolbar -->
   <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <h1 class="text-xl font-semibold text-ink">Servers</h1>
+    <h1 class="text-xl font-semibold text-ink">Server List</h1>
 
     <div class="flex flex-wrap gap-2 items-center">
-      <select
-        class="rounded-lg border border-ui bg-surface-elev text-ink px-3 py-2"
-        (change)="onStatusChange($event)">
-        <option value="all">All status</option>
-        <option value="running">Running</option>
-        <option value="stopped">Stopped</option>
-      </select>
+      <span class="text-sm text-soft">Available server configurations</span>
 
-      <button class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors">
-        Add Server
+      <button 
+        class="px-4 py-2 rounded-lg transition-colors"
+        [class]="hasSelection() ? 'text-white bg-primary hover:bg-primary-700' : 'text-gray-400 bg-gray-200 cursor-not-allowed'"
+        [disabled]="!hasSelection()"
+        (click)="createSelectedServer()">
+        Create Server
       </button>
     </div>
   </header>
@@ -86,18 +84,20 @@
   <!-- EMPTY STATE -->
   @if (!loading() && !error() && view().length === 0) {
     <div class="text-center py-12">
-      <div class="text-4xl mb-4">🖥️</div>
-      <h2 class="text-lg font-medium text-ink mb-2">No servers found</h2>
+      <div class="text-4xl mb-4">�</div>
+      <h2 class="text-lg font-medium text-ink mb-2">No server types available</h2>
       <p class="text-soft mb-6">
         @if (isUsingMockData) {
-          You're using mock data and no servers are available.
+          Mock data is not available or the file could not be loaded.
         } @else {
-          You don't have any servers in your Hetzner Cloud project yet.
+          Could not load available server configurations from Hetzner Cloud API.
         }
       </p>
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <button class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors">
-          Create Server
+        <button 
+          class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+          (click)="retry()">
+          Retry
         </button>
         @if (!isUsingMockData) {
           <a 
@@ -116,7 +116,8 @@
     <div class="hidden md:block space-y-4">
       <!-- Table Header -->
       <div class="px-4 py-3">
-        <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 text-sm text-soft font-bold">
+        <div class="grid grid-cols-[auto_2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 text-sm text-soft font-bold">
+          <span></span> <!-- Empty space for checkbox column -->
           <button 
             class="sortable-header text-left"
             [class.sorted]="isColumnSorted('name')"
@@ -124,7 +125,10 @@
             [attr.aria-label]="'Sort by name ' + (sortColumn() === 'name' ? sortDirection() : 'none')"
             type="button">
             <span>Name</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('name') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('name') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('name') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left"
@@ -133,7 +137,10 @@
             [attr.aria-label]="'Sort by type ' + (sortColumn() === 'type' ? sortDirection() : 'none')"
             type="button">
             <span>Type</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('type') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('type') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('type') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left text-xs"
@@ -142,7 +149,10 @@
             [attr.aria-label]="'Sort by vCPUs ' + (sortColumn() === 'vcpus' ? sortDirection() : 'none')"
             type="button">
             <span>vCPUs</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('vcpus') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('vcpus') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('vcpus') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left text-xs"
@@ -151,7 +161,10 @@
             [attr.aria-label]="'Sort by RAM ' + (sortColumn() === 'ram' ? sortDirection() : 'none')"
             type="button">
             <span>RAM</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('ram') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('ram') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('ram') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left text-xs"
@@ -160,7 +173,10 @@
             [attr.aria-label]="'Sort by SSD storage ' + (sortColumn() === 'ssd' ? sortDirection() : 'none')"
             type="button">
             <span>SSD</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('ssd') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('ssd') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('ssd') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left"
@@ -169,7 +185,10 @@
             [attr.aria-label]="'Sort by location ' + (sortColumn() === 'location' ? sortDirection() : 'none')"
             type="button">
             <span>Location</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('location') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('location') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('location') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-left"
@@ -178,7 +197,10 @@
             [attr.aria-label]="'Sort by status ' + (sortColumn() === 'status' ? sortDirection() : 'none')"
             type="button">
             <span>Status</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('status') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('status') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('status') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
           <button 
             class="sortable-header text-right"
@@ -187,7 +209,10 @@
             [attr.aria-label]="'Sort by price ' + (sortColumn() === 'price' ? sortDirection() : 'none')"
             type="button">
             <span>Price</span>
-            <span class="sort-arrow" aria-hidden="true">{{ getSortIndicator('price') }}</span>
+            <span class="sort-arrow" aria-hidden="true">
+              <span class="sort-arrow-up" [style.display]="showUpArrow('price') ? 'block' : 'none'">▲</span>
+              <span class="sort-arrow-down" [style.display]="showDownArrow('price') ? 'block' : 'none'">▼</span>
+            </span>
           </button>
         </div>
       </div>
@@ -195,8 +220,15 @@
       <!-- Table Rows as Cards -->
       <div class="space-y-3">
         @for (s of view(); track trackRow($index, s)) {
-          <div class="server-card cursor-pointer" (click)="viewServerDetails(s)">
-            <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center text-sm">
+          <div class="server-card cursor-pointer" (click)="selectServer(s)" [class.selected]="isSelected(s)">
+            <div class="grid grid-cols-[auto_2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center text-sm">
+              <div class="flex items-center">
+                <input 
+                  type="radio" 
+                  [checked]="isSelected(s)"
+                  (click)="$event.stopPropagation(); selectServer(s)"
+                  class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2">
+              </div>
               <div class="font-medium text-primary">{{ s.name }}</div>
               <div class="text-soft">{{ s.type }}</div>
               <div class="text-soft text-xs">{{ getCpuCount(s) }}</div>
@@ -232,9 +264,16 @@
   @if (!loading() && !error() && view().length > 0) {
     <div class="md:hidden space-y-3">
       @for (s of view(); track trackRow($index, s)) {
-        <div class="server-card" (click)="viewServerDetails(s)">
+        <div class="server-card" (click)="selectServer(s)" [class.selected]="isSelected(s)">
           <div class="flex items-center justify-between">
-            <div class="name">{{ s.name }}</div>
+            <div class="flex items-center gap-3">
+              <input 
+                type="radio" 
+                [checked]="isSelected(s)"
+                (click)="$event.stopPropagation(); selectServer(s)"
+                class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2">
+              <div class="name">{{ s.name }}</div>
+            </div>
             <div class="status-dot" [ngClass]="s.status"></div>
           </div>
           <div class="meta">
