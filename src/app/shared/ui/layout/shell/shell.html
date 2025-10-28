@@ -1,17 +1,19 @@
 <div class="h-screen w-full flex flex-col">
   <!-- Global Header - spans full width -->
   <app-topbar (search)="onSearch($event)"></app-topbar>
-  
+
   <!-- Content Area with Sidebar -->
   <div class="flex-1 flex overflow-hidden">
     <app-sidebar [collapsed]="collapsed()" (menu)="toggleSidebar()"></app-sidebar>
-    <main class="flex-1 p-6 overflow-auto bg-surface">
-      <router-outlet></router-outlet>
+    <main class="flex-1 p-6 overflow-auto bg-surface flex justify-center">
+      <div class="w-full max-w-[1440px]">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   </div>
-  
+
   <!-- Demo Restriction Dialog -->
   @if (api.showDemoRestrictionDialog()) {
-    <app-demo-restriction-dialog (close)="api.closeDemoRestrictionDialog()"></app-demo-restriction-dialog>
+  <app-demo-restriction-dialog (close)="api.closeDemoRestrictionDialog()"></app-demo-restriction-dialog>
   }
 </div>

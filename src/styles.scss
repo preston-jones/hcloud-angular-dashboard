@@ -200,18 +200,59 @@
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
 
+  /* Custom width overrides */
+  .w-28 {
+    width: 9rem !important;
+  }
+
+  .w-32 {
+    width: 9rem !important;
+  }
+
   @keyframes skeleton-pulse {
-    0%, 100% { opacity: 0.35; }
-    50% { opacity: 0.85; }
+
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+
+    50% {
+      opacity: 0.85;
+    }
   }
 
   /* optional Varianten */
-  .skeleton--sm { height: 0.75em; }
-  .skeleton--lg { height: 1.5em; }
+  .skeleton--sm {
+    height: 0.75em;
+  }
+
+  .skeleton--lg {
+    height: 1.5em;
+  }
 
   /* Fixed width button utilities to prevent text shifting */
-  .btn-fixed-sm { width: 4rem; min-width: 4rem; } /* w-16 */
-  .btn-fixed-md { width: 5rem; min-width: 5rem; } /* w-20 */
-  .btn-fixed-lg { width: 8rem; min-width: 8rem; } /* w-32 */
-  .btn-fixed-xl { width: 11rem; min-width: 11rem; } /* w-44 */
+  .btn-fixed-sm {
+    width: 4rem;
+    min-width: 4rem;
+  }
+
+  /* w-16 */
+  .btn-fixed-md {
+    width: 5rem;
+    min-width: 5rem;
+  }
+
+  /* w-20 */
+  .btn-fixed-lg {
+    width: 8rem;
+    min-width: 8em;
+  }
+
+  /* w-32 */
+  .btn-fixed-xl {
+    width: 11rem;
+    min-width: 11rem;
+  }
+
+  /* w-44 */
 }
