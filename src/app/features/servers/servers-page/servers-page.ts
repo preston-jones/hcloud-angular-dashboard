@@ -34,6 +34,10 @@ export class ServersPage implements OnInit {
     this.api.loadServers();
   }
 
+  retry(): void {
+    this.api.loadServers();
+  }
+
   // Gefilterter View
   view = computed(() => {
     const serverList = this.servers();

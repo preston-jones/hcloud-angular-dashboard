@@ -1,7 +1,18 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { catchError, of, switchMap, map } from 'rxjs';
+import { catchError, of, map } from 'rxjs';
+
+// Constants
+const REAL_BASE = 'https://api.hetzner.cloud/v1';
+const MOCK_BASE = '/assets/mock';
+
+// Helper functions for dynamic mode switching
+const getMode = () => (localStorage.getItem('hz.mode') ?? 'mock');
+const apiBase = () => (getMode() === 'real' ? REAL_BASE : MOCK_BASE);
+const authHdr = () => {
+  const t = localStorage.getItem('hz.token');
+  return getMode() === 'real' && t ? { Authorization: `Bearer ${t}` } : {};
+};
 
 export interface Server {
   id: string;
@@ -10,6 +21,9 @@ export interface Server {
   location: string;
   status: 'running' | 'stopped' | 'error';
   priceEur: number;
+  vcpus: number;
+  ram: number;
+  ssd: number;
   // Erweiterte Hetzner-Felder für später
   created?: string;
   server_type?: { name: string; cores: number; memory: number; disk: number; description?: string; };
@@ -33,7 +47,7 @@ export class HetznerApiService {
 
   /** Mock-Modus? (assets/mock vs echte API) */
   private isMockMode(): boolean {
-    return !environment.apiBase.startsWith('http') || environment.apiBase.includes('assets');
+    return getMode() === 'mock';
   }
 
   /** Set search query from topbar */
@@ -41,65 +55,75 @@ export class HetznerApiService {
     this.searchQuery.set(query);
   }
 
-  /** Auth-Headers für echte API */
-  private authHeaders(): HttpHeaders {
-    const token = localStorage.getItem('HCLOUD_TOKEN');
-    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-  }
-
-  /** Load Servers mit Transformation */
+  /** Load Servers mit dynamischer Mode-Erkennung */
   loadServers() {
     this.loading.set(true);
     this.error.set(null);
 
-    const url = this.isMockMode() 
-      ? 'assets/mock/servers.json'  // Relativer Pfad für Angular
-      : `${environment.apiBase}/servers`;
+    // Dynamic endpoint based on mode - Beispiel-GET wie beschrieben
+    const endpoint = apiBase() + (getMode() === 'real' ? '/servers' : '/servers.json');
+    const headers = authHdr();
 
-    const request$ = this.isMockMode()
-      ? this.http.get<ServersResponse>(url)
-      : this.http.get<ServersResponse>(url, { headers: this.authHeaders() });
+    // Use proper headers object - fix for TypeScript
+    const httpOptions = headers.Authorization ? { headers: new HttpHeaders(headers) } : {};
 
-    request$.pipe(
-      map(response => this.transformServersData(response)),
+    console.log('Loading servers in mode:', getMode(), 'from endpoint:', endpoint);
+
+    this.http.get<any>(endpoint, httpOptions).pipe(
+      map(response => {
+        console.log('Raw API response:', response);
+        // Handle both mock format and real API format
+        // Both mock and real API have { servers: [...] } structure
+        const serverList = response.servers || response;
+        console.log('Extracted server list:', serverList);
+        return this.transformServersData(serverList);
+      }),
       catchError((err: HttpErrorResponse) => {
         console.error('Server loading failed:', err);
-        
-        // Fallback zu Mock wenn konfiguriert und nicht bereits im Mock-Modus
-        if (environment.useMockFallback && !this.isMockMode()) {
-          console.warn('🔄 Falling back to mock data...');
-          return this.http.get<ServersResponse>('assets/mock/servers.json').pipe(
-            map(response => this.transformServersData(response)),
-            catchError(() => of([]))
-          );
-        }
-        
         this.error.set(err.message || 'Failed to load servers');
         return of([]);
       })
     ).subscribe(servers => {
+      console.log('Transformed servers:', servers);
       this.servers.set(servers);
       this.loading.set(false);
     });
   }
 
   /** Transformiert Hetzner API Response zu unserem Interface */
-  private transformServersData(response: ServersResponse): Server[] {
-    const servers = response.servers || [];
+  private transformServersData(serverList: any[]): Server[] {
+    if (!Array.isArray(serverList)) {
+      return [];
+    }
     
-    return servers.map((server: any) => ({
-      id: server.id?.toString() || '',
-      name: server.name || 'Unknown',
-      type: server.server_type?.name || 'Unknown',
-      location: server.datacenter?.location?.name || 'Unknown',
-      status: this.mapStatus(server.status),
-      priceEur: this.calculatePrice(server.server_type),
-      // Zusätzliche Felder für später
-      created: server.created,
-      server_type: server.server_type,
-      datacenter: server.datacenter,
-      country: server.datacenter?.location?.country || 'Unknown'
-    }));
+    return serverList.map((s: any) => {
+      // Both mock and real API use the same structure now
+      return {
+        id: s.id?.toString?.() ?? s.id,
+        name: s.name || 'Unknown',
+        type: s.server_type?.name || 'Unknown',                 // Same field for both
+        location: s.datacenter?.location?.name || 'Unknown',    // Same field for both
+        status: s.status === 'off' ? 'stopped' : s.status,      // Map 'off' → 'stopped'
+        priceEur: this.calculatePrice(s.server_type),            // Calculate price from server_type
+        vcpus: s.server_type?.cores || 0,
+        ram: s.server_type?.memory || 0,
+        ssd: s.server_type?.disk || 0,
+        // Zusätzliche Felder
+        created: s.created,
+        server_type: s.server_type,
+        datacenter: s.datacenter,
+        country: s.datacenter?.location?.country || 'Unknown'
+      };
+    });
+  }
+
+  /** Einfache Preis-Berechnung basierend auf server_type */
+  private calculatePrice(serverType: any): number {
+    if (!serverType) return 0;
+    const basePrice = 2.0;
+    const cpuPrice = (serverType.cores || 1) * 1.5;
+    const memPrice = (serverType.memory || 1) * 0.5;
+    return +(basePrice + cpuPrice + memPrice).toFixed(2);
   }
 
   /** Status-Mapping */
@@ -112,31 +136,17 @@ export class HetznerApiService {
     }
   }
 
-  /** Einfache Preis-Berechnung */
-  private calculatePrice(serverType: any): number {
-    if (!serverType) return 0;
-    const basePrice = 2.0;
-    const cpuPrice = (serverType.cores || 1) * 1.5;
-    const memPrice = (serverType.memory || 1) * 0.5;
-    return +(basePrice + cpuPrice + memPrice).toFixed(2);
-  }
-
   /** Locations laden (für später) */
   loadLocations() {
-    const url = this.isMockMode() 
-      ? '/assets/mock/locations.json'  // Absoluter Pfad
-      : `${environment.apiBase}/locations`;
+    const endpoint = apiBase() + (getMode() === 'real' ? '/locations' : '/locations.json');
+    const headers = authHdr();
 
-    const request$ = this.isMockMode()
-      ? this.http.get<LocationsResponse>(url)
-      : this.http.get<LocationsResponse>(url, { headers: this.authHeaders() });
+    // Use proper headers object - fix for TypeScript
+    const httpOptions = headers.Authorization ? { headers: new HttpHeaders(headers) } : {};
 
-    request$.pipe(
+    this.http.get<LocationsResponse>(endpoint, httpOptions).pipe(
       catchError((err: HttpErrorResponse) => {
         console.error('Locations loading failed:', err);
-        if (environment.useMockFallback && !this.isMockMode()) {
-          return this.http.get<LocationsResponse>('/assets/mock/locations.json');
-        }
         return of({ locations: [] });
       })
     ).subscribe(res => {
@@ -146,7 +156,32 @@ export class HetznerApiService {
 
   /** Debug-Info für UI */
   get isUsingMockData(): boolean {
-    return this.isMockMode();
+    return getMode() === 'mock';
+  }
+
+  /** Get current mode for UI */
+  get currentMode(): string {
+    return getMode();
+  }
+
+  /** Get current token for UI */
+  get currentToken(): string {
+    return localStorage.getItem('hz.token') || '';
+  }
+
+  /** Set mode and reload */
+  setMode(mode: 'mock' | 'real'): void {
+    console.log('Setting mode to:', mode);
+    const currentMode = getMode();
+    localStorage.setItem('hz.mode', mode);
+    console.log('Mode changed from', currentMode, 'to', mode);
+    // Automatically reload servers when mode changes
+    this.loadServers();
+  }
+
+  /** Set token */
+  setToken(token: string): void {
+    localStorage.setItem('hz.token', token);
   }
 
   /** Get country flag (dummy implementation with initials) */

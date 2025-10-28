@@ -69,8 +69,50 @@
     </div>
   }
 
+  <!-- ERROR STATE -->
+  @if (!loading() && error()) {
+    <div class="text-center py-12">
+      <div class="text-red-500 text-4xl mb-4">⚠️</div>
+      <h2 class="text-lg font-medium text-ink mb-2">Failed to load servers</h2>
+      <p class="text-soft mb-4">{{ error() }}</p>
+      <button 
+        class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+        (click)="retry()">
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- EMPTY STATE -->
+  @if (!loading() && !error() && view().length === 0) {
+    <div class="text-center py-12">
+      <div class="text-4xl mb-4">🖥️</div>
+      <h2 class="text-lg font-medium text-ink mb-2">No servers found</h2>
+      <p class="text-soft mb-6">
+        @if (isUsingMockData) {
+          You're using mock data and no servers are available.
+        } @else {
+          You don't have any servers in your Hetzner Cloud project yet.
+        }
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors">
+          Create Server
+        </button>
+        @if (!isUsingMockData) {
+          <a 
+            href="https://console.hetzner.cloud/" 
+            target="_blank"
+            class="px-4 py-2 rounded-lg border border-slate-300 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
+            Open Hetzner Console
+          </a>
+        }
+      </div>
+    </div>
+  }
+
   <!-- TABLE WITH CARD ROWS (md+) -->
-  @if (!loading()) {
+  @if (!loading() && !error() && view().length > 0) {
     <div class="hidden md:block space-y-4">
       <!-- Table Header -->
       <div class="px-4 py-3">
@@ -187,7 +229,7 @@
   }
 
   <!-- MOBILE CARDS (sm) -->
-  @if (!loading()) {
+  @if (!loading() && !error() && view().length > 0) {
     <div class="md:hidden space-y-3">
       @for (s of view(); track trackRow($index, s)) {
         <div class="server-card" (click)="viewServerDetails(s)">
