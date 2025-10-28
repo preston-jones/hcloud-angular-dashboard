@@ -4,7 +4,7 @@
   color: var(--sidebar-text);
   width: 280px;
   display: grid;
-  grid-template-rows: 56px 1fr 44px;
+  grid-template-rows: 1fr 44px;
   border-right: 1px solid var(--border);
 }
 
@@ -13,39 +13,8 @@
   width: 72px;
 }
 
-:host.collapsed .brand-text,
 :host.collapsed .label {
   display: none;
-}
-
-:host.collapsed .logo {
-  margin-inline: auto;
-}
-
-/* Brand-Zeile */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 56px;
-  padding: 0 12px;
-}
-
-.logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: color-mix(in oklab, var(--primary) 20%, transparent);
-  color: var(--primary);
-  font-weight: 800;
-}
-
-.brand-text {
-  font-weight: 800;
-  letter-spacing: .06em;
-  color: var(--primary);
 }
 
 /* Navigation */
