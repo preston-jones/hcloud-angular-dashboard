@@ -14,10 +14,32 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellComponent {
-  collapsed = signal(false);
+  collapsed = signal(true); // Default to collapsed (small sidebar)
+  isPinned = signal(false); // Pin state
   api = inject(HetznerApiService);
 
-  toggleSidebar = () => this.collapsed.update(v => !v);
+  expandSidebar = () => {
+    if (!this.isPinned()) {
+      this.collapsed.set(false);
+    }
+  };
+  
+  collapseSidebar = () => {
+    if (!this.isPinned()) {
+      this.collapsed.set(true);
+    }
+  };
+
+  togglePin = () => {
+    this.isPinned.update(pinned => !pinned);
+    if (this.isPinned()) {
+      // When pinning, expand the sidebar
+      this.collapsed.set(false);
+    } else {
+      // When unpinning, collapse the sidebar
+      this.collapsed.set(true);
+    }
+  };
 
   onSearch(query: string) {
     this.api.setSearchQuery(query);

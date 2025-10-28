@@ -13,8 +13,9 @@ type NavItem = { label: string; path: string; icon?: string };
 })
 export class SidebarComponent {
   @Input() collapsed = false;
+  @Input() isPinned = false;
   @HostBinding('class.collapsed') get isCollapsed() { return this.collapsed; }
-  @Output() menu = new EventEmitter<void>();
+  @Output() togglePin = new EventEmitter<void>();
 
   nav: NavItem[] = [
     { label: 'Servers', path: '/my-servers', icon: '🖥️' },
@@ -22,7 +23,7 @@ export class SidebarComponent {
     { label: 'Analyzer',  path: '/analyzer',  icon: '🌿' },
   ];
 
-  onIconClick() {
-    this.menu.emit();
+  onPinClick() {
+    this.togglePin.emit();
   }
 }

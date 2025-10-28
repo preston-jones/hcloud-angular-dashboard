@@ -3,9 +3,16 @@
   <app-topbar (search)="onSearch($event)"></app-topbar>
 
   <!-- Content Area with Sidebar -->
-  <div class="flex-1 flex overflow-hidden">
-    <app-sidebar [collapsed]="collapsed()" (menu)="toggleSidebar()"></app-sidebar>
-    <main class="flex-1 p-6 overflow-auto bg-surface flex justify-center">
+  <div class="flex-1 relative overflow-hidden">
+    <app-sidebar 
+      [collapsed]="collapsed()" 
+      [isPinned]="isPinned()"
+      (mouseenter)="expandSidebar()" 
+      (mouseleave)="collapseSidebar()"
+      (togglePin)="togglePin()">
+    </app-sidebar>
+    <main class="h-full p-6 overflow-auto bg-surface flex justify-center"
+          style="margin-left: 280px;">>
       <div class="w-full max-w-[1440px]">
         <router-outlet></router-outlet>
       </div>

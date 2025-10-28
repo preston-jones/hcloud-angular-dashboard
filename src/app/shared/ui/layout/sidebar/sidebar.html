@@ -7,7 +7,7 @@
          [routerLinkActiveOptions]="{ exact: true }"
          class="nav-link"
          [attr.aria-label]="item.label">
-        <span class="icon cursor-pointer" (click)="onIconClick()">{{ item.icon }}</span>
+        <span class="icon">{{ item.icon }}</span>
         <span class="label">{{ item.label }}</span>
       </a>
     }
@@ -15,6 +15,14 @@
 
   <!-- Footer / Version -->
   <div class="footer">
+    <button 
+      class="pin-button"
+      (click)="onPinClick()"
+      [class.pinned]="isPinned"
+      [attr.aria-label]="isPinned ? 'Unpin sidebar' : 'Pin sidebar'"
+      title="{{ isPinned ? 'Unpin sidebar' : 'Pin sidebar' }}">
+      {{ isPinned ? '📌' : '📍' }}
+    </button>
     <span class="muted">v0.1.0</span>
   </div>
 </aside>
