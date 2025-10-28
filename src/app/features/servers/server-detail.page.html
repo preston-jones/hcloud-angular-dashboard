@@ -16,21 +16,21 @@
     <div class="flex items-center gap-2">
       <button 
         (click)="deleteServer()" 
-        class="text-red-600 hover:text-red-800 font-bold underline bg-none border-none cursor-pointer">
+        class="text-red-600 hover:text-red-800 font-bold underline bg-none border-none cursor-pointer w-16 min-w-16">
         Delete
       </button>
       <button 
         (click)="rebootServer()" 
-        class="btn ghost">
+        class="btn ghost w-20 min-w-20">
         Reboot
       </button>
       <button 
         (click)="openConsole()" 
-        class="btn ghost">
+        class="btn ghost w-20 min-w-20">
         Console
       </button>
       <button 
-        class="btn primary" 
+        class="btn primary w-20" 
         (click)="toggleServerStatus()">
         {{ isRunning() ? 'Disable' : 'Enable' }}
       </button>

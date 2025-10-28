@@ -28,14 +28,14 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
           <div class="flex items-center gap-3">
             <button
               type="button"
-              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border w-32 min-w-32"
               [class]="currentMode() === 'mock' ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'"
               (click)="setMode('mock')">
               Mock Data
             </button>
             <button
               type="button"
-              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border w-32 min-w-32"
               [class]="currentMode() === 'real' ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'"
               (click)="setMode('real')">
               Real API
@@ -66,7 +66,7 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
               />
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors w-6 h-6 flex items-center justify-center"
                 (click)="toggleTokenVisibility()"
                 [attr.aria-label]="showToken() ? 'Hide token' : 'Show token'">
                 @if (showToken()) {
@@ -86,13 +86,13 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
         <div class="flex gap-3 justify-end">
           <button
             type="button"
-            class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+            class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors w-20 min-w-20"
             (click)="close.emit()">
             Cancel
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 w-28 min-w-28"
             (click)="save()">
             Save Settings
           </button>

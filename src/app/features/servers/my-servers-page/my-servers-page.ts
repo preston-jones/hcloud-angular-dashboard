@@ -23,7 +23,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
           </select>
 
           <button 
-            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors w-32 min-w-32"
             (click)="navigateToServerSelection()">
             Create Server
           </button>
@@ -88,7 +88,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
           <h2 class="text-lg font-medium text-ink mb-2">Failed to load servers</h2>
           <p class="text-soft mb-4">{{ error() }}</p>
           <button 
-            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors w-16 min-w-16"
             (click)="retry()">
             Retry
           </button>
@@ -105,7 +105,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
           </p>
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <button 
-              class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+              class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors w-44 min-w-44"
               (click)="navigateToServerSelection()">
               Create Your First Server
             </button>

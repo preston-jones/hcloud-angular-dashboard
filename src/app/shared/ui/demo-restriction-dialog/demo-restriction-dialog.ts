@@ -30,7 +30,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
         <div class="flex justify-center">
           <button
             type="button"
-            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 w-16 min-w-16"
             (click)="close.emit()">
             OK
           </button>
