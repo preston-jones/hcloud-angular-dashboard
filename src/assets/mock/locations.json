@@ -1,67 +1,73 @@
 {
   "locations": [
     {
-      "id": 1,
-      "name": "fsn1",
-      "description": "Falkenstein 1 - DC 2",
-      "country": "DE",
       "city": "Falkenstein",
-      "latitude": 50.478,
-      "longitude": 12.370
-    },
-    {
-      "id": 2,
-      "name": "nbg1",
-      "description": "Nuremberg 1 - DC 3",
       "country": "DE",
+      "description": "Falkenstein DC Park 1",
+      "id": 1,
+      "latitude": 50.47612,
+      "longitude": 12.370071,
+      "name": "fsn1",
+      "network_zone": "eu-central"
+    },
+    {
       "city": "Nuremberg",
-      "latitude": 49.452,
-      "longitude": 11.077
+      "country": "DE",
+      "description": "Nuremberg DC Park 1",
+      "id": 2,
+      "latitude": 49.452102,
+      "longitude": 11.076665,
+      "name": "nbg1",
+      "network_zone": "eu-central"
     },
     {
-      "id": 3,
-      "name": "hel1",
-      "description": "Helsinki 1 - DC 2",
-      "country": "FI",
       "city": "Helsinki",
-      "latitude": 60.169,
-      "longitude": 24.938
+      "country": "FI",
+      "description": "Helsinki DC Park 1",
+      "id": 3,
+      "latitude": 60.169855,
+      "longitude": 24.938379,
+      "name": "hel1",
+      "network_zone": "eu-central"
     },
     {
-      "id": 4,
-      "name": "ash",
+      "city": "Ashburn, VA",
+      "country": "US",
       "description": "Ashburn, VA",
-      "country": "US",
-      "city": "Ashburn",
-      "latitude": 39.021,
-      "longitude": -77.489
+      "id": 4,
+      "latitude": 39.045821,
+      "longitude": -77.487073,
+      "name": "ash",
+      "network_zone": "us-east"
     },
     {
-      "id": 5,
-      "name": "hil",
+      "city": "Hillsboro, OR",
+      "country": "US",
       "description": "Hillsboro, OR",
-      "country": "US",
-      "city": "Hillsboro",
-      "latitude": 45.523,
-      "longitude": -122.989
+      "id": 5,
+      "latitude": 45.54222,
+      "longitude": -122.951924,
+      "name": "hil",
+      "network_zone": "us-west"
     },
     {
-      "id": 6,
-      "name": "sin",
-      "description": "Singapore",
-      "country": "SG",
       "city": "Singapore",
-      "latitude": 1.290,
-      "longitude": 103.851
+      "country": "SG",
+      "description": "Singapore",
+      "id": 6,
+      "latitude": 1.283333,
+      "longitude": 103.833333,
+      "name": "sin",
+      "network_zone": "ap-southeast"
     }
   ],
   "meta": {
     "pagination": {
+      "last_page": 1,
+      "next_page": null,
       "page": 1,
       "per_page": 25,
       "previous_page": null,
-      "next_page": null,
-      "last_page": 1,
       "total_entries": 6
     }
   }
