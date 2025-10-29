@@ -126,7 +126,7 @@
                       {{ server.status }}
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-soft">€{{ server.priceEur?.toFixed(2) }}</td>
+                  <td class="py-3 px-4 text-soft">€{{ server.priceEur.toFixed(2) }}</td>
                 </tr>
               }
             </tbody>
@@ -146,7 +146,7 @@
               </div>
               <p class="text-sm text-soft mb-1">{{ server.type }}</p>
               <p class="text-sm text-soft mb-1">{{ getLocationWithFlag(server) }}</p>
-              <p class="text-sm font-medium text-ink">€{{ server.priceEur?.toFixed(2) }}/month</p>
+              <p class="text-sm font-medium text-ink">€{{ server.priceEur.toFixed(2) }}/month</p>
             </div>
           }
         </div>

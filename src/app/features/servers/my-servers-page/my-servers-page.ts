@@ -30,6 +30,39 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
         </div>
       </header>
 
+      <!-- Bulk Operations -->
+      @if (myServers().length > 0 && !loading()) {
+        <div class="flex flex-wrap gap-2 items-center p-4 bg-surface-elev rounded-lg border border-ui">
+          <span class="text-sm text-soft mr-2">Bulk Operations:</span>
+          
+          <button 
+            class="px-3 py-1.5 text-xs rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors"
+            (click)="startAllServers()"
+            [disabled]="!hasStoppedServers()"
+            [class.opacity-50]="!hasStoppedServers()">
+            Start All
+          </button>
+          
+          <button 
+            class="px-3 py-1.5 text-xs rounded-md bg-yellow-600 hover:bg-yellow-700 text-white transition-colors"
+            (click)="stopAllServers()"
+            [disabled]="!hasRunningServers()"
+            [class.opacity-50]="!hasRunningServers()">
+            Stop All
+          </button>
+          
+          <button 
+            class="px-3 py-1.5 text-xs rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors"
+            (click)="deleteAllServers()">
+            Delete All
+          </button>
+          
+          <span class="text-xs text-soft ml-2">
+            ({{ myServers().length }} server{{ myServers().length !== 1 ? 's' : '' }})
+          </span>
+        </div>
+      }
+
       <!-- SKELETON (Table with card rows) -->
       @if (loading()) {
         <div class="hidden md:block space-y-4">
@@ -251,6 +284,81 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
         </div>
       }
     </section>
+
+    <!-- Confirmation Dialogs -->
+    
+    <!-- Delete All Confirmation -->
+    @if (showDeleteAllDialog()) {
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
+          <h3 class="text-lg font-semibold text-ink mb-3">Delete All Servers</h3>
+          <p class="text-soft mb-6">
+            Are you sure you want to delete all {{ myServers().length }} servers? 
+            This action cannot be undone.
+          </p>
+          <div class="flex gap-3 justify-end">
+            <button 
+              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
+              (click)="cancelDeleteAll()">
+              Cancel
+            </button>
+            <button 
+              class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
+              (click)="confirmDeleteAll()">
+              Delete All
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Start All Confirmation -->
+    @if (showStartAllDialog()) {
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
+          <h3 class="text-lg font-semibold text-ink mb-3">Start All Servers</h3>
+          <p class="text-soft mb-6">
+            Start all stopped servers? This will start {{ getStoppedServersCount() }} servers.
+          </p>
+          <div class="flex gap-3 justify-end">
+            <button 
+              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
+              (click)="cancelStartAll()">
+              Cancel
+            </button>
+            <button 
+              class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors"
+              (click)="confirmStartAll()">
+              Start All
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Stop All Confirmation -->
+    @if (showStopAllDialog()) {
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
+          <h3 class="text-lg font-semibold text-ink mb-3">Stop All Servers</h3>
+          <p class="text-soft mb-6">
+            Stop all running servers? This will stop {{ getRunningServersCount() }} servers.
+          </p>
+          <div class="flex gap-3 justify-end">
+            <button 
+              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
+              (click)="cancelStopAll()">
+              Cancel
+            </button>
+            <button 
+              class="px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white transition-colors"
+              (click)="confirmStopAll()">
+              Stop All
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styleUrls: ['./my-servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -261,6 +369,11 @@ export class MyServersPage implements OnInit {
 
   // UI state
   status = signal<'all' | 'running' | 'stopped'>('all');
+  
+  // Confirmation dialogs
+  showDeleteAllDialog = signal(false);
+  showStartAllDialog = signal(false);
+  showStopAllDialog = signal(false);
   
   // Sorting state
   sortColumn = signal<string | null>(null);
@@ -417,5 +530,90 @@ export class MyServersPage implements OnInit {
 
   viewServerDetails(server: Server) {
     this.router.navigate(['/my-servers', server.id]);
+  }
+
+  // Helper methods for UI state
+  hasRunningServers(): boolean {
+    return this.myServers().some(server => server.status === 'running');
+  }
+
+  hasStoppedServers(): boolean {
+    return this.myServers().some(server => server.status === 'stopped');
+  }
+
+  // Bulk operations - show confirmation dialogs
+  startAllServers(): void {
+    if (this.hasStoppedServers()) {
+      this.showStartAllDialog.set(true);
+    }
+  }
+
+  stopAllServers(): void {
+    if (this.hasRunningServers()) {
+      this.showStopAllDialog.set(true);
+    }
+  }
+
+  deleteAllServers(): void {
+    if (this.myServers().length > 0) {
+      this.showDeleteAllDialog.set(true);
+    }
+  }
+
+  // Confirmation handlers for Start All
+  confirmStartAll(): void {
+    const stoppedServers = this.myServers().filter(server => server.status === 'stopped');
+    console.log('Starting all stopped servers:', stoppedServers.length);
+    
+    stoppedServers.forEach(server => {
+      this.api.updateServerStatus(server.id, 'running');
+    });
+    
+    this.showStartAllDialog.set(false);
+  }
+
+  cancelStartAll(): void {
+    this.showStartAllDialog.set(false);
+  }
+
+  // Confirmation handlers for Stop All
+  confirmStopAll(): void {
+    const runningServers = this.myServers().filter(server => server.status === 'running');
+    console.log('Stopping all running servers:', runningServers.length);
+    
+    runningServers.forEach(server => {
+      this.api.updateServerStatus(server.id, 'stopped');
+    });
+    
+    this.showStopAllDialog.set(false);
+  }
+
+  cancelStopAll(): void {
+    this.showStopAllDialog.set(false);
+  }
+
+  // Confirmation handlers for Delete All
+  confirmDeleteAll(): void {
+    const allServers = this.myServers();
+    console.log('Deleting all servers:', allServers.length);
+    
+    allServers.forEach(server => {
+      this.api.deleteServer(server.id);
+    });
+    
+    this.showDeleteAllDialog.set(false);
+  }
+
+  cancelDeleteAll(): void {
+    this.showDeleteAllDialog.set(false);
+  }
+
+  // Helper methods for counts
+  getRunningServersCount(): number {
+    return this.myServers().filter(server => server.status === 'running').length;
+  }
+
+  getStoppedServersCount(): number {
+    return this.myServers().filter(server => server.status === 'stopped').length;
   }
 }
