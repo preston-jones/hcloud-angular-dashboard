@@ -18,9 +18,10 @@ export class SidebarComponent {
   @Output() togglePin = new EventEmitter<void>();
 
   nav: NavItem[] = [
+    { label: 'Dashboard', path: '/dashboard', icon: '📊' },
     { label: 'Servers', path: '/my-servers', icon: '🖥️' },
     { label: 'Locations', path: '/locations', icon: '📍' },
-    { label: 'Analyzer',  path: '/analyzer',  icon: '🌿' },
+    { label: 'Analyzer', path: '/analyzer', icon: '🌿' },
   ];
 
   onPinClick() {

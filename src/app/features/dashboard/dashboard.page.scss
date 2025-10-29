@@ -1,0 +1,16 @@
+/* Dashboard specific styles */
+:host { 
+  display: block;
+}
+
+/* Override default card hover for clickable table rows */
+.card table tr:hover {
+  background: var(--surface-muted);
+}
+
+/* Ensure proper spacing for mobile cards */
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+}
