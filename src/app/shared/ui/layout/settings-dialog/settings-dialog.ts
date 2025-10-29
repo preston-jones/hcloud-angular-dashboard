@@ -108,9 +108,9 @@ export class SettingsDialogComponent {
   
   private apiService = inject(HetznerApiService);
   
-  // Reactive state
-  currentMode = signal(this.apiService.currentMode);
-  tokenInput = this.apiService.currentToken;
+  // Mode and token management
+  currentMode = signal<'mock' | 'real'>(this.apiService.getCurrentMode());
+  tokenInput = signal(this.apiService.getToken());
   showToken = signal(false);
 
   setMode(mode: 'mock' | 'real'): void {
@@ -122,14 +122,14 @@ export class SettingsDialogComponent {
   }
 
   save(): void {
-    console.log('Saving settings - Mode:', this.currentMode(), 'Token:', this.tokenInput ? 'Present' : 'None');
+    console.log('Saving settings - Mode:', this.currentMode(), 'Token:', this.tokenInput() ? 'Present' : 'None');
     
     // Save mode
-    this.apiService.setMode(this.currentMode() as 'mock' | 'real');
+    this.apiService.setMode(this.currentMode());
     
-    // Save token if in real mode
-    if (this.currentMode() === 'real' && this.tokenInput.trim()) {
-      this.apiService.setToken(this.tokenInput.trim());
+    // Save token if provided
+    if (this.tokenInput().trim()) {
+      this.apiService.setToken(this.tokenInput().trim());
     }
     
     console.log('Settings saved successfully');

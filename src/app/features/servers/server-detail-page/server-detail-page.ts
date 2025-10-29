@@ -40,10 +40,8 @@ export class ServerDetailPage implements OnInit {
 
     this.serverId.set(id);
     
-    // Load servers if not already loaded
-    if (!this.api.servers()) {
-      this.api.loadServers();
-    }
+    // Servers are automatically loaded by the service
+    // No need to check and load here
 
     // Wait for servers to load or use existing data
     this.loading.set(false);

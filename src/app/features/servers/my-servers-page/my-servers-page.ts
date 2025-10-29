@@ -242,7 +242,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
                     </span>
                   </div>
                   <div class="text-right text-soft">
-                    €{{ s.priceEur.toFixed(2) }}/mo
+                    €{{ (s.priceEur || 0).toFixed(2) }}/mo
                   </div>
                 </div>
               </div>
@@ -285,18 +285,13 @@ export class MyServersPage implements OnInit {
   });
 
   ngOnInit() {
-    // Initialize user-created servers from sessionStorage
-    this.api.initializeUserServers();
-    // Load actual servers from API
-    this.loadActualServers();
-  }
-
-  private loadActualServers(): void {
-    this.api.loadActualServers();
+    // Servers are automatically loaded by the service
+    // No need to call loadServers() here since service manages loading
   }
 
   retry(): void {
-    this.loadActualServers();
+    // Force reload even in mock mode
+    this.api.forceReloadServers();
   }
 
   navigateToServerSelection(): void {

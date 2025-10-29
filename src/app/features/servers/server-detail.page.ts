@@ -43,8 +43,7 @@ export class ServerDetailPage {
   showDeleteDialog = signal(false);
 
   constructor() {
-    // Initialize user servers first, then load server data
-    this.api.initializeUserServers();
+    // Load server data
     this.loadServerData();
   }
 
@@ -110,20 +109,23 @@ export class ServerDetailPage {
     console.log('Delete server confirmed:', currentData?.id);
     
     if (currentData) {
-      // Check if we're in mock mode first
-      const mode = sessionStorage.getItem('hz.mode') ?? 'mock';
-      
       this.api.deleteServer(currentData.id);
       
+      // Close the confirmation dialog first
+      this.showDeleteDialog.set(false);
+      
       // Only navigate back if we're in mock mode (actual deletion happened)
-      if (mode === 'mock') {
-        this.goBackToMyServers();
+      if (this.api.getCurrentMode() === 'mock') {
+        // Small delay to ensure the signal update has propagated
+        setTimeout(() => {
+          this.goBackToMyServers();
+        }, 100);
       }
       // In API mode, the demo dialog will show and user stays on the page
+    } else {
+      // Close the confirmation dialog
+      this.showDeleteDialog.set(false);
     }
-    
-    // Close the confirmation dialog
-    this.showDeleteDialog.set(false);
   }
 
   cancelDelete(): void {

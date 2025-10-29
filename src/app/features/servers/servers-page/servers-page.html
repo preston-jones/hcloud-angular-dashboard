@@ -251,7 +251,7 @@
                 </span>
               </div>
               <div class="text-right text-soft">
-                €{{ s.priceEur.toFixed(2) }}/mo
+                €{{ (s.priceEur || 0).toFixed(2) }}/mo
               </div>
             </div>
           </div>
@@ -278,9 +278,9 @@
           </div>
           <div class="meta">
             @if (hasCountryData(s)) {
-              {{ s.type }} • {{ getCountryFlag(s) }} {{ getCleanCityName(s) }} • €{{ s.priceEur.toFixed(2) }}/mo
+              {{ s.type }} • {{ getCountryFlag(s) }} {{ getCleanCityName(s) }} • €{{ (s.priceEur || 0).toFixed(2) }}/mo
             } @else {
-              {{ s.type }} • {{ getCleanCityName(s) }} • €{{ s.priceEur.toFixed(2) }}/mo
+              {{ s.type }} • {{ getCleanCityName(s) }} • €{{ (s.priceEur || 0).toFixed(2) }}/mo
             }
           </div>
           <div class="hardware text-xs text-soft mt-1">

@@ -25,12 +25,12 @@ export class ServersPage implements OnInit {
   sortColumn = signal<string | null>(null);
   sortDirection = signal<'asc' | 'desc' | 'none'>('none');
 
-  // API state von Service
+    // API state
   get loading() { return this.api.loading; }
   get servers() { return this.api.servers; }
   get error() { return this.api.error; }
-  get isUsingMockData() { return this.api.isUsingMockData; }
   get searchQuery() { return this.api.searchQuery; }
+  get isUsingMockData() { return this.api.isUsingMockData(); }
 
   ngOnInit() {
     // Load server types (available configurations) for this page
@@ -179,13 +179,10 @@ export class ServersPage implements OnInit {
   createSelectedServer(): void {
     const selected = this.getSelectedServer();
     if (selected) {
-      // Check if we're in mock mode first
-      const mode = sessionStorage.getItem('hz.mode') ?? 'mock';
-      
       this.api.createServerFromType(selected);
       
       // Only navigate back if we're in mock mode (actual creation happened)
-      if (mode === 'mock') {
+      if (this.api.getCurrentMode() === 'mock') {
         // Navigate back to my servers
         this.router.navigate(['/my-servers']);
       }

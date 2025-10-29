@@ -1,5 +1,81 @@
 {
-  "servers": [],
+  "servers": [
+    {
+      "id": "4711",
+      "name": "web-frontend-1",
+      "status": "running",
+      "server_type": {
+        "id": 1,
+        "name": "cx21",
+        "description": "CX21",
+        "cores": 2,
+        "memory": 4.0,
+        "disk": 40
+      },
+      "datacenter": {
+        "id": 1,
+        "name": "fsn1-dc8",
+        "location": {
+          "id": 1,
+          "name": "fsn1",
+          "description": "Falkenstein DC Park 1",
+          "country": "DE",
+          "city": "Falkenstein"
+        }
+      },
+      "created": "2024-01-15T09:00:00+00:00"
+    },
+    {
+      "id": "4712",
+      "name": "database-prod",
+      "status": "running",
+      "server_type": {
+        "id": 3,
+        "name": "cx41",
+        "description": "CX41",
+        "cores": 4,
+        "memory": 16.0,
+        "disk": 160
+      },
+      "datacenter": {
+        "id": 2,
+        "name": "nbg1-dc3",
+        "location": {
+          "id": 2,
+          "name": "nbg1",
+          "description": "Nuremberg DC Park 1",
+          "country": "DE",
+          "city": "Nuremberg"
+        }
+      },
+      "created": "2024-01-10T14:30:00+00:00"
+    },
+    {
+      "id": "4713",
+      "name": "api-backend",
+      "status": "stopped",
+      "server_type": {
+        "id": 2,
+        "name": "cx31",
+        "description": "CX31",
+        "cores": 2,
+        "memory": 8.0,
+        "disk": 80
+      },
+      "datacenter": {
+        "id": 3,
+        "name": "hel1-dc2",
+        "location": {
+          "id": 3,
+          "name": "hel1",
+          "description": "Helsinki DC Park 1",
+          "country": "FI",
+          "city": "Helsinki"
+        }
+      },
+      "created": "2024-01-20T11:15:00+00:00"
+    }
+  ],
   "meta": {
     "pagination": {
       "page": 1,
@@ -7,7 +83,7 @@
       "previous_page": null,
       "next_page": null,
       "last_page": 1,
-      "total_entries": 0
+      "total_entries": 3
     }
   }
 }
