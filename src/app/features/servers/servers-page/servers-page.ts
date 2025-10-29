@@ -149,13 +149,6 @@ export class ServersPage implements OnInit {
     });
   }
 
-  // Navigation - for server types, we might want to show creation flow
-  viewServerDetails(server: Server) {
-    // For available server types, we could navigate to create server with this type
-    // For now, navigate to the same detail page but it will show as "available"
-    this.router.navigate(['/servers', server.id]);
-  }
-
   // Selection methods
   selectServer(server: Server): void {
     this.selectedServerId.set(server.id);

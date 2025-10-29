@@ -10,6 +10,32 @@
       </button>
       <h1 class="text-xl font-semibold text-ink">Server Details</h1>
     </div>
+    
+    @if (server() && !loading()) {
+      <div class="flex flex-wrap gap-2">
+        <button 
+          (click)="startServer()"
+          [disabled]="server()!.status === 'running'"
+          class="action-btn action-btn-primary"
+          [class.opacity-50]="server()!.status === 'running'"
+          [class.cursor-not-allowed]="server()!.status === 'running'">
+          ▶️ Start Server
+        </button>
+        <button 
+          (click)="stopServer()"
+          [disabled]="server()!.status === 'stopped'"
+          class="action-btn action-btn-secondary"
+          [class.opacity-50]="server()!.status === 'stopped'"
+          [class.cursor-not-allowed]="server()!.status === 'stopped'">
+          ⏸️ Stop Server
+        </button>
+        <button 
+          (click)="deleteServer()"
+          class="action-btn action-btn-danger">
+          🗑️ Delete Server
+        </button>
+      </div>
+    }
   </header>
 
   <!-- Loading State -->
@@ -86,7 +112,7 @@
             </div>
           </div>
           <div class="text-right">
-            <div class="text-2xl font-bold text-primary">€{{ (server()!.priceEur || 0).toFixed(2) }}</div>
+            <div class="text-2xl font-bold text-primary">{{ (server()!.priceEur || 0).toFixed(2) }} €</div>
             <div class="text-sm text-soft">per month</div>
           </div>
         </div>
@@ -95,13 +121,16 @@
       <!-- Hardware Specifications -->
       <div class="server-detail-card">
         <h3 class="text-lg font-semibold text-ink mb-4">Hardware Specifications</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- CPU -->
           <div class="spec-card">
             <div class="spec-icon">🖥️</div>
             <div class="spec-content">
               <div class="spec-label">vCPUs</div>
               <div class="spec-value">{{ getCpuCount(server()!) }}</div>
+              @if (server()!.server_type?.cpu_type) {
+                <div class="spec-detail">{{ server()!.server_type!.cpu_type }}</div>
+              }
             </div>
           </div>
           
@@ -111,6 +140,7 @@
             <div class="spec-content">
               <div class="spec-label">RAM</div>
               <div class="spec-value">{{ getRamSize(server()!) }}</div>
+              <div class="spec-detail">Memory</div>
             </div>
           </div>
           
@@ -120,10 +150,66 @@
             <div class="spec-content">
               <div class="spec-label">SSD Storage</div>
               <div class="spec-value">{{ getDiskSize(server()!) }}</div>
+              @if (server()!.server_type?.storage_type) {
+                <div class="spec-detail">{{ server()!.server_type!.storage_type }}</div>
+              }
+            </div>
+          </div>
+
+          <!-- Architecture -->
+          @if (server()!.server_type?.architecture) {
+            <div class="spec-card">
+              <div class="spec-icon">🏗️</div>
+              <div class="spec-content">
+                <div class="spec-label">Architecture</div>
+                <div class="spec-value">{{ server()!.server_type!.architecture }}</div>
+                <div class="spec-detail">CPU arch</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Pricing Information -->
+      @if (getServerPricing(server()!)) {
+        <div class="server-detail-card">
+          <h3 class="text-lg font-semibold text-ink mb-4">Pricing Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="spec-card">
+              <div class="spec-icon">💰</div>
+              <div class="spec-content">
+                <div class="spec-label">Monthly (Net)</div>
+                <div class="spec-value">{{ formatPrice(getServerPricing(server()!)?.price_monthly?.net) }}</div>
+                <div class="spec-detail">Base price</div>
+              </div>
+            </div>
+            <div class="spec-card">
+              <div class="spec-icon">💸</div>
+              <div class="spec-content">
+                <div class="spec-label">Monthly (Gross)</div>
+                <div class="spec-value">{{ formatPrice(getServerPricing(server()!)?.price_monthly?.gross) }}</div>
+                <div class="spec-detail">With tax</div>
+              </div>
+            </div>
+            <div class="spec-card">
+              <div class="spec-icon">⏰</div>
+              <div class="spec-content">
+                <div class="spec-label">Hourly (Net)</div>
+                <div class="spec-value">{{ formatHourlyPrice(getServerPricing(server()!)?.price_hourly?.net) }}</div>
+                <div class="spec-detail">Per hour</div>
+              </div>
+            </div>
+            <div class="spec-card">
+              <div class="spec-icon">🕒</div>
+              <div class="spec-content">
+                <div class="spec-label">Hourly (Gross)</div>
+                <div class="spec-value">{{ formatHourlyPrice(getServerPricing(server()!)?.price_hourly?.gross) }}</div>
+                <div class="spec-detail">With tax</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- Server Information -->
       <div class="server-detail-card">
@@ -168,28 +254,20 @@
               <dd class="info-value">{{ server()!.datacenter!.location!.name }}</dd>
             </div>
           }
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="server-detail-card">
-        <h3 class="text-lg font-semibold text-ink mb-4">Actions</h3>
-        <div class="flex flex-wrap gap-3">
-          <button class="action-btn action-btn-primary">
-            ▶️ Start Server
-          </button>
-          <button class="action-btn action-btn-secondary">
-            ⏸️ Stop Server
-          </button>
-          <button class="action-btn action-btn-secondary">
-            🔄 Restart Server
-          </button>
-          <button class="action-btn action-btn-secondary">
-            ⚙️ Configure
-          </button>
-          <button class="action-btn action-btn-danger">
-            🗑️ Delete Server
-          </button>
+          @if (server()!.datacenter?.location?.city) {
+            <div class="info-row">
+              <dt class="info-label">City</dt>
+              <dd class="info-value">{{ server()!.datacenter!.location!.city }}</dd>
+            </div>
+          }
+          @if (server()!.datacenter?.location?.country) {
+            <div class="info-row">
+              <dt class="info-label">Country</dt>
+              <dd class="info-value">
+                {{ getCountryFlag(server()!) }} {{ server()!.datacenter!.location!.country }}
+              </dd>
+            </div>
+          }
         </div>
       </div>
     </div>

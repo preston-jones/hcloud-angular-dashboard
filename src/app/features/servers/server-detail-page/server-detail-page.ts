@@ -21,12 +21,12 @@ export class ServerDetailPage implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Computed server based on ID from route
+  // Computed server based on ID from route - only show actual user servers
   server = computed(() => {
     const id = this.serverId();
-    const servers = this.api.servers();
-    if (!id || !servers) return null;
-    return servers.find(s => s.id === id) || null;
+    const userServers = this.api.myServers(); // Only check user servers, not available types
+    if (!id || !userServers) return null;
+    return userServers.find(s => s.id === id) || null;
   });
 
   ngOnInit() {
@@ -39,17 +39,13 @@ export class ServerDetailPage implements OnInit {
     }
 
     this.serverId.set(id);
-    
-    // Servers are automatically loaded by the service
-    // No need to check and load here
-
-    // Wait for servers to load or use existing data
     this.loading.set(false);
   }
 
   // Navigation
   goBack() {
-    this.router.navigate(['/servers']);
+    // Always go back to my-servers since this page is only for user servers
+    this.router.navigate(['/my-servers']);
   }
 
   // Server helper methods
@@ -89,6 +85,51 @@ export class ServerDetailPage implements OnInit {
 
   getHardwareSpecs(server: Server): string {
     return `${this.getCpuCount(server)} vCPU • ${this.getRamSize(server)} • ${this.getDiskSize(server)} SSD`;
+  }
+
+  // Get pricing information for the server's location
+  getServerPricing(server: Server): any {
+    if (!server.server_type?.prices) return null;
+    // Find pricing for the server's location
+    return server.server_type.prices.find(p => p.location.toLowerCase() === server.location.toLowerCase());
+  }
+
+  // Format price values to show clean decimals with € at the end
+  formatPrice(priceString: string | undefined): string {
+    if (!priceString) return '0 €';
+    const price = parseFloat(priceString);
+    return `${price.toFixed(2)} €`;
+  }
+
+  formatHourlyPrice(priceString: string | undefined): string {
+    if (!priceString) return '0 €';
+    const price = parseFloat(priceString);
+    return `${price.toFixed(2)} €`;
+  }
+
+  // Server actions
+  startServer(): void {
+    const server = this.server();
+    if (server && server.status !== 'running') {
+      this.api.updateServerStatus(server.id, 'running');
+    }
+  }
+
+  stopServer(): void {
+    const server = this.server();
+    if (server && server.status !== 'stopped') {
+      this.api.updateServerStatus(server.id, 'stopped');
+    }
+  }
+
+  deleteServer(): void {
+    const server = this.server();
+    if (server) {
+      if (confirm(`Are you sure you want to delete server "${server.name}"? This action cannot be undone.`)) {
+        this.api.deleteServer(server.id);
+        this.goBack(); // Navigate back after deletion
+      }
+    }
   }
 
   // Format created date

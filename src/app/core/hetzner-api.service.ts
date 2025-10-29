@@ -13,7 +13,21 @@ export interface Server {
   ram: number;
   ssd: number;
   created?: string;
-  server_type?: { name: string; cores: number; memory: number; disk: number; description?: string; };
+  server_type?: { 
+    name: string; 
+    cores: number; 
+    memory: number; 
+    disk: number; 
+    description?: string;
+    cpu_type?: string;
+    storage_type?: string;
+    architecture?: string;
+    prices?: Array<{
+      location: string;
+      price_hourly: { net: string; gross: string; };
+      price_monthly: { net: string; gross: string; };
+    }>;
+  };
   datacenter?: { location: { name: string; city: string; country: string; }; };
   country?: string;
 }
@@ -332,7 +346,13 @@ export class HetznerApiService {
             ram: st.memory || 0,
             ssd: st.disk || 0,
             created: new Date().toISOString(),
-            server_type: st,
+            server_type: {
+              ...st,
+              cpu_type: st.cpu_type,
+              storage_type: st.storage_type,
+              architecture: st.architecture,
+              prices: st.prices
+            },
             datacenter: { 
               location: { 
                 name: price.location, 

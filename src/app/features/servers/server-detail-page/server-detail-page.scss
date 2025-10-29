@@ -52,6 +52,14 @@
   color: var(--text);
 }
 
+.spec-detail {
+  font-size: 11px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
 /* Information Rows */
 .info-row {
   display: flex;
