@@ -12,8 +12,8 @@
         @if (server() && !loading()) {
           <h1 class="text-2xl font-bold text-ink">{{ server()!.name }}</h1>
           <div class="flex items-center gap-3 mt-1">
-            <span class="text-lg font-medium text-soft">{{ server()!.type.toUpperCase() }}</span>
-            <span class="text-soft">#{{ server()!.id.slice(-8) }}</span>
+            <span class="text-lg font-medium text-soft">{{ server()!.server_type?.name?.toUpperCase() || 'UNKNOWN' }}</span>
+            <span class="text-soft">#{{ server()!.id.toString().slice(-8) }}</span>
             <span class="inline-flex items-center gap-2">
               <span class="status-dot" [ngClass]="server()!.status"></span>
               <span class="capitalize text-soft">{{ server()!.status }}</span>
@@ -82,8 +82,18 @@
     </div>
   }
 
+  <!-- Loading State -->
+  @if (loading() || api.loading()) {
+    <div class="server-detail-card">
+      <div class="text-center py-8">
+        <div class="text-soft text-lg mb-2">⏳ Loading Server Details...</div>
+        <p class="text-soft">Please wait while we fetch your server information.</p>
+      </div>
+    </div>
+  }
+
   <!-- Server Not Found -->
-  @if (!server() && !loading() && !error()) {
+  @else if (!server() && !loading() && !error() && !api.loading()) {
     <div class="server-detail-card">
       <div class="text-center py-8">
         <div class="text-soft text-lg mb-2">🔍 Server Not Found</div>

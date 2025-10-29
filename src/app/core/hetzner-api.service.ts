@@ -3,17 +3,12 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, map } from 'rxjs';
 
 export interface Server {
-  id: string;
+  id: number;
   name: string;
-  type: string;
-  location: string;
   status: 'running' | 'stopped' | 'error' | 'available';
-  priceEur: number;
-  vcpus: number;
-  ram: number;
-  ssd: number;
   created?: string;
   server_type?: { 
+    id: number;
     name: string; 
     cores: number; 
     memory: number; 
@@ -28,7 +23,27 @@ export interface Server {
       price_monthly: { net: string; gross: string; };
     }>;
   };
-  datacenter?: { location: { name: string; city: string; country: string; }; };
+  datacenter?: { 
+    id: number;
+    name: string;
+    location: { 
+      id: number;
+      name: string; 
+      city: string; 
+      country: string; 
+      description: string;
+      latitude: number;
+      longitude: number;
+    }; 
+  };
+  
+  // Computed properties for compatibility
+  type?: string;
+  location?: string;
+  priceEur?: number;
+  vcpus?: number;
+  ram?: number;
+  ssd?: number;
   country?: string;
 }
 
@@ -238,7 +253,7 @@ export class HetznerApiService {
       return;
     }
 
-    const createdId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const createdId = Date.now() + Math.floor(Math.random() * 1000);
     
     const newServer: Server = {
       ...serverType,
@@ -257,7 +272,7 @@ export class HetznerApiService {
   }
 
   /** Update server status */
-  updateServerStatus(serverId: string, newStatus: 'running' | 'stopped' | 'error' | 'available'): void {
+  updateServerStatus(serverId: number, newStatus: 'running' | 'stopped' | 'error' | 'available'): void {
     if (this.mode() !== 'mock') {
       this.showDemoRestrictionDialog.set(true);
       return;
@@ -276,7 +291,7 @@ export class HetznerApiService {
   }
 
   /** Delete a server */
-  deleteServer(serverId: string): void {
+  deleteServer(serverId: number): void {
     if (this.mode() !== 'mock') {
       this.showDemoRestrictionDialog.set(true);
       return;
@@ -293,7 +308,7 @@ export class HetznerApiService {
   }
 
   /** Reboot a server */
-  rebootServer(serverId: string): void {
+  rebootServer(serverId: number): void {
     if (this.mode() !== 'mock') {
       this.showDemoRestrictionDialog.set(true);
       return;
@@ -321,7 +336,7 @@ export class HetznerApiService {
 
   /** Check if server has country data */
   hasCountryData(server: Server): boolean {
-    return !!server.country && server.country !== 'Unknown';
+    return !!server.datacenter?.location?.country && server.datacenter.location.country !== 'Unknown';
   }
 
   // =============================================================================
@@ -332,41 +347,21 @@ export class HetznerApiService {
   private transformServerTypesToServers(serverTypes: any[]): Server[] {
     const servers: Server[] = [];
     
-    serverTypes.slice(0, 5).forEach((st: any) => {
-      st.prices?.forEach((price: any, index: number) => {
-        if (index < 3) {
+    serverTypes.slice(0, 5).forEach((st: any, index: number) => {
+      st.prices?.forEach((price: any, priceIndex: number) => {
+        if (priceIndex < 3) {
           servers.push({
-            id: `${st.name}-${price.location}`,
+            id: Date.now() + index * 1000 + priceIndex,
             name: `${st.name.toUpperCase()} - ${st.description}`,
-            type: st.name,
-            location: price.location.toUpperCase(),
-            status: 'available' as any,
-            priceEur: parseFloat(price.price_monthly.net),
-            vcpus: st.cores || 0,
-            ram: st.memory || 0,
-            ssd: st.disk || 0,
+            status: 'available',
             created: new Date().toISOString(),
-            server_type: {
-              ...st,
-              cpu_type: st.cpu_type,
-              storage_type: st.storage_type,
-              architecture: st.architecture,
-              prices: st.prices
-            },
-            datacenter: { 
-              location: { 
-                name: price.location, 
-                city: this.getLocationCity(price.location), 
-                country: this.getLocationCountry(price.location) 
-              } 
-            },
-            country: this.getLocationCountry(price.location)
+            server_type: st
           });
         }
       });
     });
     
-    return servers.sort((a, b) => a.priceEur - b.priceEur);
+    return servers;
   }
 
   /** Calculate price for a server type */
@@ -376,31 +371,5 @@ export class HetznerApiService {
     const cpuPrice = (serverType.cores || 1) * 1.5;
     const memPrice = (serverType.memory || 1) * 0.5;
     return +(basePrice + cpuPrice + memPrice).toFixed(2);
-  }
-
-  /** Get city name from location code */
-  private getLocationCity(locationCode: string): string {
-    const locationMap: Record<string, string> = {
-      'fsn1': 'Falkenstein',
-      'nbg1': 'Nuremberg', 
-      'hel1': 'Helsinki',
-      'ash': 'Ashburn',
-      'hil': 'Hillsboro',
-      'sin': 'Singapore'
-    };
-    return locationMap[locationCode] || locationCode;
-  }
-
-  /** Get country code from location code */
-  private getLocationCountry(locationCode: string): string {
-    const countryMap: Record<string, string> = {
-      'fsn1': 'DE',
-      'nbg1': 'DE', 
-      'hel1': 'FI',
-      'ash': 'US',
-      'hil': 'US',
-      'sin': 'SG'
-    };
-    return countryMap[locationCode] || 'Unknown';
   }
 }

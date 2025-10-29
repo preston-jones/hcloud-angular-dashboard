@@ -115,7 +115,7 @@
                     <td class="py-3 px-4">
                       <span class="font-medium text-ink">{{ server.name }}</span>
                     </td>
-                    <td class="py-3 px-4 text-soft">{{ server.type }}</td>
+                    <td class="py-3 px-4 text-soft">{{ server.server_type?.name || 'Unknown' }}</td>
                     <td class="py-3 px-4 text-soft">
                       @if (hasCountryData(server)) {
                         {{ getLocationWithFlag(server) }}
@@ -128,7 +128,7 @@
                         {{ server.status }}
                       </span>
                     </td>
-                    <td class="py-3 px-4 text-soft">€{{ server.priceEur.toFixed(2) }}</td>
+                    <td class="py-3 px-4 text-soft">€{{ getServerPrice(server!) }}</td>
                   </tr>
                 }
               </tbody>
@@ -146,9 +146,9 @@
                     {{ server.status }}
                   </span>
                 </div>
-                <p class="text-sm text-soft mb-1">{{ server.type }}</p>
+                <p class="text-sm text-soft mb-1">{{ server.server_type?.name || 'Unknown' }}</p>
                 <p class="text-sm text-soft mb-1">{{ getLocationWithFlag(server) }}</p>
-                <p class="text-sm font-medium text-ink">€{{ server.priceEur.toFixed(2) }}/month</p>
+                <p class="text-sm font-medium text-ink">€{{ getServerPrice(server!) }}/month</p>
               </div>
             }
           </div>

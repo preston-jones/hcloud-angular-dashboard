@@ -19,7 +19,7 @@ export class ServersPage implements OnInit {
   status = signal<'all' | 'running' | 'stopped'>('all');
   
   // Selection state for server creation
-  selectedServerId = signal<string | null>(null);
+  selectedServerId = signal<number | null>(null);
   
   // Sorting state
   sortColumn = signal<string | null>(null);
@@ -59,8 +59,8 @@ export class ServersPage implements OnInit {
     const filtered = serverList.filter(s => {
       const matchesQuery =
         s.name.toLowerCase().includes(term) ||
-        s.type.toLowerCase().includes(term) ||
-        s.location.toLowerCase().includes(term);
+        (s.server_type?.name || '').toLowerCase().includes(term) ||
+        (s.datacenter?.location?.name || '').toLowerCase().includes(term);
       return matchesQuery;
     });
 
@@ -106,7 +106,7 @@ export class ServersPage implements OnInit {
       case 'name':
         return server.name.toLowerCase();
       case 'type':
-        return server.type.toLowerCase();
+        return (server.server_type?.name || '').toLowerCase();
       case 'vcpus':
         return server.server_type?.cores || 0;
       case 'ram':
@@ -189,15 +189,15 @@ export class ServersPage implements OnInit {
 
   // Country helpers
   getCountryFlag(server: Server): string {
-    return this.api.getCountryFlag(server.country || '');
+    return this.api.getCountryFlag(server.datacenter?.location?.country || '');
   }
 
   hasCountryData(server: Server): boolean {
-    return this.api.hasCountryData(server);
+    return !!server.datacenter?.location?.country && server.datacenter.location.country !== 'Unknown';
   }
 
   getLocationWithFlag(server: Server): string {
-    const city = server.datacenter?.location?.city || server.location;
+    const city = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     if (this.hasCountryData(server)) {
       return `${this.getCountryFlag(server)} ${city}`;
     }
@@ -206,7 +206,7 @@ export class ServersPage implements OnInit {
 
   // Helper to get clean city name (removes state abbreviations)
   getCleanCityName(server: Server): string {
-    const fullCity = server.datacenter?.location?.city || server.location;
+    const fullCity = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     // Remove state abbreviations like ", VA", ", OR", etc.
     return fullCity.replace(/,\s*[A-Z]{2}$/, '');
   }

@@ -413,7 +413,7 @@ export class MyServersPage implements OnInit {
 
   onStatusChange(event: Event) {
     const select = event.target as HTMLSelectElement;
-    this.status.set(select.value as any);
+    this.status.set(select.value as 'all' | 'running' | 'stopped');
   }
 
   // Sorting handler

@@ -64,19 +64,27 @@ export class DashboardPage implements OnInit {
 
   // Country helpers
   getCountryFlag(server: Server): string {
-    return this.api.getCountryFlag(server.country || '');
+    return this.api.getCountryFlag(server.datacenter?.location?.country || '');
   }
 
   hasCountryData(server: Server): boolean {
-    return this.api.hasCountryData(server);
+    return !!server.datacenter?.location?.country && server.datacenter.location.country !== 'Unknown';
   }
 
   getLocationWithFlag(server: Server): string {
-    const city = server.datacenter?.location?.city || server.location;
+    const city: string = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     if (this.hasCountryData(server)) {
       return `${this.getCountryFlag(server)} ${city}`;
     }
     return city;
+  }
+
+  // Price helper
+  getServerPrice(server: Server): string {
+    if (!server.server_type?.prices) return '0.00';
+    const serverLocation = server.datacenter?.location?.name;
+    const pricing = server.server_type.prices.find(p => p.location === serverLocation);
+    return pricing ? parseFloat(pricing.price_monthly.net).toFixed(2) : '0.00';
   }
 
   // Hardware specs helpers

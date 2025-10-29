@@ -14,10 +14,10 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
 export class ServerDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private api = inject(HetznerApiService);
+  public api = inject(HetznerApiService);
 
   // Local state
-  serverId = signal<string | null>(null);
+  serverId = signal<number | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -31,9 +31,16 @@ export class ServerDetailPage implements OnInit {
 
   ngOnInit() {
     // Get server ID from route params
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
       this.error.set('No server ID provided');
+      this.loading.set(false);
+      return;
+    }
+
+    const id = parseInt(idParam, 10);
+    if (isNaN(id)) {
+      this.error.set('Invalid server ID');
       this.loading.set(false);
       return;
     }
@@ -50,15 +57,15 @@ export class ServerDetailPage implements OnInit {
 
   // Server helper methods
   getCountryFlag(server: Server): string {
-    return this.api.getCountryFlag(server.country || '');
+    return this.api.getCountryFlag(server.datacenter?.location?.country || '');
   }
 
   hasCountryData(server: Server): boolean {
-    return this.api.hasCountryData(server);
+    return !!server.datacenter?.location?.country && server.datacenter.location.country !== 'Unknown';
   }
 
   getLocationWithFlag(server: Server): string {
-    const city = server.datacenter?.location?.city || server.location;
+    const city = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     if (this.hasCountryData(server)) {
       return `${this.getCountryFlag(server)} ${city}`;
     }
@@ -66,7 +73,7 @@ export class ServerDetailPage implements OnInit {
   }
 
   getCleanCityName(server: Server): string {
-    const fullCity = server.datacenter?.location?.city || server.location;
+    const fullCity = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     return fullCity.replace(/,\s*[A-Z]{2}$/, '');
   }
 
@@ -91,7 +98,8 @@ export class ServerDetailPage implements OnInit {
   getServerPricing(server: Server): any {
     if (!server.server_type?.prices) return null;
     // Find pricing for the server's location
-    return server.server_type.prices.find(p => p.location.toLowerCase() === server.location.toLowerCase());
+    const serverLocation = server.datacenter?.location?.name;
+    return server.server_type.prices.find(p => p.location.toLowerCase() === serverLocation?.toLowerCase());
   }
 
   // Format price values to show clean decimals with € at the end
