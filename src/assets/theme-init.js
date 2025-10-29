@@ -2,8 +2,13 @@
   try {
     const key = 'theme';
     const saved = sessionStorage.getItem(key); // 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const useDark = saved ? saved === 'dark' : prefersDark;
+    
+    // If no saved preference, set dark mode as default in session storage
+    if (!saved) {
+      sessionStorage.setItem(key, 'dark');
+    }
+    
+    const useDark = saved ? saved === 'dark' : true;
     const root = document.documentElement;
     root.classList.toggle('dark', useDark);
   } catch (_) {}

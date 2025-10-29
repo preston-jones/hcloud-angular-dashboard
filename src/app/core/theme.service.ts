@@ -5,7 +5,21 @@ const STORAGE_KEY = 'theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  theme = signal<Theme>(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  theme = signal<Theme>(this.getInitialTheme());
+
+  private getInitialTheme(): Theme {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return saved as Theme;
+      }
+      // Default to dark mode if no saved preference
+      return 'dark';
+    } catch {
+      // Fallback to checking document class or default to dark
+      return document.documentElement.classList.contains('dark') ? 'dark' : 'dark';
+    }
+  }
 
   set(theme: Theme) {
     this.theme.set(theme);

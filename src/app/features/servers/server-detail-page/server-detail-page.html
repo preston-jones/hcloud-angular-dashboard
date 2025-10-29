@@ -1,6 +1,6 @@
 <section class="space-y-6">
-  <!-- Header with Navigation -->
-  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <!-- Header with Navigation and Power Control -->
+  <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
     <div class="flex items-center gap-3">
       <button 
         (click)="goBack()"
@@ -8,32 +8,45 @@
         aria-label="Go back to servers list">
         ← Back
       </button>
-      <h1 class="text-xl font-semibold text-ink">Server Details</h1>
+      <div class="flex-1">
+        @if (server() && !loading()) {
+          <h1 class="text-2xl font-bold text-ink">{{ server()!.name }}</h1>
+          <div class="flex items-center gap-3 mt-1">
+            <span class="text-lg font-medium text-soft">{{ server()!.type.toUpperCase() }}</span>
+            <span class="text-soft">#{{ server()!.id.slice(-8) }}</span>
+            <span class="inline-flex items-center gap-2">
+              <span class="status-dot" [ngClass]="server()!.status"></span>
+              <span class="capitalize text-soft">{{ server()!.status }}</span>
+            </span>
+          </div>
+        } @else {
+          <h1 class="text-xl font-semibold text-ink">Server Details</h1>
+        }
+      </div>
     </div>
     
     @if (server() && !loading()) {
-      <div class="flex flex-wrap gap-2">
-        <button 
-          (click)="startServer()"
-          [disabled]="server()!.status === 'running'"
-          class="action-btn action-btn-primary"
-          [class.opacity-50]="server()!.status === 'running'"
-          [class.cursor-not-allowed]="server()!.status === 'running'">
-          ▶️ Start Server
-        </button>
-        <button 
-          (click)="stopServer()"
-          [disabled]="server()!.status === 'stopped'"
-          class="action-btn action-btn-secondary"
-          [class.opacity-50]="server()!.status === 'stopped'"
-          [class.cursor-not-allowed]="server()!.status === 'stopped'">
-          ⏸️ Stop Server
-        </button>
+      <div class="flex items-center gap-3">
         <button 
           (click)="deleteServer()"
           class="action-btn action-btn-danger">
-          🗑️ Delete Server
+          🗑️ Delete
         </button>
+        
+        <!-- Power Toggle Switch with Label -->
+        <div class="power-toggle-wrapper">
+          <label class="power-switch">
+            <input 
+              type="checkbox" 
+              [checked]="server()!.status === 'running'"
+              (change)="togglePower()"
+              [disabled]="false">
+            <span class="power-slider"></span>
+          </label>
+          <span class="power-label">
+            {{ server()!.status === 'running' ? 'ON' : 'OFF' }}
+          </span>
+        </div>
       </div>
     }
   </header>
@@ -87,187 +100,194 @@
   <!-- Server Details -->
   @if (server() && !loading()) {
     <div class="space-y-6">
-      <!-- Server Overview Card -->
+      <!-- Consolidated Server Metrics Card -->
       <div class="server-detail-card">
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div class="flex-1">
-            <h2 class="text-2xl font-bold text-ink mb-2">{{ server()!.name }}</h2>
-            <div class="flex items-center gap-3 mb-4">
-              <span class="inline-flex items-center gap-2">
-                <span class="status-dot" [ngClass]="server()!.status"></span>
-                <span class="capitalize text-soft">{{ server()!.status }}</span>
-              </span>
-              <span class="text-soft">•</span>
-              <span class="text-soft">{{ server()!.type }}</span>
-            </div>
-            <div class="text-sm text-soft">
-              @if (hasCountryData(server()!)) {
-                <span class="inline-flex items-center gap-2">
-                  <span class="text-base">{{ getCountryFlag(server()!) }}</span>
-                  <span>{{ getCleanCityName(server()!) }}</span>
-                </span>
-              } @else {
-                <span>{{ getCleanCityName(server()!) }}</span>
-              }
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-2xl font-bold text-primary">{{ (server()!.priceEur || 0).toFixed(2) }} €</div>
-            <div class="text-sm text-soft">per month</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hardware Specifications -->
-      <div class="server-detail-card">
-        <h3 class="text-lg font-semibold text-ink mb-4">Hardware Specifications</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- CPU -->
-          <div class="spec-card">
-            <div class="spec-icon">🖥️</div>
-            <div class="spec-content">
-              <div class="spec-label">vCPUs</div>
-              <div class="spec-value">{{ getCpuCount(server()!) }}</div>
-              @if (server()!.server_type?.cpu_type) {
-                <div class="spec-detail">{{ server()!.server_type!.cpu_type }}</div>
-              }
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <!-- vCPU -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">🖥️</div>
+              <div class="metric-text">
+                <div class="metric-value">{{ getCpuCount(server()!) }}</div>
+                <div class="metric-label">vCPU</div>
+              </div>
             </div>
           </div>
           
           <!-- RAM -->
-          <div class="spec-card">
-            <div class="spec-icon">💾</div>
-            <div class="spec-content">
-              <div class="spec-label">RAM</div>
-              <div class="spec-value">{{ getRamSize(server()!) }}</div>
-              <div class="spec-detail">Memory</div>
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">💾</div>
+              <div class="metric-text">
+                <div class="metric-value">{{ getRamSize(server()!) }}</div>
+                <div class="metric-label">RAM</div>
+              </div>
             </div>
           </div>
           
-          <!-- Storage -->
-          <div class="spec-card">
-            <div class="spec-icon">💽</div>
-            <div class="spec-content">
-              <div class="spec-label">SSD Storage</div>
-              <div class="spec-value">{{ getDiskSize(server()!) }}</div>
-              @if (server()!.server_type?.storage_type) {
-                <div class="spec-detail">{{ server()!.server_type!.storage_type }}</div>
-              }
-            </div>
-          </div>
-
-          <!-- Architecture -->
-          @if (server()!.server_type?.architecture) {
-            <div class="spec-card">
-              <div class="spec-icon">🏗️</div>
-              <div class="spec-content">
-                <div class="spec-label">Architecture</div>
-                <div class="spec-value">{{ server()!.server_type!.architecture }}</div>
-                <div class="spec-detail">CPU arch</div>
+          <!-- Disk -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">💽</div>
+              <div class="metric-text">
+                <div class="metric-value">{{ getDiskSize(server()!) }}</div>
+                <div class="metric-label">DISK LOCAL</div>
               </div>
             </div>
-          }
+          </div>
+          
+          <!-- Usage (placeholder) -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">📊</div>
+              <div class="metric-text">
+                <div class="metric-value">€ 0.00</div>
+                <div class="metric-label">USAGE</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Traffic (placeholder) -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">📈</div>
+              <div class="metric-text">
+                <div class="metric-value">0/20TB</div>
+                <div class="metric-label">TRAFFIC OUT</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Price -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">💰</div>
+              <div class="metric-text">
+                <div class="metric-value">{{ (server()!.priceEur || 0).toFixed(2) }} €</div>
+                <div class="metric-label">PRICE/MO</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Pricing Information -->
-      @if (getServerPricing(server()!)) {
-        <div class="server-detail-card">
-          <h3 class="text-lg font-semibold text-ink mb-4">Pricing Information</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="spec-card">
-              <div class="spec-icon">💰</div>
-              <div class="spec-content">
-                <div class="spec-label">Monthly (Net)</div>
-                <div class="spec-value">{{ formatPrice(getServerPricing(server()!)?.price_monthly?.net) }}</div>
-                <div class="spec-detail">Base price</div>
+      <!-- Content Sections (Two Column Layout) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Left Column: Server Activities (Full Height) -->
+        <div class="lg:col-span-1">
+          <div class="server-detail-card h-full">
+            <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
+              ⚡ Server Activities
+            </h3>
+            <div class="space-y-3">
+              <div class="activity-item">
+                <div class="activity-left">
+                  <div class="activity-icon">🟢</div>
+                  <div class="activity-title">Server created</div>
+                </div>
+                <div class="activity-time">{{ server()!.created ? getRelativeTime(server()!.created!) : 'Unknown' }}</div>
               </div>
-            </div>
-            <div class="spec-card">
-              <div class="spec-icon">💸</div>
-              <div class="spec-content">
-                <div class="spec-label">Monthly (Gross)</div>
-                <div class="spec-value">{{ formatPrice(getServerPricing(server()!)?.price_monthly?.gross) }}</div>
-                <div class="spec-detail">With tax</div>
-              </div>
-            </div>
-            <div class="spec-card">
-              <div class="spec-icon">⏰</div>
-              <div class="spec-content">
-                <div class="spec-label">Hourly (Net)</div>
-                <div class="spec-value">{{ formatHourlyPrice(getServerPricing(server()!)?.price_hourly?.net) }}</div>
-                <div class="spec-detail">Per hour</div>
-              </div>
-            </div>
-            <div class="spec-card">
-              <div class="spec-icon">🕒</div>
-              <div class="spec-content">
-                <div class="spec-label">Hourly (Gross)</div>
-                <div class="spec-value">{{ formatHourlyPrice(getServerPricing(server()!)?.price_hourly?.gross) }}</div>
-                <div class="spec-detail">With tax</div>
-              </div>
+              @if (server()!.status === 'running') {
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-icon">▶️</div>
+                    <div class="activity-title">Server started</div>
+                  </div>
+                  <div class="activity-time">Recently</div>
+                </div>
+              }
             </div>
           </div>
         </div>
-      }
 
-      <!-- Server Information -->
-      <div class="server-detail-card">
-        <h3 class="text-lg font-semibold text-ink mb-4">Server Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="info-row">
-            <dt class="info-label">Server ID</dt>
-            <dd class="info-value">{{ server()!.id }}</dd>
-          </div>
-          <div class="info-row">
-            <dt class="info-label">Server Type</dt>
-            <dd class="info-value">{{ server()!.type }}</dd>
-          </div>
-          <div class="info-row">
-            <dt class="info-label">Location</dt>
-            <dd class="info-value">
-              @if (hasCountryData(server()!)) {
-                {{ getCountryFlag(server()!) }} {{ server()!.location }}
-              } @else {
-                {{ server()!.location }}
-              }
-            </dd>
-          </div>
-          <div class="info-row">
-            <dt class="info-label">Status</dt>
-            <dd class="info-value">
-              <span class="inline-flex items-center gap-2">
-                <span class="status-dot" [ngClass]="server()!.status"></span>
-                <span class="capitalize">{{ server()!.status }}</span>
-              </span>
-            </dd>
-          </div>
-          @if (server()!.created) {
-            <div class="info-row">
-              <dt class="info-label">Created</dt>
-              <dd class="info-value">{{ formatDate(server()!.created) }}</dd>
+        <!-- Right Column: Server Options + Location (Stacked) -->
+        <div class="lg:col-span-1 space-y-6">
+          
+          <!-- Server Options -->
+          <div class="server-detail-card">
+            <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
+              ⚙️ Server Options
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="option-button-wrapper">
+                <div class="option-icon">💾</div>
+                <div class="option-button-content">
+                  <button class="option-button-card" disabled>
+                    <span class="option-action">Disable</span>
+                  </button>
+                  <div class="option-label">BACKUP</div>
+                </div>
+              </div>
+              
+              <div class="option-button-wrapper">
+                <div class="option-icon">📦</div>
+                <div class="option-button-content">
+                  <button class="option-button-card" disabled>
+                    <span class="option-action">Select group</span>
+                  </button>
+                  <div class="option-label">PLACEMENT GROUP</div>
+                </div>
+              </div>
+              
+              <div class="option-button-wrapper">
+                <div class="option-icon">🌐</div>
+                <div class="option-button-content">
+                  <button class="option-button-card" disabled>
+                    <span class="option-action">Disable</span>
+                  </button>
+                  <div class="option-label">PUBLIC NETWORK</div>
+                </div>
+              </div>
             </div>
-          }
-          @if (server()!.datacenter?.location?.name) {
-            <div class="info-row">
-              <dt class="info-label">Datacenter</dt>
-              <dd class="info-value">{{ server()!.datacenter!.location!.name }}</dd>
+          </div>
+
+          <!-- Server Location -->
+          <div class="server-detail-card">
+            <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
+              📍 Server Location
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Left: Location Details -->
+              <div class="location-details">
+                <div class="grid grid-cols-2 gap-4">
+                  <!-- Column 1: DATACENTER & COUNTRY -->
+                  <div class="space-y-4">
+                    <div class="location-item">
+                      <div class="location-label">DATACENTER</div>
+                      <div class="location-value">{{ server()!.datacenter?.location?.name || server()!.location }}</div>
+                    </div>
+                    <div class="location-item">
+                      <div class="location-label">COUNTRY</div>
+                      <div class="location-value">
+                        {{ getCountryFlag(server()!) }} {{ server()!.datacenter?.location?.country || server()!.country }}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Column 2: CITY & NETWORK ZONE -->
+                  <div class="space-y-4">
+                    <div class="location-item">
+                      <div class="location-label">CITY</div>
+                      <div class="location-value">{{ getCleanCityName(server()!) }}</div>
+                    </div>
+                    <div class="location-item">
+                      <div class="location-label">NETWORK ZONE</div>
+                      <div class="location-value">eu-central</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right: Location Map (Full Height) -->
+              <div class="location-map h-full">
+                <div class="map-placeholder h-full">
+                  <div class="map-point"></div>
+                  🗺️ Map View
+                </div>
+              </div>
             </div>
-          }
-          @if (server()!.datacenter?.location?.city) {
-            <div class="info-row">
-              <dt class="info-label">City</dt>
-              <dd class="info-value">{{ server()!.datacenter!.location!.city }}</dd>
-            </div>
-          }
-          @if (server()!.datacenter?.location?.country) {
-            <div class="info-row">
-              <dt class="info-label">Country</dt>
-              <dd class="info-value">
-                {{ getCountryFlag(server()!) }} {{ server()!.datacenter!.location!.country }}
-              </dd>
-            </div>
-          }
+          </div>
         </div>
       </div>
     </div>

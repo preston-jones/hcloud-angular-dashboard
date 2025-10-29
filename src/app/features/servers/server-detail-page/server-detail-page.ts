@@ -147,4 +147,32 @@ export class ServerDetailPage implements OnInit {
       return 'Invalid date';
     }
   }
+
+  getRelativeTime(date: string): string {
+    const now = new Date();
+    const createdDate = new Date(date);
+    const diffMs = now.getTime() - createdDate.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 60) {
+      return `${diffMins} minutes ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours} hours ago`;
+    } else {
+      return `${diffDays} days ago`;
+    }
+  }
+
+  togglePower(): void {
+    const currentServer = this.server();
+    if (!currentServer) return;
+
+    if (currentServer.status === 'running') {
+      this.stopServer();
+    } else {
+      this.startServer();
+    }
+  }
 }
