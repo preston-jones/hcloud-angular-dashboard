@@ -1,265 +1,508 @@
 # Hetzner Cloud Angular Dashboard
 
-A modern, responsive web dashboard for managing Hetzner Cloud servers built with Angular 17+ and Tailwind CSS. This demo application showcases best practices for Angular development with a clean, professional UI inspired by Hetzner's design language.
+A modern Angular dashboard for managing Hetzner Cloud servers with dual-mode operation (Mock/Production).
 
-![Dashboard Preview](https://img.shields.io/badge/Angular-17+-red?style=flat-square&logo=angular)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue?style=flat-square&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC?style=flat-square&logo=tailwind-css)
+## 🔄 Complete Data Flow Chain - Step by Step
 
-## ✨ Features
+This document provides a detailed walkthrough of how data flows through the application from the first page visit to final rendering.
 
-### 🖥️ **Server Management**
-- **Server List View**: Comprehensive server overview with card-based layout
-- **Server Details**: Detailed view with hardware specifications and actions
-- **Real-time Search**: Global search functionality in the top navigation
-- **Status Filtering**: Filter servers by running, stopped, or all statuses
-- **Country Flags**: Automatic country detection with emoji flags for server locations
+### Step 1: Application Bootstrap
 
-### 🎨 **Modern UI/UX**
-- **Dark/Light Theme**: Toggle between themes with system preference detection
-- **Responsive Design**: Mobile-first approach with tablet and desktop optimizations
-- **Loading States**: Skeleton loading animations for better UX
-- **Hover Effects**: Smooth transitions and interactive feedback
-- **Professional Layout**: Clean sidebar navigation with collapsible menu
-
-### 🔧 **Technical Features**
-- **Modern Angular**: Built with Angular 17+ using standalone components
-- **Signal-based State**: Reactive state management with Angular signals
-- **TypeScript**: Strict typing throughout the application
-- **Lazy Loading**: Route-based code splitting for optimal performance
-- **Mock API**: Development-ready with mock data and fallback handling
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Angular CLI 17+
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/preston-jones/hcloud-angular-dashboard.git
-cd hcloud-angular-dashboard
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
+**What Happens:**
+```
+Browser loads index.html → Angular starts → App component initializes → Services instantiate
 ```
 
-The application will be available at `http://localhost:4200/`
-
-### Development Commands
-
-```bash
-# Development server with hot reload
-npm start
-
-# Build for production
-npm run build
-
-# Run unit tests
-npm test
-
-# Run linting
-npm run lint
-
-# Format code
-npm run format
-```
-
-## 📱 Application Structure
-
-### **Core Architecture**
-```
-src/
-├── app/
-│   ├── core/                    # Core services and utilities
-│   │   ├── hetzner-api.service  # API service with mock data support
-│   │   ├── theme.service        # Dark/light theme management
-│   │   └── auth.interceptor     # HTTP authentication
-│   ├── features/                # Feature modules
-│   │   └── servers/             # Server management feature
-│   │       ├── servers-page/    # Server list view
-│   │       └── server-detail-page/ # Individual server details
-│   ├── shared/                  # Shared components and utilities
-│   │   └── ui/layout/           # Layout components
-│   │       ├── shell/           # Main application shell
-│   │       ├── topbar/          # Global navigation header
-│   │       └── sidebar/         # Navigation sidebar
-│   └── assets/                  # Static assets and mock data
-```
-
-### **Key Components**
-
-#### **🏠 Shell Layout**
-- **Topbar**: Global header with search, theme toggle, and user avatar
-- **Sidebar**: Navigation menu with collapsible functionality
-- **Main Content**: Router outlet for feature components
-
-#### **🖥️ Server Features**
-- **Server List**: Grid/card view with hardware specs, status, and pricing
-- **Server Detail**: Comprehensive server information and action buttons
-- **Search & Filter**: Real-time filtering by name, type, location, and status
-
-#### **⚙️ Services**
-- **HetznerApiService**: Mock API with structured data transformation
-- **ThemeService**: System-aware theme management with persistence
-
-## 🎨 Design System
-
-### **Color Palette**
-- **Primary**: Hetzner Red (`#d73653`)
-- **Background**: Dark (`#0f1419`) / Light (`#ffffff`)
-- **Surface**: Elevated cards with subtle borders
-- **Text**: Semantic color hierarchy (primary, soft, muted)
-
-### **Typography**
-- **Headers**: Inter font with multiple weights
-- **Body**: System font stack for optimal readability
-- **Code**: Roboto Mono for technical content
-
-### **Components**
-- **Cards**: Rounded corners with hover effects
-- **Buttons**: Consistent sizing and state management
-- **Status Indicators**: Color-coded dots with semantic meaning
-- **Loading States**: Skeleton placeholders with animations
-
-## 🔌 API Integration
-
-### **Mock Data Setup**
-The application includes a comprehensive mock API system:
-
+**Code Flow:**
 ```typescript
-// Environment configuration
-export const environment = {
-  apiBase: 'assets/mock',  // Points to mock data
-  useMockFallback: true,   // Fallback to mock if real API fails
-  production: false
-};
-```
+// main.ts
+bootstrapApplication(AppComponent, appConfig);
 
-### **Data Structure**
-```typescript
-interface Server {
-  id: string;
-  name: string;
-  type: string;
-  location: string;
-  status: 'running' | 'stopped' | 'error';
-  priceEur: number;
-  created?: string;
-  server_type?: {
-    name: string;
-    cores: number;
-    memory: number;
-    disk: number;
-  };
-  datacenter?: {
-    location: {
-      name: string;
-      city: string;
-      country: string;
-    };
-  };
+// App starts and creates service instances
+@Injectable({ providedIn: 'root' })
+export class HetznerApiService {
+  constructor() {
+    console.log('🚀 Service created');
+    this.loadServers();  // Triggers initial data load
+  }
 }
 ```
 
-### **Real API Integration**
-To connect to the actual Hetzner Cloud API:
-
-1. Update `environment.ts`:
-```typescript
-export const environment = {
-  apiBase: 'https://api.hetzner.cloud/v1',
-  useMockFallback: false,
-  production: true
-};
-```
-
-2. Add your API token to localStorage:
-```javascript
-localStorage.setItem('HCLOUD_TOKEN', 'your-hetzner-api-token');
-```
-
-## 🛠️ Development
-
-### **Code Style**
-- **Angular Style Guide**: Follows official Angular style conventions
-- **TypeScript Strict**: Strict type checking enabled
-- **ESLint**: Consistent code formatting and best practices
-- **Prettier**: Automated code formatting
-
-### **Component Architecture**
-- **Standalone Components**: Modern Angular 17+ approach
-- **Signal-based State**: Reactive programming with Angular signals
-- **OnPush Change Detection**: Optimized performance
-- **Lazy Loading**: Route-based code splitting
-
-### **Testing Strategy**
-- **Unit Tests**: Jest with Angular Testing Library
-- **Component Tests**: Isolated component testing
-- **Service Tests**: Mock-based service testing
-- **E2E Tests**: Cypress for end-to-end testing
-
-## 📦 Build & Deployment
-
-### **Production Build**
-```bash
-# Build with optimization
-npm run build
-
-# Build with specific environment
-ng build --configuration production
-```
-
-### **Docker Support**
-```dockerfile
-# Multi-stage build for optimal size
-FROM node:18-alpine as builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-```
-
-### **Deployment Options**
-- **Static Hosting**: Netlify, Vercel, GitHub Pages
-- **Cloud Platforms**: AWS S3, Google Cloud Storage
-- **Container**: Docker with Nginx
-- **CDN**: Cloudflare, AWS CloudFront
-
-## 🤝 Contributing
-
-1. **Fork the repository**
-2. **Create feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit changes**: `git commit -m 'Add amazing feature'`
-4. **Push to branch**: `git push origin feature/amazing-feature`
-5. **Open Pull Request**
-
-### **Development Guidelines**
-- Follow Angular style guide conventions
-- Write unit tests for new features
-- Update documentation for API changes
-- Use conventional commit messages
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Angular Team**: For the excellent framework and tooling
-- **Tailwind CSS**: For the utility-first CSS framework
-- **Hetzner**: For inspiration from their clean design language
-- **Community**: For feedback and contributions
+**Result:** Service singleton created, constructor runs once
 
 ---
 
-**Built with ❤️ using Angular 17+ and modern web technologies**
+### Step 2: Initial Data Loading Check
+
+**What Happens:**
+```
+loadServers() called → Check sessionStorage → Determine data source
+```
+
+**Code Flow:**
+```typescript
+loadServers(): void {
+  console.log('🔄 loadServers called - Mode:', this.mode());
+  
+  // STEP 2A: Check if we have cached data
+  if (this.mode() === 'mock') {
+    const persistedData = sessionStorage.getItem('hetzner_mock_servers');
+    if (persistedData) {
+      console.log('📱 Found cached data in sessionStorage');
+      const servers = JSON.parse(persistedData);
+      this.servers.set(servers);  // Update signal directly
+      return; // Exit early - no HTTP request needed
+    }
+  }
+  
+  // STEP 2B: No cached data, proceed to HTTP request
+  console.log('🌐 No cached data, loading from source');
+}
+```
+
+**First Visit Result:** No sessionStorage data exists, continues to HTTP request
+**Return Visit Result:** Loads from sessionStorage, skips HTTP request
+
+---
+
+### Step 3: HTTP Data Request
+
+**What Happens:**
+```
+Determine endpoint → Make HTTP request → Process response
+```
+
+**Code Flow:**
+```typescript
+// STEP 3A: Determine endpoint based on mode
+const endpoint = this.getEndpoint('servers');
+// Mock mode: '/assets/mock/servers.json'
+// Real mode: 'https://api.hetzner.cloud/v1/servers'
+
+// STEP 3B: Configure headers (auth for real mode)
+const headers = this.getAuthHeaders();
+const httpOptions = headers.Authorization ? { headers } : {};
+
+// STEP 3C: Make HTTP request
+console.log('Loading servers from:', endpoint);
+this.http.get<any>(endpoint, httpOptions).pipe(
+  map(response => {
+    console.log('API response:', response);
+    return response.servers || [];  // Extract server array
+  }),
+  catchError(error => {
+    console.error('Loading failed:', error);
+    this.error.set(error.message);
+    return of([]); // Return empty array on error
+  })
+)
+```
+
+**Result:** HTTP request made to appropriate endpoint
+
+---
+
+### Step 4: Response Processing and Signal Update
+
+**What Happens:**
+```
+HTTP response arrives → Extract servers → Update signal → Cache in sessionStorage
+```
+
+**Code Flow:**
+```typescript
+.subscribe(servers => {
+  console.log('Servers loaded:', servers.length);
+  
+  // STEP 4A: Update Angular signal (triggers reactivity)
+  this.servers.set(servers);
+  // servers signal now contains: [
+  //   { id: '4711', name: 'web-frontend-1', status: 'running' },
+  //   { id: '4712', name: 'database-prod', status: 'running' },
+  //   { id: '4713', name: 'api-backend', status: 'stopped' }
+  // ]
+  
+  // STEP 4B: Cache in sessionStorage (mock mode only)
+  if (this.mode() === 'mock') {
+    sessionStorage.setItem('hetzner_mock_servers', JSON.stringify(servers));
+    console.log('💾 Cached servers in sessionStorage');
+  }
+  
+  this.loading.set(false);
+});
+```
+
+**Result:** 
+- Signal contains server data
+- SessionStorage has cached copy (mock mode)
+- UI will automatically update
+
+---
+
+### Step 5: Computed Signal Recalculation
+
+**What Happens:**
+```
+servers signal changes → Computed signals recalculate → Components get new data
+```
+
+**Code Flow:**
+```typescript
+// This computed signal automatically recalculates when servers signal changes
+myServers = computed(() => {
+  console.log('🔄 myServers computed - recalculating');
+  const allServers = this.servers();  // Read from servers signal
+  
+  if (!allServers) return [];
+  
+  // Filter out server types (status: 'available'), keep actual servers
+  const myActualServers = allServers.filter(s => s.status !== 'available');
+  console.log('👥 My servers count:', myActualServers.length);
+  
+  return myActualServers;
+});
+```
+
+**Signal Dependency Chain:**
+```
+servers signal changes
+    ↓
+myServers computed recalculates  
+    ↓
+Components reading myServers get notified
+    ↓
+Templates re-render automatically
+```
+
+**Result:** Derived data (myServers) automatically updates
+
+---
+
+### Step 6: Component Data Binding
+
+**What Happens:**
+```
+Component reads from service signals → Templates bind to data → Change detection runs
+```
+
+**Code Flow:**
+```typescript
+// In component
+@Component({
+  selector: 'app-my-servers',
+  changeDetection: ChangeDetectionStrategy.OnPush, // Optimized change detection
+})
+export class MyServersPageComponent {
+  private api = inject(HetznerApiService);
+  
+  // STEP 6A: Direct signal binding (no subscriptions needed)
+  servers = this.api.myServers;     // Points to computed signal
+  loading = this.api.loading;       // Points to loading signal
+  error = this.api.error;           // Points to error signal
+  
+  // These are reactive - when signals change, template updates automatically
+}
+```
+
+**Signal Connection:**
+```
+Service Signal ←→ Component Property ←→ Template Binding
+     ↓                    ↓                   ↓
+  servers.set()      this.servers       {{ servers() }}
+```
+
+**Result:** Component has live connection to service data
+
+---
+
+### Step 7: Template Rendering
+
+**What Happens:**
+```
+Angular change detection → Read signal values → Update DOM → Display to user
+```
+
+**Template Code:**
+```html
+<!-- STEP 7A: Conditional rendering based on state -->
+@if (loading()) {
+  <div class="loading">Loading servers...</div>
+} @else if (error()) {
+  <div class="error">{{ error() }}</div>
+} @else {
+  <!-- STEP 7B: Loop through servers with tracking -->
+  @for (server of servers(); track server.id) {
+    <div class="server-card">
+      <h3>{{ server.name }}</h3>
+      <span class="status-{{ server.status }}">{{ server.status }}</span>
+      <button (click)="deleteServer(server.id)">Delete</button>
+    </div>
+  }
+}
+```
+
+**Rendering Process:**
+```
+1. Angular reads signal values: servers(), loading(), error()
+2. Evaluates conditions: @if, @else
+3. Loops through data: @for
+4. Creates DOM elements for each server
+5. Sets up event listeners: (click)
+6. Displays final UI to user
+```
+
+**Result:** User sees server list with interactive buttons
+
+---
+
+### Step 8: User Interaction (Delete Server)
+
+**What Happens:**
+```
+User clicks delete → Confirmation → Service method → Signal update → UI refresh
+```
+
+**Code Flow:**
+```typescript
+// STEP 8A: User clicks delete button
+<button (click)="deleteServer('4711')">Delete</button>
+
+// STEP 8B: Component method calls service
+deleteServer(id: string): void {
+  this.api.deleteServer(id);
+}
+
+// STEP 8C: Service processes deletion
+deleteServer(serverId: string): void {
+  console.log('🗑️ Delete server:', serverId);
+  
+  // Get current data from signal
+  const currentServers = this.servers();  // [4711, 4712, 4713]
+  
+  // Filter out deleted server
+  const filteredServers = currentServers.filter(s => s.id !== serverId);
+  // Result: [4712, 4713]
+  
+  // Update signal (triggers automatic UI update)
+  this.servers.set(filteredServers);
+  
+  // Update sessionStorage cache
+  sessionStorage.setItem('hetzner_mock_servers', JSON.stringify(filteredServers));
+  console.log('💾 Deletion cached in sessionStorage');
+}
+```
+
+**Reactive Update Chain:**
+```
+servers.set([4712, 4713])
+    ↓
+myServers computed recalculates → returns [4712, 4713]
+    ↓
+Component.servers automatically gets new value
+    ↓
+Template re-renders → Server 4711 disappears from UI
+```
+
+**Result:** Server immediately disappears from UI, change persisted
+
+---
+
+### Step 9: Navigation to Another Page
+
+**What Happens:**
+```
+User navigates → Component destroys → New component creates → Reads existing data
+```
+
+**Code Flow:**
+```typescript
+// STEP 9A: User navigates (e.g., to dashboard)
+this.router.navigate(['/dashboard']);
+
+// STEP 9B: Old component destroys (automatic cleanup)
+// No manual cleanup needed - signals handle this automatically
+
+// STEP 9C: New component initializes
+@Component({...})
+export class DashboardComponent {
+  private api = inject(HetznerApiService); // Same service instance
+  
+  // STEP 9D: Connect to existing signals
+  servers = this.api.myServers; // Gets current data [4712, 4713]
+  
+  ngOnInit() {
+    // No need to load data - service already has it
+    console.log('Dashboard loaded, servers:', this.servers().length);
+  }
+}
+```
+
+**State Preservation:**
+```
+Service (Singleton)
+├── servers signal: [4712, 4713] ✓ Preserved
+├── sessionStorage: [4712, 4713] ✓ Preserved  
+└── loading state: false ✓ Preserved
+```
+
+**Result:** Navigation is instant, no data loss, no reloading
+
+---
+
+### Step 10: Return to Original Page
+
+**What Happens:**
+```
+Navigate back → Component creates → Service still exists → Loads from sessionStorage
+```
+
+**Code Flow:**
+```typescript
+// STEP 10A: User returns to servers page
+this.router.navigate(['/servers']);
+
+// STEP 10B: MyServersPageComponent initializes again
+ngOnInit() {
+  // Component reconnects to service signals
+  this.servers = this.api.myServers; // Still [4712, 4713]
+}
+
+// STEP 10C: If loadServers() is called for any reason
+loadServers(): void {
+  // Check sessionStorage first
+  const cached = sessionStorage.getItem('hetzner_mock_servers');
+  if (cached) {
+    console.log('📱 Loading from cache, no HTTP request needed');
+    const servers = JSON.parse(cached); // [4712, 4713]
+    this.servers.set(servers);
+    return; // Early exit - no JSON file loaded
+  }
+  
+  // This path is not taken because we have cached data
+}
+```
+
+**Performance Benefits:**
+```
+❌ Without caching: HTTP request → 200ms delay → UI shows loading
+✅ With caching: Instant load → 0ms delay → UI shows immediately
+```
+
+**Result:** Instant page load, deleted server still gone, no unwanted data resets
+
+---
+
+### Step 11: Mode Switching
+
+**What Happens:**
+```
+User switches modes → Clear cache → Reload from new source → Update UI
+```
+
+**Code Flow:**
+```typescript
+// STEP 11A: User switches from mock to real mode
+setMode('real'): void {
+  console.log('🔄 Switching to real mode');
+  
+  // Update mode signal
+  this.mode.set('real');
+  
+  // Clear mock data cache
+  sessionStorage.removeItem('hetzner_mock_servers');
+  console.log('🗑️ Cleared mock cache');
+  
+  // Reload data from new source
+  this.loadServers(); // Now hits real API
+}
+
+// STEP 11B: loadServers() in real mode
+loadServers(): void {
+  // No sessionStorage check in real mode
+  const endpoint = 'https://api.hetzner.cloud/v1/servers';
+  const headers = { Authorization: `Bearer ${token}` };
+  
+  this.http.get(endpoint, { headers }).subscribe(servers => {
+    this.servers.set(servers); // Real server data
+    // No sessionStorage caching in real mode
+  });
+}
+```
+
+**Mode Transition:**
+```
+Mock Mode: [4712, 4713] (cached, modified)
+    ↓ (switch mode)
+Real Mode: [real-1, real-2, real-3] (fresh from API)
+```
+
+**Result:** Clean transition, real data loaded, no cache pollution
+
+---
+
+## 📊 Data Reading/Writing Summary
+
+### Reading Priority (Top to Bottom)
+```
+1. Angular Signal (RAM)           → Instant access
+   └── servers.set() / servers()
+
+2. SessionStorage (Browser)       → Very fast
+   └── sessionStorage.getItem('hetzner_mock_servers')
+
+3. JSON Files (Static Assets)     → Fast (cached by browser)
+   └── /assets/mock/servers.json
+
+4. Real API (Network)            → Slower
+   └── https://api.hetzner.cloud/v1/servers
+```
+
+### Writing Strategy
+```
+Mock Mode:
+1. Update Angular Signal          → Immediate UI update
+2. Update SessionStorage         → Persist for navigation
+
+Real Mode:
+1. Make API Call                 → Update server
+2. Update Signal on success      → Reflect server state
+```
+
+### Reactivity Chain
+```
+Data Source → HTTP Client → Service Signal → Computed Signal → Component → Template → DOM → User
+```
+
+### Performance Optimizations
+- **Signals**: Only update when data actually changes
+- **SessionStorage**: Eliminates redundant HTTP requests  
+- **OnPush**: Reduces change detection cycles
+- **Computed**: Efficient derived state calculation
+- **Early Returns**: Skip unnecessary processing
+
+This step-by-step flow ensures a smooth, performant user experience with realistic demo behavior and seamless transitions between mock and production modes.
+
+## Quick Start
+
+### Development server
+```bash
+ng serve
+```
+Navigate to `http://localhost:4200/`
+
+### Build
+```bash
+ng build
+```
+
+### Features
+- **Dual Mode Operation**: Mock mode for demos, Real mode for production
+- **Reactive State Management**: Angular signals with computed properties
+- **Persistent Demo Changes**: SessionStorage caching in mock mode
+- **Modern Angular**: Standalone components, control flow syntax
+- **Performance Optimized**: OnPush change detection, minimal HTTP requests
+
+### Architecture
+- **Service Layer**: `HetznerApiService` manages all data operations
+- **Component Layer**: Reactive components with signal bindings
+- **Data Layer**: JSON files (mock) + Real API + SessionStorage cache
