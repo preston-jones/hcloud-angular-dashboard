@@ -23,7 +23,8 @@ export class HetznerApiService {
   private http = inject(HttpClient);
 
   // State signals
-  servers = signal<Server[] | null>(null);
+  servers = signal<Server[] | null>(null);              // Actual user servers
+  serverTypes = signal<Server[] | null>(null);          // Available server configurations
   locations = signal<any[] | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
@@ -39,6 +40,12 @@ export class HetznerApiService {
     const filteredServers = allServers?.filter(s => s.status !== 'available') || [];
     console.log('🔄 myServers computed - All servers:', allServers?.length, 'My servers:', filteredServers.length);
     return filteredServers;
+  });
+
+  // Available server types for creation
+  availableServerTypes = computed(() => {
+    const types = this.serverTypes();
+    return types?.filter(s => s.status === 'available') || [];
   });
 
   // Mode and URL helpers
@@ -191,7 +198,7 @@ export class HetznerApiService {
       })
     ).subscribe(servers => {
       console.log('Server types loaded:', servers.length);
-      this.servers.set(servers);
+      this.serverTypes.set(servers);  // Use separate signal!
       this.loading.set(false);
     });
   }

@@ -25,11 +25,12 @@ export class ServersPage implements OnInit {
   sortColumn = signal<string | null>(null);
   sortDirection = signal<'asc' | 'desc' | 'none'>('none');
 
-    // API state
-  get loading() { return this.api.loading; }
-  get servers() { return this.api.servers; }
-  get error() { return this.api.error; }
-  get searchQuery() { return this.api.searchQuery; }
+      // Get data from service
+  servers = this.api.availableServerTypes;  // Use server types for creation page
+  locations = this.api.locations;
+  loading = this.api.loading;
+  error = this.api.error;
+  searchQuery = this.api.searchQuery;
   get isUsingMockData() { return this.api.isUsingMockData(); }
 
   ngOnInit() {
@@ -43,8 +44,8 @@ export class ServersPage implements OnInit {
 
   // Only show available server types (not actual servers)
   availableServers = computed(() => {
-    const servers = this.servers() || [];
-    return servers.filter(s => s.status === 'available');
+    const serverTypes = this.servers() || [];  // Now reading from serverTypes signal
+    return serverTypes.filter(s => s.status === 'available');
   });
 
   // Gefilterter View for available servers
