@@ -1,0 +1,44 @@
+{
+  "floating_ips": [
+    {
+      "id": 105662818,
+      "description": null,
+      "created": "2025-10-30T20:02:37Z",
+      "ip": "49.13.35.55",
+      "type": "ipv4",
+      "server": 111897044,
+      "dns_ptr": [
+        {
+          "ip": "49.13.35.55",
+          "dns_ptr": "static.55.35.13.49.clients.your-server.de"
+        }
+      ],
+      "home_location": {
+        "city": "Nuremberg",
+        "country": "DE",
+        "description": "Nuremberg DC Park 1",
+        "id": 2,
+        "latitude": 49.452102,
+        "longitude": 11.076665,
+        "name": "nbg1",
+        "network_zone": "eu-central"
+      },
+      "blocked": false,
+      "protection": {
+        "delete": false
+      },
+      "labels": {},
+      "name": "float_test"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "last_page": 1,
+      "next_page": null,
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "total_entries": 1
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "error": {
+    "message": "API functionality was removed",
+    "code": "deprecated_api_endpoint",
+    "details": {
+      "announcement": "https://docs.hetzner.cloud/changelog#2025-01-30-listing-arbitrary-actions-in-the-actions-list-endpoint-is-removed"
+    }
+  }
+}

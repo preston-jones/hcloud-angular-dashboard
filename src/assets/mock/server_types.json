@@ -2354,22 +2354,6 @@
       "memory": 2,
       "prices": [
         {
-          "location": "fsn1",
-          "price_hourly": {
-            "gross": "0.0152320000000000",
-            "net": "0.0128000000"
-          },
-          "price_monthly": {
-            "gross": "9.5081000000000000",
-            "net": "7.9900000000"
-          },
-          "included_traffic": 21990232555520,
-          "price_per_tb_traffic": {
-            "gross": "1.1900000000000000",
-            "net": "1.0000000000"
-          }
-        },
-        {
           "location": "sin",
           "price_hourly": {
             "gross": "0.0114240000000000",
@@ -2901,6 +2885,87 @@
         {
           "id": 6,
           "name": "sin",
+          "deprecation": null
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "name": "cx23",
+      "architecture": "x86",
+      "cores": 2,
+      "cpu_type": "shared",
+      "category": "cost_optimized",
+      "deprecated": false,
+      "deprecation": null,
+      "description": "CX 23",
+      "disk": 40,
+      "memory": 4,
+      "prices": [
+        {
+          "location": "fsn1",
+          "price_hourly": {
+            "gross": "0.0057120000000000",
+            "net": "0.0048000000"
+          },
+          "price_monthly": {
+            "gross": "3.5581000000000000",
+            "net": "2.9900000000"
+          },
+          "included_traffic": 21990232555520,
+          "price_per_tb_traffic": {
+            "gross": "1.1900000000000000",
+            "net": "1.0000000000"
+          }
+        },
+        {
+          "location": "hel1",
+          "price_hourly": {
+            "gross": "0.0057120000000000",
+            "net": "0.0048000000"
+          },
+          "price_monthly": {
+            "gross": "3.5581000000000000",
+            "net": "2.9900000000"
+          },
+          "included_traffic": 21990232555520,
+          "price_per_tb_traffic": {
+            "gross": "1.1900000000000000",
+            "net": "1.0000000000"
+          }
+        },
+        {
+          "location": "nbg1",
+          "price_hourly": {
+            "gross": "0.0057120000000000",
+            "net": "0.0048000000"
+          },
+          "price_monthly": {
+            "gross": "3.5581000000000000",
+            "net": "2.9900000000"
+          },
+          "included_traffic": 21990232555520,
+          "price_per_tb_traffic": {
+            "gross": "1.1900000000000000",
+            "net": "1.0000000000"
+          }
+        }
+      ],
+      "storage_type": "local",
+      "locations": [
+        {
+          "id": 1,
+          "name": "fsn1",
+          "deprecation": null
+        },
+        {
+          "id": 2,
+          "name": "nbg1",
+          "deprecation": null
+        },
+        {
+          "id": 3,
+          "name": "hel1",
           "deprecation": null
         }
       ]

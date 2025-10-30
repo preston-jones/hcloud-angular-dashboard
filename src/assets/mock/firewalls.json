@@ -1,0 +1,52 @@
+{
+  "firewalls": [
+    {
+      "id": 10142013,
+      "created": "2025-10-30T19:59:06Z",
+      "name": "firewall-1",
+      "labels": {},
+      "rules": [
+        {
+          "description": null,
+          "direction": "in",
+          "port": "22",
+          "protocol": "tcp",
+          "destination_ips": [],
+          "source_ips": [
+            "0.0.0.0/0",
+            "::/0"
+          ]
+        },
+        {
+          "description": null,
+          "direction": "in",
+          "port": null,
+          "protocol": "icmp",
+          "destination_ips": [],
+          "source_ips": [
+            "0.0.0.0/0",
+            "::/0"
+          ]
+        }
+      ],
+      "applied_to": [
+        {
+          "type": "server",
+          "server": {
+            "id": 111897044
+          }
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "last_page": 1,
+      "next_page": null,
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "total_entries": 1
+    }
+  }
+}

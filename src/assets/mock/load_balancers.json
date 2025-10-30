@@ -1,0 +1,192 @@
+{
+  "load_balancers": [
+    {
+      "id": 4962920,
+      "algorithm": {
+        "type": "round_robin"
+      },
+      "created": "2025-10-30T20:00:47Z",
+      "included_traffic": 21990232555520,
+      "ingoing_traffic": 0,
+      "labels": {},
+      "load_balancer_type": {
+        "id": 1,
+        "name": "lb11",
+        "description": "LB11",
+        "max_connections": 10000,
+        "max_services": 5,
+        "max_targets": 25,
+        "max_assigned_certificates": 10,
+        "deprecated": null,
+        "prices": [
+          {
+            "location": "fsn1",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 21990232555520,
+            "price_per_tb_traffic": {
+              "net": "1.0000",
+              "gross": "1.1900"
+            }
+          },
+          {
+            "location": "nbg1",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 21990232555520,
+            "price_per_tb_traffic": {
+              "net": "1.0000",
+              "gross": "1.1900"
+            }
+          },
+          {
+            "location": "hel1",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 21990232555520,
+            "price_per_tb_traffic": {
+              "net": "1.0000",
+              "gross": "1.1900"
+            }
+          },
+          {
+            "location": "ash",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 1099511627776,
+            "price_per_tb_traffic": {
+              "net": "1.0000",
+              "gross": "1.1900"
+            }
+          },
+          {
+            "location": "hil",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 1099511627776,
+            "price_per_tb_traffic": {
+              "net": "1.0000",
+              "gross": "1.1900"
+            }
+          },
+          {
+            "location": "sin",
+            "price_hourly": {
+              "net": "0.0088",
+              "gross": "0.0105"
+            },
+            "price_monthly": {
+              "net": "5.3900",
+              "gross": "6.4141"
+            },
+            "included_traffic": 1099511627776,
+            "price_per_tb_traffic": {
+              "net": "7.4000",
+              "gross": "8.8060"
+            }
+          }
+        ]
+      },
+      "location": {
+        "id": 2,
+        "city": "Nuremberg",
+        "country": "DE",
+        "description": "Nuremberg DC Park 1",
+        "latitude": 49.452102,
+        "longitude": 11.076665,
+        "name": "nbg1",
+        "network_zone": "eu-central"
+      },
+      "name": "load-balancer-1",
+      "outgoing_traffic": 0,
+      "private_net": [],
+      "protection": {
+        "delete": false
+      },
+      "public_net": {
+        "enabled": true,
+        "ipv4": {
+          "dns_ptr": "static.142.4.98.91.clients.your-server.de",
+          "ip": "91.98.4.142"
+        },
+        "ipv6": {
+          "dns_ptr": "",
+          "ip": "2a01:4f8:1c1d:74a::1"
+        }
+      },
+      "services": [
+        {
+          "destination_port": 80,
+          "health_check": {
+            "interval": 15,
+            "port": 80,
+            "protocol": "http",
+            "retries": 3,
+            "timeout": 10,
+            "http": {
+              "domain": "",
+              "path": "/",
+              "response": "",
+              "status_codes": [
+                "2??",
+                "3??"
+              ],
+              "tls": false
+            }
+          },
+          "listen_port": 80,
+          "protocol": "http",
+          "proxyprotocol": false,
+          "http": {
+            "certificates": [],
+            "cookie_lifetime": 300,
+            "cookie_name": "HCLBSTICKY",
+            "redirect_http": false,
+            "sticky_sessions": false
+          }
+        }
+      ],
+      "targets": []
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 1
+    }
+  }
+}

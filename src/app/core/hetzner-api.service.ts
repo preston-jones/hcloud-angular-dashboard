@@ -184,7 +184,7 @@ export class HetznerApiService {
   }
 
   forceReloadServers(): void {
-    // Only clear the old cache system, keep user-created servers
+    // Clear old cache system but preserve user-created servers
     sessionStorage.removeItem(CACHE_KEYS.MOCK_SERVERS);
     this.hasLoadedInitialData = false;
     this.loadServers();
@@ -388,7 +388,13 @@ export class HetznerApiService {
         server.id === serverId ? { ...server, status: newStatus } : server
       );
       this.servers.set(updatedServers);
-      sessionStorage.setItem(CACHE_KEYS.MOCK_SERVERS, JSON.stringify(updatedServers));
+      
+      // Update only user-created servers in cache, not static mock data
+      const userServers = this.getCachedUserServers();
+      const updatedUserServers = userServers.map(server => 
+        server.id === serverId ? { ...server, status: newStatus } : server
+      );
+      sessionStorage.setItem(CACHE_KEYS.USER_SERVERS, JSON.stringify(updatedUserServers));
     }
   }
 
@@ -400,7 +406,9 @@ export class HetznerApiService {
     if (currentServers) {
       const filteredServers = currentServers.filter(server => server.id !== serverId);
       this.servers.set(filteredServers);
-      sessionStorage.setItem(CACHE_KEYS.MOCK_SERVERS, JSON.stringify(filteredServers));
+      
+      // Remove from user-created servers only, preserve static mock data
+      this.removeUserServerFromCache(serverId);
     }
   }
 
