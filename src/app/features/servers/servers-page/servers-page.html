@@ -291,3 +291,12 @@
     </div>
   }
 </section>
+
+<!-- Server Name Dialog -->
+@if (showNameDialog() && getSelectedServer()) {
+  <app-server-name-dialog
+    [selectedServer]="getSelectedServer()!"
+    (confirm)="onServerNameConfirmed($event)"
+    (cancel)="onServerNameCancelled()">
+  </app-server-name-dialog>
+}

@@ -3,11 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } 
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { Server } from '../../../core/models';
+import { ServerNameDialogComponent } from '../../../shared/ui/server-name-dialog/server-name-dialog';
 
 @Component({
   selector: 'app-servers-page',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, ServerNameDialogComponent],
   templateUrl: './servers-page.html',
   styleUrls: ['./servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +22,9 @@ export class ServersPage implements OnInit {
   
   // Selection state for server creation
   selectedServerId = signal<number | null>(null);
+  
+  // Dialog state
+  showNameDialog = signal(false);
   
   // Sorting state
   sortColumn = signal<string | null>(null);
@@ -174,7 +178,17 @@ export class ServersPage implements OnInit {
   createSelectedServer(): void {
     const selected = this.getSelectedServer();
     if (selected) {
-      this.api.createServerFromType(selected);
+      // Show the name dialog instead of creating immediately
+      this.showNameDialog.set(true);
+    }
+  }
+
+  // Handle server creation with custom name
+  onServerNameConfirmed(serverName: string): void {
+    const selected = this.getSelectedServer();
+    if (selected) {
+      this.api.createServerFromType(selected, serverName);
+      this.showNameDialog.set(false);
       
       // Only navigate back if we're in mock mode (actual creation happened)
       if (this.api.getCurrentMode() === 'mock') {
@@ -183,6 +197,11 @@ export class ServersPage implements OnInit {
       }
       // In API mode, the demo dialog will show and user stays on the current page
     }
+  }
+
+  // Handle dialog cancellation
+  onServerNameCancelled(): void {
+    this.showNameDialog.set(false);
   }
 
   // TrackBy

@@ -321,20 +321,58 @@ export class HetznerApiService {
   // =============================================================================
 
   /** Create a new server from a server type configuration */
-  createServerFromType(serverType: Server): void {
+  createServerFromType(serverType: Server, customName?: string): void {
     if (!this.checkWritePermission()) return;
 
     const createdId = Date.now() + Math.floor(Math.random() * 1000);
     
+    // Use datacenter from serverType if available, otherwise pick from existing servers
+    let datacenterToUse = serverType.datacenter;
+    
+    if (!datacenterToUse) {
+      // If serverType doesn't have datacenter, pick one from existing servers
+      const existingServers = this.servers() || [];
+      const serversWithDatacenters = existingServers.filter(s => s.datacenter);
+      if (serversWithDatacenters.length > 0) {
+        const randomExistingServer = serversWithDatacenters[Math.floor(Math.random() * serversWithDatacenters.length)];
+        datacenterToUse = randomExistingServer.datacenter;
+      }
+    }
+    
+    // If still no datacenter, fall back to default location
+    if (!datacenterToUse) {
+      const availableLocations = this.locations() || [];
+      const defaultLocation = availableLocations.find(l => l.name === 'hel1') || availableLocations[0];
+      if (defaultLocation) {
+        datacenterToUse = {
+          id: defaultLocation.id,
+          name: defaultLocation.name,
+          location: defaultLocation
+        };
+      }
+    }
+    
+    // Generate fallback server name (only used if no custom name provided)
+    const generateFallbackName = (serverType: Server, datacenter: any): string => {
+      const memory = serverType.server_type?.memory || 8;
+      const locationName = datacenter?.location?.name || datacenter?.name || 'hel1';
+      const instanceNumber = Math.floor(Math.random() * 999) + 1;
+      
+      return `server-${memory}gb-${locationName}-${instanceNumber}`;
+    };
+    
+    const serverName = customName || generateFallbackName(serverType, datacenterToUse);
+    
     const newServer: Server = {
       ...serverType,
       id: createdId,
-      name: `${serverType.type}-${Date.now()}`,
+      name: serverName,
       status: 'running',
       created: new Date().toISOString(),
       ingoing_traffic: 0,
       outgoing_traffic: 0,
       included_traffic: serverType.included_traffic || this.getIncludedTrafficFromServerType(serverType),
+      datacenter: datacenterToUse,
     };
 
     this.addServerToState(newServer);
