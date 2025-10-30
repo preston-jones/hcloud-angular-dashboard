@@ -99,20 +99,6 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
             }
           </div>
         </div>
-
-        <!-- Mobile Skeleton -->
-        <div class="md:hidden space-y-3">
-          @for (_ of [1,2,3]; track $index) {
-            <div class="server-card">
-              <div class="flex items-center justify-between mb-2">
-                <div class="skeleton h-5 w-32"></div>
-                <div class="skeleton h-3 w-3 rounded-full"></div>
-              </div>
-              <div class="skeleton h-4 w-full"></div>
-              <div class="skeleton h-3 w-3/4 mt-1"></div>
-            </div>
-          }
-        </div>
       }
 
       <!-- ERROR STATE -->
@@ -153,9 +139,9 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
         </div>
       }
 
-      <!-- TABLE WITH CARD ROWS (md+) -->
+      <!-- TABLE WITH CARD ROWS (Responsive) -->
       @if (!loading() && !error() && myServers().length > 0) {
-        <div class="hidden md:block space-y-4">
+        <div class="space-y-4">
           <!-- Table Header -->
           <div class="px-4 py-3">
             <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 text-sm text-soft font-bold">
