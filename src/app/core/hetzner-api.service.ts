@@ -1,80 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, map } from 'rxjs';
-
-export interface Server {
-  id: number;
-  name: string;
-  status: 'running' | 'stopped' | 'error' | 'available';
-  created?: string;
-  server_type?: { 
-    id: number;
-    name: string; 
-    cores: number; 
-    memory: number; 
-    disk: number; 
-    description?: string;
-    cpu_type?: string;
-    storage_type?: string;
-    architecture?: string;
-    prices?: Array<{
-      location: string;
-      price_hourly: { net: string; gross: string; };
-      price_monthly: { net: string; gross: string; };
-      included_traffic?: number;
-      price_per_tb_traffic?: { net: string; gross: string; };
-    }>;
-  };
-  datacenter?: { 
-    id: number;
-    name: string;
-    location: { 
-      id: number;
-      name: string; 
-      city: string; 
-      country: string; 
-      description: string;
-      latitude: number;
-      longitude: number;
-    }; 
-  };
-  public_net?: {
-    ipv4?: {
-      id: number;
-      ip: string;
-      blocked: boolean;
-      dns_ptr?: string;
-    };
-    ipv6?: {
-      id: number;
-      ip: string;
-      blocked: boolean;
-      dns_ptr?: string[];
-    };
-    floating_ips?: any[];
-    // Traffic data may be nested in public_net in some API responses
-    ingoing_traffic?: number;
-    outgoing_traffic?: number;
-  };
-  
-  // Traffic properties (may be at root level or nested)
-  traffic?: {
-    ingoing?: number;
-    outgoing?: number;
-  };
-  included_traffic?: number;
-  ingoing_traffic?: number;
-  outgoing_traffic?: number;
-  
-  // Computed properties for compatibility
-  type?: string;
-  location?: string;
-  priceEur?: number;
-  vcpus?: number;
-  ram?: number;
-  ssd?: number;
-  country?: string;
-}
+import { Server, ApiMode, CACHE_KEYS, DEFAULT_INCLUDED_TRAFFIC } from './models';
 
 /**
  * Service for managing Hetzner Cloud servers with support for both mock and real API modes
@@ -83,10 +10,6 @@ export interface Server {
 export class HetznerApiService {
   private http = inject(HttpClient);
   private hasLoadedInitialData = false;
-  // Cache keys
-  private readonly MOCK_SERVERS_KEY = 'hetzner_mock_servers';
-  private readonly USER_SERVERS_KEY = 'hetzner_user_servers';
-  private readonly MODE_KEY = 'hetzner_api_mode';
 
   // =============================================================================
   // STATE SIGNALS
@@ -99,7 +22,7 @@ export class HetznerApiService {
   error = signal<string | null>(null);
   searchQuery = signal('');
   showDemoRestrictionDialog = signal(false);
-  mode = signal<'mock' | 'real'>(this.getPersistedMode());
+  mode = signal<ApiMode>(this.getPersistedMode());
   
   // =============================================================================
   // COMPUTED PROPERTIES
@@ -120,9 +43,9 @@ export class HetznerApiService {
   // =============================================================================
 
   /** Get persisted mode from localStorage */
-  private getPersistedMode(): 'mock' | 'real' {
+  private getPersistedMode(): ApiMode {
     try {
-      const saved = localStorage.getItem(this.MODE_KEY);
+      const saved = localStorage.getItem(CACHE_KEYS.MODE);
       return (saved === 'real') ? 'real' : 'mock';
     } catch {
       return 'mock';
@@ -130,9 +53,9 @@ export class HetznerApiService {
   }
 
   /** Persist mode to localStorage */
-  private persistMode(mode: 'mock' | 'real'): void {
+  private persistMode(mode: ApiMode): void {
     try {
-      localStorage.setItem(this.MODE_KEY, mode);
+      localStorage.setItem(CACHE_KEYS.MODE, mode);
     } catch {
       // localStorage might not be available
     }
@@ -144,7 +67,7 @@ export class HetznerApiService {
 
   constructor() {
     // Clear old cache system on startup, keep user-created servers
-    sessionStorage.removeItem(this.MOCK_SERVERS_KEY);
+    sessionStorage.removeItem(CACHE_KEYS.MOCK_SERVERS);
     this.hasLoadedInitialData = false;
     
     this.loadServers();
@@ -155,12 +78,12 @@ export class HetznerApiService {
   // MODE MANAGEMENT
   // =============================================================================
 
-  setMode(newMode: 'mock' | 'real'): void {
+  setMode(newMode: ApiMode): void {
     this.mode.set(newMode);
     this.persistMode(newMode);  // Persist the mode setting
     // Clear both cache systems when switching modes
-    sessionStorage.removeItem(this.MOCK_SERVERS_KEY);
-    sessionStorage.removeItem(this.USER_SERVERS_KEY);
+    sessionStorage.removeItem(CACHE_KEYS.MOCK_SERVERS);
+    sessionStorage.removeItem(CACHE_KEYS.USER_SERVERS);
     this.hasLoadedInitialData = false;
     this.loadServers();
   }
@@ -262,7 +185,7 @@ export class HetznerApiService {
 
   forceReloadServers(): void {
     // Only clear the old cache system, keep user-created servers
-    sessionStorage.removeItem(this.MOCK_SERVERS_KEY);
+    sessionStorage.removeItem(CACHE_KEYS.MOCK_SERVERS);
     this.hasLoadedInitialData = false;
     this.loadServers();
   }
@@ -272,11 +195,11 @@ export class HetznerApiService {
   // =============================================================================
 
   setToken(token: string): void {
-    sessionStorage.setItem('hz.token', token);
+    sessionStorage.setItem(CACHE_KEYS.TOKEN, token);
   }
 
   getToken(): string {
-    return sessionStorage.getItem('hz.token') || '';
+    return sessionStorage.getItem(CACHE_KEYS.TOKEN) || '';
   }
 
   // =============================================================================
@@ -292,7 +215,7 @@ export class HetznerApiService {
   }
 
   private getAuthHeaders() {
-    const token = sessionStorage.getItem('hz.token');
+    const token = sessionStorage.getItem(CACHE_KEYS.TOKEN);
     return token ? { 'Authorization': `Bearer ${token}` } : {};
   }
 
@@ -302,44 +225,56 @@ export class HetznerApiService {
 
   /** Load servers from current mode (mock or real API) */
   loadServers(): void {
-    this.loading.set(true);
-    this.error.set(null);
+    this.setLoadingState(true);
+    
+    const { endpoint, httpOptions } = this.prepareServerRequest();
+    
+    this.http.get<any>(endpoint, httpOptions).pipe(
+      map(response => this.processServerResponse(response)),
+      catchError((err: HttpErrorResponse) => this.handleServerError(err))
+    ).subscribe(servers => {
+      this.finalizeServerLoad(servers);
+    });
+  }
 
+  private setLoadingState(loading: boolean): void {
+    this.loading.set(loading);
+    this.error.set(null);
+  }
+
+  private prepareServerRequest(): { endpoint: string, httpOptions: any } {
     const endpoint = this.getEndpoint('servers');
     const headers = this.getAuthHeaders();
     const httpOptions = headers.Authorization ? { headers: { ...headers } } : {};
+    return { endpoint, httpOptions };
+  }
 
-    this.http.get<any>(endpoint, httpOptions).pipe(
-      map(response => {
-        const servers = response.servers || [];
-        // Add computed properties to servers
-        return servers.map((server: any) => ({
-          ...server,
-          priceEur: this.calculateServerPrice(server)
-        }));
-      }),
-      catchError((err: HttpErrorResponse) => {
-        // In API mode, don't immediately fail - the error might be temporary
-        const errorMessage = err.message || 'Failed to load servers';
-        console.warn('Server loading failed:', errorMessage);
-        this.error.set(errorMessage);
-        return of([]); // Return empty array instead of failing completely
-      })
-    ).subscribe(servers => {
-      // In mock mode, merge with user-created servers from cache
-      // In real API mode, just use the servers as-is (read-only)
-      if (this.mode() === 'mock') {
-        const cachedServers = this.getCachedUserServers();
-        const mergedServers = [...servers, ...cachedServers];
-        this.servers.set(mergedServers);
-      } else {
-        // Real API is read-only - just display the servers
-        this.servers.set(servers);
-      }
-      
-      this.loading.set(false);
-      this.hasLoadedInitialData = true;
-    });
+  private processServerResponse(response: any): any[] {
+    const servers = response.servers || [];
+    return servers.map((server: any) => ({
+      ...server,
+      priceEur: this.calculateServerPrice(server)
+    }));
+  }
+
+  private handleServerError(err: HttpErrorResponse) {
+    const errorMessage = err.message || 'Failed to load servers';
+    console.warn('Server loading failed:', errorMessage);
+    this.error.set(errorMessage);
+    return of([]);
+  }
+
+  private finalizeServerLoad(servers: any[]): void {
+    if (this.mode() === 'mock') {
+      const cachedServers = this.getCachedUserServers();
+      const mergedServers = [...servers, ...cachedServers];
+      this.servers.set(mergedServers);
+    } else {
+      this.servers.set(servers);
+    }
+    
+    this.loading.set(false);
+    this.hasLoadedInitialData = true;
   }
 
   /** Load server types (available configurations) from current mode */
@@ -387,11 +322,7 @@ export class HetznerApiService {
 
   /** Create a new server from a server type configuration */
   createServerFromType(serverType: Server): void {
-    // Real API is read-only - show demo restriction dialog
-    if (this.mode() !== 'mock') {
-      this.showDemoRestrictionDialog.set(true);
-      return;
-    }
+    if (!this.checkWritePermission()) return;
 
     const createdId = Date.now() + Math.floor(Math.random() * 1000);
     
@@ -401,27 +332,17 @@ export class HetznerApiService {
       name: `${serverType.type}-${Date.now()}`,
       status: 'running',
       created: new Date().toISOString(),
-      // For new servers, traffic starts at 0 (realistic for newly created servers)
       ingoing_traffic: 0,
       outgoing_traffic: 0,
-      // Ensure included_traffic is set from server type pricing
       included_traffic: serverType.included_traffic || this.getIncludedTrafficFromServerType(serverType),
     };
 
-    const currentServers = this.servers() || [];
-    const updatedServers = [...currentServers, newServer];
-    this.servers.set(updatedServers);
-    
-    // Use new caching strategy for user-created servers (mock mode only)
-    this.saveUserServerToCache(newServer);
+    this.addServerToState(newServer);
   }
 
   /** Update server status */
   updateServerStatus(serverId: number, newStatus: 'running' | 'stopped' | 'error' | 'available'): void {
-    if (this.mode() !== 'mock') {
-      this.showDemoRestrictionDialog.set(true);
-      return;
-    }
+    if (!this.checkWritePermission()) return;
 
     const currentServers = this.servers();
     if (currentServers) {
@@ -429,36 +350,41 @@ export class HetznerApiService {
         server.id === serverId ? { ...server, status: newStatus } : server
       );
       this.servers.set(updatedServers);
-      
-      // Persist status changes to sessionStorage in mock mode
-      sessionStorage.setItem(this.MOCK_SERVERS_KEY, JSON.stringify(updatedServers));
+      sessionStorage.setItem(CACHE_KEYS.MOCK_SERVERS, JSON.stringify(updatedServers));
     }
   }
 
   /** Delete a server */
   deleteServer(serverId: number): void {
-    if (this.mode() !== 'mock') {
-      this.showDemoRestrictionDialog.set(true);
-      return;
-    }
+    if (!this.checkWritePermission()) return;
 
     const currentServers = this.servers();
     if (currentServers) {
       const filteredServers = currentServers.filter(server => server.id !== serverId);
       this.servers.set(filteredServers);
-      
-      // Persist changes to sessionStorage in mock mode
-      sessionStorage.setItem(this.MOCK_SERVERS_KEY, JSON.stringify(filteredServers));
+      sessionStorage.setItem(CACHE_KEYS.MOCK_SERVERS, JSON.stringify(filteredServers));
     }
   }
 
   /** Reboot a server */
   rebootServer(serverId: number): void {
+    if (!this.checkWritePermission()) return;
+    // In real implementation, this would make an API call
+  }
+
+  private checkWritePermission(): boolean {
     if (this.mode() !== 'mock') {
       this.showDemoRestrictionDialog.set(true);
-      return;
+      return false;
     }
-    // In real implementation, this would make an API call
+    return true;
+  }
+
+  private addServerToState(newServer: Server): void {
+    const currentServers = this.servers() || [];
+    const updatedServers = [...currentServers, newServer];
+    this.servers.set(updatedServers);
+    this.saveUserServerToCache(newServer);
   }
 
   // =============================================================================
@@ -493,22 +419,34 @@ export class HetznerApiService {
     const servers: Server[] = [];
     
     serverTypes.slice(0, 5).forEach((st: any, index: number) => {
-      st.prices?.forEach((price: any, priceIndex: number) => {
-        if (priceIndex < 3) {
-          servers.push({
-            id: Date.now() + index * 1000 + priceIndex,
-            name: `${st.name.toUpperCase()} - ${st.description}`,
-            status: 'available',
-            created: new Date().toISOString(),
-            server_type: st,
-            // Add computed properties for compatibility
-            priceEur: parseFloat(price.price_monthly?.gross || this.calculatePrice(st).toString())
-          });
-        }
-      });
+      const serverVariants = this.createServerVariants(st, index);
+      servers.push(...serverVariants);
     });
     
     return servers;
+  }
+
+  private createServerVariants(serverType: any, index: number): Server[] {
+    const variants: Server[] = [];
+    
+    serverType.prices?.forEach((price: any, priceIndex: number) => {
+      if (priceIndex < 3) {
+        variants.push(this.createAvailableServer(serverType, price, index, priceIndex));
+      }
+    });
+    
+    return variants;
+  }
+
+  private createAvailableServer(serverType: any, price: any, index: number, priceIndex: number): Server {
+    return {
+      id: Date.now() + index * 1000 + priceIndex,
+      name: `${serverType.name.toUpperCase()} - ${serverType.description}`,
+      status: 'available',
+      created: new Date().toISOString(),
+      server_type: serverType,
+      priceEur: parseFloat(price.price_monthly?.gross || this.calculatePrice(serverType).toString())
+    };
   }
 
   /** Calculate price for a server type */
@@ -541,7 +479,7 @@ export class HetznerApiService {
   /** Get user-created servers from cache (for write operations only) */
   private getCachedUserServers(): Server[] {
     try {
-      const cached = sessionStorage.getItem(this.USER_SERVERS_KEY);
+      const cached = sessionStorage.getItem(CACHE_KEYS.USER_SERVERS);
       return cached ? JSON.parse(cached) : [];
     } catch {
       return [];
@@ -552,23 +490,23 @@ export class HetznerApiService {
   private saveUserServerToCache(server: Server): void {
     const userServers = this.getCachedUserServers();
     userServers.push(server);
-    sessionStorage.setItem(this.USER_SERVERS_KEY, JSON.stringify(userServers));
+    sessionStorage.setItem(CACHE_KEYS.USER_SERVERS, JSON.stringify(userServers));
   }
 
   /** Remove user-created server from cache */
   private removeUserServerFromCache(serverId: number): void {
     const userServers = this.getCachedUserServers();
     const filtered = userServers.filter(s => s.id !== serverId);
-    sessionStorage.setItem(this.USER_SERVERS_KEY, JSON.stringify(filtered));
+    sessionStorage.setItem(CACHE_KEYS.USER_SERVERS, JSON.stringify(filtered));
   }
 
   /** Get included traffic from server type pricing */
   private getIncludedTrafficFromServerType(serverType: Server): number {
     if (serverType.server_type?.prices && serverType.server_type.prices.length > 0) {
       // Use the first pricing entry's included traffic as default
-      return serverType.server_type.prices[0].included_traffic || 21990232555520;
+      return serverType.server_type.prices[0].included_traffic || DEFAULT_INCLUDED_TRAFFIC;
     }
     // Default fallback (20TB in bytes)
-    return 21990232555520;
+    return DEFAULT_INCLUDED_TRAFFIC;
   }
 }

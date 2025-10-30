@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
+import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { Server } from '../../../core/models';
 
 @Component({
   selector: 'app-servers-page',

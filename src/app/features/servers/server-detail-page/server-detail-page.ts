@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
-import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
+import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { Server } from '../../../core/models';
 import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 
 @Component({

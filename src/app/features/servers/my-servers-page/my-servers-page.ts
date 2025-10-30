@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
+import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/models';
 
 @Component({
   selector: 'app-my-servers-page',
@@ -368,7 +369,7 @@ export class MyServersPage implements OnInit {
   private router = inject(Router);
 
   // UI state
-  status = signal<'all' | 'running' | 'stopped'>('all');
+  status = signal<StatusFilter>('all');
   
   // Confirmation dialogs
   showDeleteAllDialog = signal(false);
@@ -377,7 +378,7 @@ export class MyServersPage implements OnInit {
   
   // Sorting state
   sortColumn = signal<string | null>(null);
-  sortDirection = signal<'asc' | 'desc' | 'none'>('none');
+  sortDirection = signal<SortDirection>('none');
 
   // API state
   get loading() { return this.api.loading; }
@@ -413,7 +414,7 @@ export class MyServersPage implements OnInit {
 
   onStatusChange(event: Event) {
     const select = event.target as HTMLSelectElement;
-    this.status.set(select.value as 'all' | 'running' | 'stopped');
+    this.status.set(select.value as StatusFilter);
   }
 
   // Sorting handler
@@ -422,24 +423,35 @@ export class MyServersPage implements OnInit {
     const currentDirection = this.sortDirection();
 
     if (currentColumn === column) {
-      // Cycle through: none -> asc -> desc -> none
-      switch (currentDirection) {
-        case 'none':
-          this.sortDirection.set('asc');
-          break;
-        case 'asc':
-          this.sortDirection.set('desc');
-          break;
-        case 'desc':
-          this.sortColumn.set(null);
-          this.sortDirection.set('none');
-          break;
-      }
+      this.cycleSortDirection();
     } else {
-      // New column, start with ascending
-      this.sortColumn.set(column);
-      this.sortDirection.set('asc');
+      this.setSortColumn(column, 'asc');
     }
+  }
+
+  private cycleSortDirection(): void {
+    const current = this.sortDirection();
+    switch (current) {
+      case 'none':
+        this.sortDirection.set('asc');
+        break;
+      case 'asc':
+        this.sortDirection.set('desc');
+        break;
+      case 'desc':
+        this.resetSort();
+        break;
+    }
+  }
+
+  private setSortColumn(column: string, direction: 'asc' | 'desc'): void {
+    this.sortColumn.set(column);
+    this.sortDirection.set(direction);
+  }
+
+  private resetSort(): void {
+    this.sortColumn.set(null);
+    this.sortDirection.set('none');
   }
 
   // Get sort value for a server based on column
@@ -476,51 +488,28 @@ export class MyServersPage implements OnInit {
     }
 
     return [...servers].sort((a, b) => {
-      const aValue = this.getSortValue(a, column);
-      const bValue = this.getSortValue(b, column);
-
-      let comparison = 0;
-      
-      if (aValue < bValue) {
-        comparison = -1;
-      } else if (aValue > bValue) {
-        comparison = 1;
-      }
-
+      const comparison = this.compareValues(a, b, column);
       return direction === 'asc' ? comparison : -comparison;
     });
   }
 
-  // Get sort indicator for column header
-  getSortIndicator(column: string): string {
-    if (this.sortColumn() !== column) {
-      return '▲▼'; // Default: both arrows when not sorted
-    }
+  private compareValues(a: any, b: any, column: string): number {
+    const aValue = this.getSortValue(a, column);
+    const bValue = this.getSortValue(b, column);
     
-    switch (this.sortDirection()) {
-      case 'asc':
-        return '▲'; // Ascending arrow only
-      case 'desc':
-        return '▼'; // Descending arrow only
-      default:
-        return '▲▼'; // Default: both arrows
-    }
+    if (aValue < bValue) return -1;
+    if (aValue > bValue) return 1;
+    return 0;
   }
 
   // Check if up arrow should be visible
   showUpArrow(column: string): boolean {
-    if (this.sortColumn() !== column) {
-      return true; // Show both arrows when not sorted
-    }
-    return this.sortDirection() === 'asc' || this.sortDirection() === 'none';
+    return this.sortColumn() !== column || this.sortDirection() !== 'desc';
   }
 
   // Check if down arrow should be visible
   showDownArrow(column: string): boolean {
-    if (this.sortColumn() !== column) {
-      return true; // Show both arrows when not sorted
-    }
-    return this.sortDirection() === 'desc' || this.sortDirection() === 'none';
+    return this.sortColumn() !== column || this.sortDirection() !== 'asc';
   }
 
   // Check if column is currently being sorted
@@ -560,52 +549,49 @@ export class MyServersPage implements OnInit {
     }
   }
 
-  // Confirmation handlers for Start All
+  // Confirmation handlers
   confirmStartAll(): void {
-    const stoppedServers = this.myServers().filter(server => server.status === 'stopped');
-    console.log('Starting all stopped servers:', stoppedServers.length);
-    
-    stoppedServers.forEach(server => {
-      this.api.updateServerStatus(server.id, 'running');
-    });
-    
+    this.executeOnFilteredServers('stopped', server => 
+      this.api.updateServerStatus(server.id, 'running')
+    );
     this.showStartAllDialog.set(false);
   }
 
+  confirmStopAll(): void {
+    this.executeOnFilteredServers('running', server => 
+      this.api.updateServerStatus(server.id, 'stopped')
+    );
+    this.showStopAllDialog.set(false);
+  }
+
+  confirmDeleteAll(): void {
+    this.executeOnAllServers(server => this.api.deleteServer(server.id));
+    this.showDeleteAllDialog.set(false);
+  }
+
+  // Cancel handlers
   cancelStartAll(): void {
     this.showStartAllDialog.set(false);
-  }
-
-  // Confirmation handlers for Stop All
-  confirmStopAll(): void {
-    const runningServers = this.myServers().filter(server => server.status === 'running');
-    console.log('Stopping all running servers:', runningServers.length);
-    
-    runningServers.forEach(server => {
-      this.api.updateServerStatus(server.id, 'stopped');
-    });
-    
-    this.showStopAllDialog.set(false);
   }
 
   cancelStopAll(): void {
     this.showStopAllDialog.set(false);
   }
 
-  // Confirmation handlers for Delete All
-  confirmDeleteAll(): void {
-    const allServers = this.myServers();
-    console.log('Deleting all servers:', allServers.length);
-    
-    allServers.forEach(server => {
-      this.api.deleteServer(server.id);
-    });
-    
+  cancelDeleteAll(): void {
     this.showDeleteAllDialog.set(false);
   }
 
-  cancelDeleteAll(): void {
-    this.showDeleteAllDialog.set(false);
+  private executeOnFilteredServers(status: string, action: (server: any) => void): void {
+    const servers = this.myServers().filter(server => server.status === status);
+    console.log(`Operating on ${servers.length} ${status} servers`);
+    servers.forEach(action);
+  }
+
+  private executeOnAllServers(action: (server: any) => void): void {
+    const servers = this.myServers();
+    console.log(`Operating on ${servers.length} servers`);
+    servers.forEach(action);
   }
 
   // Helper methods for counts

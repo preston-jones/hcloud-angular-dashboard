@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
-import { HetznerApiService, Server } from '../../core/hetzner-api.service';
+import { HetznerApiService } from '../../core/hetzner-api.service';
+import { Server } from '../../core/models';
 
 @Component({
   selector: 'app-dashboard',
