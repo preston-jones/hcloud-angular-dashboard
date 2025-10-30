@@ -50,6 +50,7 @@ export interface Location {
   description: string;
   latitude: number;
   longitude: number;
+  network_zone?: string;
 }
 
 /**
@@ -102,6 +103,14 @@ export interface TrafficInfo {
 }
 
 /**
+ * Server protection settings
+ */
+export interface ServerProtection {
+  delete: boolean;
+  rebuild?: boolean;
+}
+
+/**
  * Main Server interface representing a Hetzner Cloud server
  */
 export interface Server {
@@ -112,6 +121,7 @@ export interface Server {
   server_type?: ServerType;
   datacenter?: Datacenter;
   public_net?: PublicNetwork;
+  protection?: ServerProtection;
   
   // Traffic properties (may be at root level or nested)
   traffic?: TrafficInfo;
@@ -126,5 +136,6 @@ export interface Server {
   vcpus?: number;
   ram?: number;
   ssd?: number;
+  architecture?: string;
   country?: string;
 }

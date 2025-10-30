@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, map } from 'rxjs';
-import { Server, ApiMode, CACHE_KEYS, DEFAULT_INCLUDED_TRAFFIC } from './models';
+import { Server, ApiMode, CACHE_KEYS, DEFAULT_INCLUDED_TRAFFIC, ServerProtection } from './models';
 
 /**
  * Service for managing Hetzner Cloud servers with support for both mock and real API modes
@@ -398,12 +398,40 @@ export class HetznerApiService {
     }
   }
 
+  /** Update server protection status */
+  updateServerProtection(serverId: number, isProtected: boolean): void {
+    if (!this.checkWritePermission()) return;
+
+    const currentServers = this.servers();
+    if (currentServers) {
+      const updatedServers = currentServers.map(server => 
+        server.id === serverId ? { ...server, protection: { delete: isProtected } } : server
+      );
+      this.servers.set(updatedServers);
+      
+      // Update only user-created servers in cache, not static mock data
+      const userServers = this.getCachedUserServers();
+      const updatedUserServers = userServers.map(server => 
+        server.id === serverId ? { ...server, protection: { delete: isProtected } } : server
+      );
+      sessionStorage.setItem(CACHE_KEYS.USER_SERVERS, JSON.stringify(updatedUserServers));
+    }
+  }
+
   /** Delete a server */
   deleteServer(serverId: number): void {
     if (!this.checkWritePermission()) return;
 
     const currentServers = this.servers();
     if (currentServers) {
+      // Check if server is protected from deletion
+      const serverToDelete = currentServers.find(server => server.id === serverId);
+      if (serverToDelete?.protection?.delete) {
+        console.warn(`Cannot delete server ${serverToDelete.name}: Server is protected from deletion`);
+        // You could show an error dialog here
+        return;
+      }
+
       const filteredServers = currentServers.filter(server => server.id !== serverId);
       this.servers.set(filteredServers);
       

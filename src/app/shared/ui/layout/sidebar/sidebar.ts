@@ -19,8 +19,7 @@ export class SidebarComponent {
 
   nav: NavItem[] = [
     { label: 'Dashboard', path: '/dashboard', icon: '📊' },
-    { label: 'Servers', path: '/my-servers', icon: '🖥️' },
-    { label: 'Locations', path: '/locations', icon: '📍' },
+    { label: 'Server', path: '/my-servers', icon: '🖥️' },
     { label: 'Analyzer', path: '/analyzer', icon: '🌿' },
   ];
 
