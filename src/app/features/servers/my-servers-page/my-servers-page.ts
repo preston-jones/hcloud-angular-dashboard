@@ -114,17 +114,17 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
                   (change)="toggleSelectAll()"
                   aria-label="Select all servers">
               </div>
-              <div class="text-left">
+              <div class="flex items-center text-left">
                 <span>Name</span>
               </div>
-              <div class="text-left">
+              <div class="flex items-center text-left">
                 <span>Public IP</span>
               </div>
-              <div class="text-left">
+              <div class="flex items-center text-left">
                 <span>Location</span>
               </div>
               <button 
-                class="sortable-header text-left"
+                class="sortable-header text-left flex items-center"
                 [class.sorted]="isColumnSorted('created')"
                 (click)="onSort('created')"
                 [attr.aria-label]="'Sort by created date ' + (sortColumn() === 'created' ? sortDirection() : 'none')"
@@ -135,8 +135,7 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
                   <span class="sort-arrow-down" [style.display]="showDownArrow('created') ? 'block' : 'none'">▼</span>
                 </span>
               </button>
-              <div class="text-center">
-                <span>🛡</span>
+              <div class="flex items-center justify-center">
               </div>
             </div>
           </div>
