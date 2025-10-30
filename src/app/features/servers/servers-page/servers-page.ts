@@ -206,6 +206,12 @@ export class ServersPage implements OnInit {
 
   // Helper to get clean city name (removes state abbreviations)
   getCleanCityName(server: Server): string {
+    // For server types (available servers), show "All Locations" since they can be deployed anywhere
+    if (!server.datacenter) {
+      return 'All Locations';
+    }
+    
+    // For actual server instances, show the city
     const fullCity = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     // Remove state abbreviations like ", VA", ", OR", etc.
     return fullCity.replace(/,\s*[A-Z]{2}$/, '');

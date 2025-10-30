@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
+import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 
 @Component({
   selector: 'app-server-detail-page',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, DeleteConfirmationDialogComponent],
   templateUrl: './server-detail-page.html',
   styleUrls: ['./server-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +22,7 @@ export class ServerDetailPage implements OnInit, OnDestroy {
   loading = signal(true);
   error = signal<string | null>(null);
   showActionsDropdown = signal(false);
+  showDeleteDialog = signal(false);
   
   // Feature states
   backupEnabled = signal(false);
@@ -261,11 +263,23 @@ export class ServerDetailPage implements OnInit, OnDestroy {
   deleteServer(): void {
     const server = this.server();
     if (server) {
-      if (confirm(`Are you sure you want to delete server "${server.name}"? This action cannot be undone.`)) {
-        this.api.deleteServer(server.id);
-        this.goBack(); // Navigate back after deletion
-      }
+      this.showDeleteDialog.set(true);
     }
+  }
+
+  // Handle delete confirmation
+  confirmDelete(): void {
+    const server = this.server();
+    if (server) {
+      this.api.deleteServer(server.id);
+      this.showDeleteDialog.set(false);
+      this.goBack(); // Navigate back after deletion
+    }
+  }
+
+  // Handle delete cancellation
+  cancelDelete(): void {
+    this.showDeleteDialog.set(false);
   }
 
   // Format created date

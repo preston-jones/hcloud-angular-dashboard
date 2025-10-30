@@ -83,8 +83,10 @@ export interface Server {
 export class HetznerApiService {
   private http = inject(HttpClient);
   private hasLoadedInitialData = false;
+  // Cache keys
   private readonly MOCK_SERVERS_KEY = 'hetzner_mock_servers';
   private readonly USER_SERVERS_KEY = 'hetzner_user_servers';
+  private readonly MODE_KEY = 'hetzner_api_mode';
 
   // =============================================================================
   // STATE SIGNALS
@@ -97,7 +99,7 @@ export class HetznerApiService {
   error = signal<string | null>(null);
   searchQuery = signal('');
   showDemoRestrictionDialog = signal(false);
-  mode = signal<'mock' | 'real'>('mock');
+  mode = signal<'mock' | 'real'>(this.getPersistedMode());
   
   // =============================================================================
   // COMPUTED PROPERTIES
@@ -112,6 +114,29 @@ export class HetznerApiService {
     const types = this.serverTypes();
     return types?.filter(s => s.status === 'available') || [];
   });
+
+  // =============================================================================
+  // MODE PERSISTENCE
+  // =============================================================================
+
+  /** Get persisted mode from localStorage */
+  private getPersistedMode(): 'mock' | 'real' {
+    try {
+      const saved = localStorage.getItem(this.MODE_KEY);
+      return (saved === 'real') ? 'real' : 'mock';
+    } catch {
+      return 'mock';
+    }
+  }
+
+  /** Persist mode to localStorage */
+  private persistMode(mode: 'mock' | 'real'): void {
+    try {
+      localStorage.setItem(this.MODE_KEY, mode);
+    } catch {
+      // localStorage might not be available
+    }
+  }
 
   // =============================================================================
   // CONSTRUCTOR
@@ -132,6 +157,7 @@ export class HetznerApiService {
 
   setMode(newMode: 'mock' | 'real'): void {
     this.mode.set(newMode);
+    this.persistMode(newMode);  // Persist the mode setting
     // Clear both cache systems when switching modes
     sessionStorage.removeItem(this.MOCK_SERVERS_KEY);
     sessionStorage.removeItem(this.USER_SERVERS_KEY);
@@ -205,6 +231,17 @@ export class HetznerApiService {
 
   getCurrentMode(): 'mock' | 'real' {
     return this.mode();
+  }
+
+  // =============================================================================
+  // PUBLIC API METHODS
+  // =============================================================================
+
+  /** Manually retry loading data (useful for error recovery) */
+  retry(): void {
+    this.loadServers();
+    this.loadServerTypes();
+    this.loadLocations();
   }
 
   isUsingMockData(): boolean {
@@ -282,8 +319,11 @@ export class HetznerApiService {
         }));
       }),
       catchError((err: HttpErrorResponse) => {
-        this.error.set(err.message || 'Failed to load servers');
-        return of([]);
+        // In API mode, don't immediately fail - the error might be temporary
+        const errorMessage = err.message || 'Failed to load servers';
+        console.warn('Server loading failed:', errorMessage);
+        this.error.set(errorMessage);
+        return of([]); // Return empty array instead of failing completely
       })
     ).subscribe(servers => {
       // In mock mode, merge with user-created servers from cache
