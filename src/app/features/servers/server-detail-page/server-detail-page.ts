@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, signal, TemplateRef, ViewChild, AfterViewInit, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 
@@ -13,10 +14,13 @@ import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-con
   styleUrls: ['./server-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServerDetailPage implements OnInit, OnDestroy {
+export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   public api = inject(HetznerApiService);
+  private pageHeaderService = inject(PageHeaderService);
+
+  @ViewChild('serverHeaderTemplate', { static: true }) serverHeaderTemplate!: TemplateRef<any>;
 
   // Local state
   serverId = signal<number | null>(null);
@@ -41,6 +45,15 @@ export class ServerDetailPage implements OnInit, OnDestroy {
     if (!id || !userServers) return null;
     return userServers.find(s => s.id === id) || null;
   });
+
+  constructor() {
+    // Update header when server data changes
+    effect(() => {
+      if (this.serverHeaderTemplate) {
+        this.updatePageHeader();
+      }
+    });
+  }
 
   ngOnInit() {
     // Get server ID from route params
@@ -67,6 +80,18 @@ export class ServerDetailPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.clearTimer();
+    this.pageHeaderService.clearHeader();
+  }
+
+  ngAfterViewInit() {
+    this.updatePageHeader();
+  }
+
+  private updatePageHeader() {
+    this.pageHeaderService.setHeader({
+      template: this.serverHeaderTemplate,
+      context: { $implicit: this }
+    });
   }
 
   // Timer management

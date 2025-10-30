@@ -1,35 +1,35 @@
-<section class="space-y-6" (click)="closeActionsDropdown()">
-  <!-- Header with Navigation and Power Control -->
-  <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+<!-- Header Template for Page Header Service -->
+<ng-template #serverHeaderTemplate let-component>
+  <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between px-6 py-4" (click)="component.closeActionsDropdown()">
     <div class="flex items-start gap-4">
-      @if (server() && !loading()) {
+      @if (component.server() && !component.loading()) {
         <!-- Server Type/ID -->
         <div class="text-center">
-          <div class="text-3xl font-bold text-ink">{{ server()!.server_type?.name?.toUpperCase() || 'UNKNOWN' }}</div>
-          <div class="text-sm text-soft">#{{ server()!.id.toString().slice(-8) }}</div>
+          <div class="text-3xl font-bold text-ink">{{ component.server()!.server_type?.name?.toUpperCase() || 'UNKNOWN' }}</div>
+          <div class="text-sm text-soft">#{{ component.server()!.id.toString().slice(-8) }}</div>
         </div>
         
         <!-- Separator Line -->
-        <div class="border-l border-ui h-16 self-start mt-1"></div>
+        <div class="border-l-2 border-ui h-16 self-start mt-1"></div>
         
         <!-- Server Name and IPs -->
         <div class="flex-1">
           <div class="flex items-center gap-2">
-            <span class="status-dot" [ngClass]="server()!.status"></span>
-            <h1 class="text-2xl font-bold text-ink">{{ server()!.name }}</h1>
+            <span class="status-dot" [ngClass]="component.server()!.status"></span>
+            <h1 class="text-2xl font-bold text-ink">{{ component.server()!.name }}</h1>
           </div>
-          @if (hasPublicIPs(server()!)) {
+          @if (component.hasPublicIPs(component.server()!)) {
             <div class="flex items-center gap-4 mt-2">
-              @if (getIPv4(server()!)) {
+              @if (component.getIPv4(component.server()!)) {
                 <div class="flex items-center gap-2">
                   <span class="text-xs text-soft">IPv4:</span>
-                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ getIPv4(server()!) }}</code>
+                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ component.getIPv4(component.server()!) }}</code>
                 </div>
               }
-              @if (getIPv6(server()!)) {
+              @if (component.getIPv6(component.server()!)) {
                 <div class="flex items-center gap-2">
                   <span class="text-xs text-soft">IPv6:</span>
-                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ getIPv6(server()!) }}</code>
+                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ component.getIPv6(component.server()!) }}</code>
                 </div>
               }
             </div>
@@ -42,42 +42,42 @@
       }
     </div>
     
-    @if (server() && !loading()) {
+    @if (component.server() && !component.loading()) {
       <div class="flex items-center gap-3">
         <!-- Actions Dropdown -->
         <div class="relative">
           <button 
-            (click)="$event.stopPropagation(); toggleActionsDropdown()"
+            (click)="$event.stopPropagation(); component.toggleActionsDropdown()"
             class="action-btn action-btn-secondary flex items-center gap-2">
             Actions
-            <span class="text-xs">{{ showActionsDropdown() ? '▲' : '▼' }}</span>
+            <span class="text-xs">{{ component.showActionsDropdown() ? '▲' : '▼' }}</span>
           </button>
           
-          @if (showActionsDropdown()) {
+          @if (component.showActionsDropdown()) {
             <div 
               class="actions-dropdown absolute right-0 top-full mt-2 w-48 rounded-lg z-50"
               (click)="$event.stopPropagation()">
               <div class="py-2">
-                @if (server()!.status === 'running') {
+                @if (component.server()!.status === 'running') {
                   <button 
-                    (click)="turnOffServer()"
+                    (click)="component.turnOffServer()"
                     class="w-full px-4 py-2 text-left text-sm transition-colors">
                     Turn Off
                   </button>
                   <button 
-                    (click)="shutDownServer()"
+                    (click)="component.shutDownServer()"
                     class="w-full px-4 py-2 text-left text-sm transition-colors">
                     Shut Down
                   </button>
                 }
-                @if (server()!.status === 'stopped') {
+                @if (component.server()!.status === 'stopped') {
                   <div class="px-4 py-2 text-sm text-soft">
                     Server is stopped
                   </div>
                 }
                 <hr class="my-2 border-ui">
                 <button 
-                  (click)="deleteServerFromDropdown()"
+                  (click)="component.deleteServerFromDropdown()"
                   class="delete-action w-full px-4 py-2 text-left text-sm transition-colors">
                   Delete
                 </button>
@@ -91,8 +91,8 @@
           <label class="power-switch">
             <input 
               type="checkbox" 
-              [checked]="server()!.status === 'running'"
-              (change)="togglePower()"
+              [checked]="component.server()!.status === 'running'"
+              (change)="component.togglePower()"
               [disabled]="false">
             <span class="power-slider">
               <span class="power-label-off">OFF</span>
@@ -103,6 +103,9 @@
       </div>
     }
   </header>
+</ng-template>
+
+<section class="space-y-6" (click)="closeActionsDropdown()">
 
   <!-- Loading State -->
   @if (loading()) {
@@ -165,7 +168,7 @@
     <div class="space-y-6">
       <!-- Consolidated Server Metrics Card -->
       <div class="server-detail-card">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="flex flex-wrap gap-4">
           <!-- vCPU -->
           <div class="metric-item">
             <div class="metric-content">

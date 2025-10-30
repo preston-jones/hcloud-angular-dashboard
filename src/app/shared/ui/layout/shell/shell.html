@@ -11,8 +11,31 @@
       (mouseleave)="collapseSidebar()"
       (togglePin)="togglePin()">
     </app-sidebar>
-    <main class="h-full p-6 overflow-auto bg-surface flex justify-center"
-          style="margin-left: 280px;">
+    
+    <!-- Page Header - adapts to sidebar state -->
+    @if (pageHeaderService.header()) {
+      <div class="page-header bg-card border-b border-ui transition-all duration-300"
+           [style.margin-left]="getSidebarWidth()">
+        @if (pageHeaderService.header()?.template) {
+          <ng-container 
+            [ngTemplateOutlet]="pageHeaderService.header()!.template!" 
+            [ngTemplateOutletContext]="pageHeaderService.header()!.context">
+          </ng-container>
+        } @else {
+          <div class="px-6 py-4">
+            @if (pageHeaderService.header()?.title) {
+              <h1 class="text-2xl font-bold text-ink">{{ pageHeaderService.header()!.title }}</h1>
+            }
+            @if (pageHeaderService.header()?.subtitle) {
+              <p class="text-soft mt-1">{{ pageHeaderService.header()!.subtitle }}</p>
+            }
+          </div>
+        }
+      </div>
+    }
+    
+    <main class="h-full p-6 overflow-auto bg-surface flex justify-center transition-all duration-300"
+          [style.margin-left]="getSidebarWidth()">
       <div class="w-full max-w-[1440px]">
         <router-outlet></router-outlet>
       </div>
