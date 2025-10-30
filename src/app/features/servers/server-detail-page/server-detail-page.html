@@ -1,6 +1,6 @@
 <!-- Header Template for Page Header Service -->
 <ng-template #serverHeaderTemplate let-component>
-  <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between px-6 py-4" (click)="component.closeActionsDropdown()">
+  <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between px-6 py-4 h-[120px]" (click)="component.closeActionsDropdown()">
     <div class="flex items-start gap-4">
       @if (component.server() && !component.loading()) {
         <!-- Server Type/ID -->
