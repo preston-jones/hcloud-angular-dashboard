@@ -249,80 +249,6 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
       </div>
     </div>
 
-    <!-- Confirmation Dialogs -->
-    
-    <!-- Delete All Confirmation -->
-    @if (showDeleteAllDialog()) {
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
-          <h3 class="text-lg font-semibold text-ink mb-3">Delete All Servers</h3>
-          <p class="text-soft mb-6">
-            Are you sure you want to delete all {{ myServers().length }} servers? 
-            This action cannot be undone.
-          </p>
-          <div class="flex gap-3 justify-end">
-            <button 
-              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
-              (click)="cancelDeleteAll()">
-              Cancel
-            </button>
-            <button 
-              class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
-              (click)="confirmDeleteAll()">
-              Delete All
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Start All Confirmation -->
-    @if (showStartAllDialog()) {
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
-          <h3 class="text-lg font-semibold text-ink mb-3">Start All Servers</h3>
-          <p class="text-soft mb-6">
-            Start all stopped servers? This will start {{ getStoppedServersCount() }} servers.
-          </p>
-          <div class="flex gap-3 justify-end">
-            <button 
-              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
-              (click)="cancelStartAll()">
-              Cancel
-            </button>
-            <button 
-              class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors"
-              (click)="confirmStartAll()">
-              Start All
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Stop All Confirmation -->
-    @if (showStopAllDialog()) {
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-surface rounded-xl border border-ui p-6 max-w-md w-full">
-          <h3 class="text-lg font-semibold text-ink mb-3">Stop All Servers</h3>
-          <p class="text-soft mb-6">
-            Stop all running servers? This will stop {{ getRunningServersCount() }} servers.
-          </p>
-          <div class="flex gap-3 justify-end">
-            <button 
-              class="px-4 py-2 rounded-lg border border-ui text-soft hover:bg-surface-elev transition-colors"
-              (click)="cancelStopAll()">
-              Cancel
-            </button>
-            <button 
-              class="px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white transition-colors"
-              (click)="confirmStopAll()">
-              Stop All
-            </button>
-          </div>
-        </div>
-      </div>
-    }
   `,
   styleUrls: ['./my-servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -336,11 +262,6 @@ export class MyServersPage implements OnInit {
   
   // Computed for selection count
   selectedCount = computed(() => this.selectedServerIds().size);
-  
-  // Confirmation dialogs
-  showDeleteAllDialog = signal(false);
-  showStartAllDialog = signal(false);
-  showStopAllDialog = signal(false);
   
   // Sorting state
   sortColumn = signal<string | null>('created');
@@ -572,87 +493,9 @@ export class MyServersPage implements OnInit {
     this.router.navigate(['/my-servers', server.id]);
   }
 
-  // Helper methods for UI state
-  hasRunningServers(): boolean {
-    return this.myServers().some(server => server.status === 'running');
-  }
 
-  hasStoppedServers(): boolean {
-    return this.myServers().some(server => server.status === 'stopped');
-  }
 
-  // Bulk operations - show confirmation dialogs
-  startAllServers(): void {
-    if (this.hasStoppedServers()) {
-      this.showStartAllDialog.set(true);
-    }
-  }
 
-  stopAllServers(): void {
-    if (this.hasRunningServers()) {
-      this.showStopAllDialog.set(true);
-    }
-  }
-
-  deleteAllServers(): void {
-    if (this.myServers().length > 0) {
-      this.showDeleteAllDialog.set(true);
-    }
-  }
-
-  // Confirmation handlers
-  confirmStartAll(): void {
-    this.executeOnFilteredServers('stopped', server => 
-      this.api.updateServerStatus(server.id, 'running')
-    );
-    this.showStartAllDialog.set(false);
-  }
-
-  confirmStopAll(): void {
-    this.executeOnFilteredServers('running', server => 
-      this.api.updateServerStatus(server.id, 'stopped')
-    );
-    this.showStopAllDialog.set(false);
-  }
-
-  confirmDeleteAll(): void {
-    this.executeOnAllServers(server => this.api.deleteServer(server.id));
-    this.showDeleteAllDialog.set(false);
-  }
-
-  // Cancel handlers
-  cancelStartAll(): void {
-    this.showStartAllDialog.set(false);
-  }
-
-  cancelStopAll(): void {
-    this.showStopAllDialog.set(false);
-  }
-
-  cancelDeleteAll(): void {
-    this.showDeleteAllDialog.set(false);
-  }
-
-  private executeOnFilteredServers(status: string, action: (server: any) => void): void {
-    const servers = this.myServers().filter(server => server.status === status);
-    console.log(`Operating on ${servers.length} ${status} servers`);
-    servers.forEach(action);
-  }
-
-  private executeOnAllServers(action: (server: any) => void): void {
-    const servers = this.myServers();
-    console.log(`Operating on ${servers.length} servers`);
-    servers.forEach(action);
-  }
-
-  // Helper methods for counts
-  getRunningServersCount(): number {
-    return this.myServers().filter(server => server.status === 'running').length;
-  }
-
-  getStoppedServersCount(): number {
-    return this.myServers().filter(server => server.status === 'stopped').length;
-  }
 
   // Get the monthly price for a server
   getServerPrice(server: Server): string {
