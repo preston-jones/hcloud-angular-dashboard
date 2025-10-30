@@ -263,11 +263,11 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
               <div class="server-card cursor-pointer" (click)="viewServerDetails(s)">
                 <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center text-sm">
                   <div class="font-medium text-primary">{{ s.name }}</div>
-                  <div class="text-soft">{{ s.type }}</div>
-                  <div class="text-soft text-xs">{{ s.vcpus }}</div>
-                  <div class="text-soft text-xs">{{ s.ram }} GB</div>
-                  <div class="text-soft text-xs">{{ s.ssd }} GB</div>
-                  <div class="text-soft">{{ s.location }}</div>
+                  <div class="text-soft">{{ getServerType(s) }}</div>
+                  <div class="text-soft text-xs">{{ getCpuCount(s) }}</div>
+                  <div class="text-soft text-xs">{{ getRamSize(s) }}</div>
+                  <div class="text-soft text-xs">{{ getDiskSize(s) }}</div>
+                  <div class="text-soft">{{ getLocationWithFlag(s) }}</div>
                   <div>
                     <span class="inline-flex items-center gap-2">
                       <span class="status-dot" [ngClass]="s.status"></span>
@@ -275,7 +275,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
                     </span>
                   </div>
                   <div class="text-right text-soft">
-                    €{{ (s.priceEur || 0).toFixed(2) }}/mo
+                    €{{ getServerPrice(s) }}/mo
                   </div>
                 </div>
               </div>
@@ -448,19 +448,19 @@ export class MyServersPage implements OnInit {
       case 'name':
         return server.name.toLowerCase();
       case 'type':
-        return server.type.toLowerCase();
+        return this.getServerType(server).toLowerCase();
       case 'vcpus':
-        return server.vcpus || 0;
+        return server.server_type?.cores || 0;
       case 'ram':
-        return server.ram || 0;
+        return server.server_type?.memory || 0;
       case 'ssd':
-        return server.ssd || 0;
+        return server.server_type?.disk || 0;
       case 'location':
-        return server.location.toLowerCase();
+        return (server.datacenter?.location?.city || server.location || '').toLowerCase();
       case 'status':
         return server.status;
       case 'price':
-        return server.priceEur || 0;
+        return this.api.getServerPrice(server);
       default:
         return '';
     }
@@ -615,5 +615,38 @@ export class MyServersPage implements OnInit {
 
   getStoppedServersCount(): number {
     return this.myServers().filter(server => server.status === 'stopped').length;
+  }
+
+  // Get the monthly price for a server
+  getServerPrice(server: Server): string {
+    return this.api.getServerPriceFormatted(server);
+  }
+
+  // Get server type display name
+  getServerType(server: Server): string {
+    return server.server_type?.name || server.type || 'Unknown';
+  }
+
+  // Hardware specs helpers
+  getCpuCount(server: Server): string {
+    return this.api.getCpuCount(server);
+  }
+
+  getRamSize(server: Server): string {
+    return this.api.getRamSize(server);
+  }
+
+  getDiskSize(server: Server): string {
+    return this.api.getDiskSize(server);
+  }
+
+  // Location helpers
+  getLocationWithFlag(server: Server): string {
+    const city: string = server.datacenter?.location?.city || server.datacenter?.location?.name || server.location || 'Unknown';
+    if (server.datacenter?.location?.country) {
+      const flag = this.api.getCountryFlag(server.datacenter.location.country);
+      return `${flag} ${city}`;
+    }
+    return city;
   }
 }

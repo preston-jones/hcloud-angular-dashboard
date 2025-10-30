@@ -37,7 +37,7 @@ export class DashboardPage implements OnInit {
   // Calculate totals
   totalCosts = computed(() => {
     const servers = this.myServers();
-    return servers.reduce((total, server) => total + (server.priceEur || 0), 0);
+    return servers.reduce((total, server) => total + this.api.getServerPrice(server), 0);
   });
 
   totalVCpus = computed(() => {
@@ -49,6 +49,22 @@ export class DashboardPage implements OnInit {
     const servers = this.myServers();
     return servers.reduce((total, server) => total + (server.server_type?.memory || 0), 0);
   });
+
+  // Calculate total traffic - works with both mock and real API data
+  totalIngoingTraffic = computed(() => {
+    const servers = this.myServers();
+    return servers.reduce((total, server) => total + this.api.getServerIncomingTraffic(server), 0);
+  });
+
+  totalOutgoingTraffic = computed(() => {
+    const servers = this.myServers();
+    return servers.reduce((total, server) => total + this.api.getServerOutgoingTraffic(server), 0);
+  });
+
+  // Format bytes to human readable
+  formatBytes(bytes: number): string {
+    return this.api.formatBytes(bytes);
+  }
 
   // Navigation
   viewServerDetails(server: Server) {
@@ -81,23 +97,20 @@ export class DashboardPage implements OnInit {
 
   // Price helper
   getServerPrice(server: Server): string {
-    if (!server.server_type?.prices) return '0.00';
-    const serverLocation = server.datacenter?.location?.name;
-    const pricing = server.server_type.prices.find(p => p.location === serverLocation);
-    return pricing ? parseFloat(pricing.price_monthly.net).toFixed(2) : '0.00';
+    return this.api.getServerPriceFormatted(server);
   }
 
   // Hardware specs helpers
   getCpuCount(server: Server): string {
-    return server.server_type?.cores ? `${server.server_type.cores}` : '0';
+    return this.api.getCpuCount(server);
   }
 
   getRamSize(server: Server): string {
-    return server.server_type?.memory ? `${server.server_type.memory} GB` : '0 GB';
+    return this.api.getRamSize(server);
   }
 
   getDiskSize(server: Server): string {
-    return server.server_type?.disk ? `${server.server_type.disk} GB` : '0 GB';
+    return this.api.getDiskSize(server);
   }
 
   // Skeleton rows

@@ -259,8 +259,8 @@
       "load_balancers": [],
       "volumes": [],
       "included_traffic": 21990232555520,
-      "ingoing_traffic": 0,
-      "outgoing_traffic": 0,
+      "ingoing_traffic": 1288490188800,
+      "outgoing_traffic": 907354726400,
       "created": "2025-10-29T21:55:38Z"
     }
   ],

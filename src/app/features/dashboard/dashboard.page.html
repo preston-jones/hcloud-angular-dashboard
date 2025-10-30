@@ -66,14 +66,14 @@
       <!-- Data Transfer In -->
       <div class="card">
         <h3 class="text-sm font-medium text-soft mb-2">Data Transfer In</h3>
-        <p class="text-2xl font-bold text-ink">1.2 TB</p>
+        <p class="text-2xl font-bold text-ink">{{ formatBytes(totalIngoingTraffic()) }}</p>
         <p class="text-xs text-soft mt-1">This month</p>
       </div>
 
       <!-- Data Transfer Out -->
       <div class="card">
         <h3 class="text-sm font-medium text-soft mb-2">Data Transfer Out</h3>
-        <p class="text-2xl font-bold text-ink">845 GB</p>
+        <p class="text-2xl font-bold text-ink">{{ formatBytes(totalOutgoingTraffic()) }}</p>
         <p class="text-xs text-soft mt-1">This month</p>
       </div>
     </div>
@@ -85,9 +85,10 @@
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg font-medium text-ink">My Servers</h2>
           <button 
-            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
+            class="text-primary hover:text-primary-700 transition-colors flex items-center gap-1"
             (click)="goToMyServers()">
             View All
+            <span>></span>
           </button>
         </div>
 

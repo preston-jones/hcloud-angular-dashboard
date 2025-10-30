@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
@@ -11,7 +11,7 @@ import { HetznerApiService, Server } from '../../../core/hetzner-api.service';
   styleUrls: ['./server-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServerDetailPage implements OnInit {
+export class ServerDetailPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   public api = inject(HetznerApiService);
@@ -20,6 +20,16 @@ export class ServerDetailPage implements OnInit {
   serverId = signal<number | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+  showActionsDropdown = signal(false);
+  
+  // Feature states
+  backupEnabled = signal(false);
+  backupActivity = signal<{ message: string; time: Date } | null>(null);
+  
+  // Timer state
+  serverStartTime = signal<Date | null>(null);
+  currentTime = signal<Date>(new Date());
+  private timerInterval: any = null;
 
   // Computed server based on ID from route - only show actual user servers
   server = computed(() => {
@@ -47,6 +57,66 @@ export class ServerDetailPage implements OnInit {
 
     this.serverId.set(id);
     this.loading.set(false);
+    
+    // Initialize timer if server is running
+    this.initializeTimer();
+  }
+
+  ngOnDestroy() {
+    this.clearTimer();
+  }
+
+  // Timer management
+  private initializeTimer() {
+    const currentServer = this.server();
+    if (currentServer?.status === 'running') {
+      this.serverStartTime.set(new Date());
+      this.startTimer();
+    }
+  }
+
+  private startTimer() {
+    this.clearTimer();
+    this.timerInterval = setInterval(() => {
+      this.currentTime.set(new Date());
+    }, 1000);
+  }
+
+  private clearTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private resetTimer() {
+    this.serverStartTime.set(new Date());
+    this.currentTime.set(new Date());
+  }
+
+  // Get elapsed time since server started
+  getElapsedTime(): string {
+    const startTime = this.serverStartTime();
+    const current = this.currentTime();
+    
+    if (!startTime) return 'Recently';
+    
+    const diffMs = current.getTime() - startTime.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    
+    if (diffHours > 0) {
+      const remainingMinutes = diffMinutes % 60;
+      if (remainingMinutes > 0) {
+        return `${diffHours}h ${remainingMinutes}m ago`;
+      } else {
+        return `${diffHours}h ago`;
+      }
+    } else if (diffMinutes > 0) {
+      return `${diffMinutes}m ago`;
+    } else {
+      return 'Just started';
+    }
   }
 
   // Navigation
@@ -78,20 +148,34 @@ export class ServerDetailPage implements OnInit {
   }
 
   // Hardware specs helpers
+  // Hardware specs helpers (delegate to service)
   getCpuCount(server: Server): string {
-    return server.server_type?.cores ? `${server.server_type.cores}` : '0';
+    return this.api.getCpuCount(server);
   }
 
   getRamSize(server: Server): string {
-    return server.server_type?.memory ? `${server.server_type.memory} GB` : '0 GB';
+    return this.api.getRamSize(server);
   }
 
   getDiskSize(server: Server): string {
-    return server.server_type?.disk ? `${server.server_type.disk} GB` : '0 GB';
+    return this.api.getDiskSize(server);
   }
 
   getHardwareSpecs(server: Server): string {
     return `${this.getCpuCount(server)} vCPU • ${this.getRamSize(server)} • ${this.getDiskSize(server)} SSD`;
+  }
+
+  // IP address helpers
+  getIPv4(server: Server): string | null {
+    return server.public_net?.ipv4?.ip || null;
+  }
+
+  getIPv6(server: Server): string | null {
+    return server.public_net?.ipv6?.ip || null;
+  }
+
+  hasPublicIPs(server: Server): boolean {
+    return !!(server.public_net?.ipv4?.ip || server.public_net?.ipv6?.ip);
   }
 
   // Get pricing information for the server's location
@@ -100,6 +184,46 @@ export class ServerDetailPage implements OnInit {
     // Find pricing for the server's location
     const serverLocation = server.datacenter?.location?.name;
     return server.server_type.prices.find(p => p.location.toLowerCase() === serverLocation?.toLowerCase());
+  }
+
+  // Get the monthly price for the server (delegate to service)
+  getServerPrice(server: Server): number {
+    return this.api.getServerPrice(server);
+  }
+
+  // Get the included traffic for the server in TB
+  getIncludedTraffic(server: Server): string {
+    const pricing = this.getServerPricing(server);
+    if (pricing?.included_traffic) {
+      // Convert bytes to TB (1 TB = 1,000,000,000,000 bytes)
+      const trafficTB = pricing.included_traffic / 1000000000000;
+      return Math.round(trafficTB).toString();
+    }
+    return '0';
+  }
+
+  // Get traffic display string
+  getTrafficDisplay(server: Server): string {
+    const outgoingGB = server.outgoing_traffic ? (server.outgoing_traffic / 1024 / 1024 / 1024).toFixed(1) : '0';
+    const includedTB = this.getIncludedTraffic(server);
+    return `${outgoingGB} GB / ${includedTB} TB`;
+  }
+
+  // Get incoming traffic display - works with both mock and real API data
+  getIncomingTrafficDisplay(server: Server): string {
+    const ingoing = this.api.getServerIncomingTraffic(server);
+    return ingoing ? this.api.formatBytes(ingoing) : '0 B';
+  }
+
+  // Get outgoing traffic display - works with both mock and real API data
+  getOutgoingTrafficDisplay(server: Server): string {
+    const outgoing = this.api.getServerOutgoingTraffic(server);
+    return outgoing ? this.api.formatBytes(outgoing) : '0 B';
+  }
+
+  // Format bytes to human readable (delegate to service)
+  formatBytes(bytes: number): string {
+    return this.api.formatBytes(bytes);
   }
 
   // Format price values to show clean decimals with € at the end
@@ -120,6 +244,8 @@ export class ServerDetailPage implements OnInit {
     const server = this.server();
     if (server && server.status !== 'running') {
       this.api.updateServerStatus(server.id, 'running');
+      this.resetTimer();
+      this.startTimer();
     }
   }
 
@@ -127,6 +253,8 @@ export class ServerDetailPage implements OnInit {
     const server = this.server();
     if (server && server.status !== 'stopped') {
       this.api.updateServerStatus(server.id, 'stopped');
+      this.clearTimer();
+      this.serverStartTime.set(null);
     }
   }
 
@@ -160,17 +288,41 @@ export class ServerDetailPage implements OnInit {
     const now = new Date();
     const createdDate = new Date(date);
     const diffMs = now.getTime() - createdDate.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
 
-    if (diffMins < 60) {
-      return `${diffMins} minutes ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours} hours ago`;
+    if (diffHours > 0) {
+      const remainingMinutes = diffMinutes % 60;
+      if (remainingMinutes > 0) {
+        return `${diffHours}h ${remainingMinutes}m ago`;
+      } else {
+        return `${diffHours}h ago`;
+      }
+    } else if (diffMinutes > 0) {
+      return `${diffMinutes}m ago`;
     } else {
-      return `${diffDays} days ago`;
+      return 'Just created';
     }
+  }
+
+  /** Calculate current usage cost based on server uptime */
+  calculateCurrentUsage(server: Server): string {
+    if (!server.created) return '0.00';
+    
+    // Get the hourly price from the pricing data
+    const monthlyPrice = this.api.getServerPrice(server);
+    const hourlyPrice = monthlyPrice / (30 * 24); // Convert monthly to hourly (approximation)
+    
+    // Calculate hours since creation
+    const now = new Date();
+    const createdDate = new Date(server.created);
+    const diffMs = now.getTime() - createdDate.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+    
+    // Calculate usage cost
+    const usageCost = hourlyPrice * diffHours;
+    
+    return Math.max(0.01, usageCost).toFixed(2); // Minimum 0.01 to match console behavior
   }
 
   togglePower(): void {
@@ -181,6 +333,76 @@ export class ServerDetailPage implements OnInit {
       this.stopServer();
     } else {
       this.startServer();
+    }
+  }
+
+  // Dropdown methods
+  toggleActionsDropdown(): void {
+    this.showActionsDropdown.set(!this.showActionsDropdown());
+  }
+
+  closeActionsDropdown(): void {
+    this.showActionsDropdown.set(false);
+  }
+
+  // Server actions from dropdown
+  turnOffServer(): void {
+    const server = this.server();
+    if (server && server.status === 'running') {
+      this.stopServer();
+    }
+    this.closeActionsDropdown();
+  }
+
+  shutDownServer(): void {
+    const server = this.server();
+    if (server && server.status === 'running') {
+      this.stopServer();
+    }
+    this.closeActionsDropdown();
+  }
+
+  deleteServerFromDropdown(): void {
+    this.closeActionsDropdown();
+    this.deleteServer();
+  }
+
+  // Backup management
+  toggleBackup(): void {
+    const currentState = this.backupEnabled();
+    this.backupEnabled.set(!currentState);
+    
+    const message = !currentState 
+      ? 'Backup enabled'
+      : 'Backup disabled';
+    
+    this.backupActivity.set({
+      message: message,
+      time: new Date()
+    });
+  }
+
+  // Get backup activity time display
+  getBackupActivityTime(): string {
+    const activity = this.backupActivity();
+    if (!activity) return '';
+    
+    const now = new Date();
+    const diffMs = now.getTime() - activity.time.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    
+    if (diffHours > 0) {
+      const remainingMinutes = diffMinutes % 60;
+      if (remainingMinutes > 0) {
+        return `${diffHours}h ${remainingMinutes}m ago`;
+      } else {
+        return `${diffHours}h ago`;
+      }
+    } else if (diffMinutes > 0) {
+      return `${diffMinutes}m ago`;
+    } else {
+      return 'Just now';
     }
   }
 }

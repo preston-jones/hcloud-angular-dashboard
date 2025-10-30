@@ -1,51 +1,104 @@
-<section class="space-y-6">
+<section class="space-y-6" (click)="closeActionsDropdown()">
   <!-- Header with Navigation and Power Control -->
   <header class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-    <div class="flex items-center gap-3">
-      <button 
-        (click)="goBack()"
-        class="rounded-lg px-3 py-2 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors"
-        aria-label="Go back to servers list">
-        ← Back
-      </button>
-      <div class="flex-1">
-        @if (server() && !loading()) {
-          <h1 class="text-2xl font-bold text-ink">{{ server()!.name }}</h1>
-          <div class="flex items-center gap-3 mt-1">
-            <span class="text-lg font-medium text-soft">{{ server()!.server_type?.name?.toUpperCase() || 'UNKNOWN' }}</span>
-            <span class="text-soft">#{{ server()!.id.toString().slice(-8) }}</span>
-            <span class="inline-flex items-center gap-2">
-              <span class="status-dot" [ngClass]="server()!.status"></span>
-              <span class="capitalize text-soft">{{ server()!.status }}</span>
-            </span>
+    <div class="flex items-start gap-4">
+      @if (server() && !loading()) {
+        <!-- Server Type/ID -->
+        <div class="text-center">
+          <div class="text-3xl font-bold text-ink">{{ server()!.server_type?.name?.toUpperCase() || 'UNKNOWN' }}</div>
+          <div class="text-sm text-soft">#{{ server()!.id.toString().slice(-8) }}</div>
+        </div>
+        
+        <!-- Separator Line -->
+        <div class="border-l border-ui h-16 self-start mt-1"></div>
+        
+        <!-- Server Name and IPs -->
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="status-dot" [ngClass]="server()!.status"></span>
+            <h1 class="text-2xl font-bold text-ink">{{ server()!.name }}</h1>
           </div>
-        } @else {
+          @if (hasPublicIPs(server()!)) {
+            <div class="flex items-center gap-4 mt-2">
+              @if (getIPv4(server()!)) {
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-soft">IPv4:</span>
+                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ getIPv4(server()!) }}</code>
+                </div>
+              }
+              @if (getIPv6(server()!)) {
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-soft">IPv6:</span>
+                  <code class="px-2 py-1 text-xs bg-muted rounded text-ink font-mono">{{ getIPv6(server()!) }}</code>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="flex-1">
           <h1 class="text-xl font-semibold text-ink">Server Details</h1>
-        }
-      </div>
+        </div>
+      }
     </div>
     
     @if (server() && !loading()) {
       <div class="flex items-center gap-3">
-        <button 
-          (click)="deleteServer()"
-          class="action-btn action-btn-danger">
-          🗑️ Delete
-        </button>
+        <!-- Actions Dropdown -->
+        <div class="relative">
+          <button 
+            (click)="$event.stopPropagation(); toggleActionsDropdown()"
+            class="action-btn action-btn-secondary flex items-center gap-2">
+            Actions
+            <span class="text-xs">{{ showActionsDropdown() ? '▲' : '▼' }}</span>
+          </button>
+          
+          @if (showActionsDropdown()) {
+            <div 
+              class="actions-dropdown absolute right-0 top-full mt-2 w-48 rounded-lg z-50"
+              (click)="$event.stopPropagation()">
+              <div class="py-2">
+                @if (server()!.status === 'running') {
+                  <button 
+                    (click)="turnOffServer()"
+                    class="w-full px-4 py-2 text-left text-sm transition-colors">
+                    Turn Off
+                  </button>
+                  <button 
+                    (click)="shutDownServer()"
+                    class="w-full px-4 py-2 text-left text-sm transition-colors">
+                    Shut Down
+                  </button>
+                }
+                @if (server()!.status === 'stopped') {
+                  <div class="px-4 py-2 text-sm text-soft">
+                    Server is stopped
+                  </div>
+                }
+                <hr class="my-2 border-ui">
+                <button 
+                  (click)="deleteServerFromDropdown()"
+                  class="delete-action w-full px-4 py-2 text-left text-sm transition-colors">
+                  Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
         
         <!-- Power Toggle Switch with Label -->
-        <div class="power-toggle-wrapper">
+        <div class="flex items-center gap-3">
           <label class="power-switch">
             <input 
               type="checkbox" 
               [checked]="server()!.status === 'running'"
               (change)="togglePower()"
               [disabled]="false">
-            <span class="power-slider"></span>
+            <span class="power-slider">
+              <span class="power-label-off">OFF</span>
+              <span class="power-label-on">ON</span>
+            </span>
           </label>
-          <span class="power-label">
-            {{ server()!.status === 'running' ? 'ON' : 'OFF' }}
-          </span>
         </div>
       </div>
     }
@@ -146,23 +199,34 @@
             </div>
           </div>
           
-          <!-- Usage (placeholder) -->
+          <!-- Usage -->
           <div class="metric-item">
             <div class="metric-content">
-              <div class="metric-icon">📊</div>
+              <div class="metric-icon">€</div>
               <div class="metric-text">
-                <div class="metric-value">€ 0.00</div>
+                <div class="metric-value">{{ calculateCurrentUsage(server()!) }}</div>
                 <div class="metric-label">USAGE</div>
               </div>
             </div>
           </div>
           
-          <!-- Traffic (placeholder) -->
+          <!-- Traffic In -->
           <div class="metric-item">
             <div class="metric-content">
-              <div class="metric-icon">📈</div>
+              <div class="metric-icon">↓</div>
               <div class="metric-text">
-                <div class="metric-value">0/20TB</div>
+                <div class="metric-value">{{ getIncomingTrafficDisplay(server()!) }}</div>
+                <div class="metric-label">TRAFFIC IN</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Traffic Out -->
+          <div class="metric-item">
+            <div class="metric-content">
+              <div class="metric-icon">↑</div>
+              <div class="metric-text">
+                <div class="metric-value">{{ getOutgoingTrafficDisplay(server()!) }}</div>
                 <div class="metric-label">TRAFFIC OUT</div>
               </div>
             </div>
@@ -171,10 +235,10 @@
           <!-- Price -->
           <div class="metric-item">
             <div class="metric-content">
-              <div class="metric-icon">💰</div>
+              <div class="metric-icon">€</div>
               <div class="metric-text">
-                <div class="metric-value">{{ (server()!.priceEur || 0).toFixed(2) }} €</div>
-                <div class="metric-label">PRICE/MO</div>
+                <div class="metric-value">{{ getServerPrice(server()!).toFixed(2) }}<span class="text-xs">/MO</span></div>
+                <div class="metric-label">PRICE</div>
               </div>
             </div>
           </div>
@@ -188,12 +252,11 @@
         <div class="lg:col-span-1">
           <div class="server-detail-card h-full">
             <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-              ⚡ Server Activities
+              🔔 Server Activities
             </h3>
             <div class="space-y-3">
               <div class="activity-item">
                 <div class="activity-left">
-                  <div class="activity-icon">🟢</div>
                   <div class="activity-title">Server created</div>
                 </div>
                 <div class="activity-time">{{ server()!.created ? getRelativeTime(server()!.created!) : 'Unknown' }}</div>
@@ -201,10 +264,25 @@
               @if (server()!.status === 'running') {
                 <div class="activity-item">
                   <div class="activity-left">
-                    <div class="activity-icon">▶️</div>
                     <div class="activity-title">Server started</div>
                   </div>
+                  <div class="activity-time">{{ getElapsedTime() }}</div>
+                </div>
+              }
+              @if (server()!.status === 'stopped') {
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-title">Server stopped</div>
+                  </div>
                   <div class="activity-time">Recently</div>
+                </div>
+              }
+              @if (backupActivity()) {
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-title">{{ backupActivity()!.message }}</div>
+                  </div>
+                  <div class="activity-time">{{ getBackupActivityTime() }}</div>
                 </div>
               }
             </div>
@@ -223,8 +301,13 @@
               <div class="option-button-wrapper">
                 <div class="option-icon">💾</div>
                 <div class="option-button-content">
-                  <button class="option-button-card" disabled>
-                    <span class="option-action">Disable</span>
+                  <button 
+                    class="px-4 py-2 rounded-lg transition-colors"
+                    [class]="!backupEnabled() ? 'text-white bg-primary hover:bg-primary-700' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                    (click)="toggleBackup()">
+                    <span class="font-medium">
+                      {{ backupEnabled() ? 'Disable' : 'Enable' }}
+                    </span>
                   </button>
                   <div class="option-label">BACKUP</div>
                 </div>
@@ -262,12 +345,12 @@
               <div class="location-details">
                 <div class="grid grid-cols-2 gap-4">
                   <!-- Column 1: DATACENTER & COUNTRY -->
-                  <div class="space-y-4">
-                    <div class="location-item">
+                  <div class="location-item">
+                    <div class="location-details">
                       <div class="location-label">DATACENTER</div>
-                      <div class="location-value">{{ server()!.datacenter?.location?.name || server()!.location }}</div>
+                      <div class="location-value">{{ server()!.datacenter?.name || server()!.datacenter?.location?.name || server()!.location }}</div>
                     </div>
-                    <div class="location-item">
+                    <div class="location-details mt-4">
                       <div class="location-label">COUNTRY</div>
                       <div class="location-value">
                         {{ getCountryFlag(server()!) }} {{ server()!.datacenter?.location?.country || server()!.country }}
