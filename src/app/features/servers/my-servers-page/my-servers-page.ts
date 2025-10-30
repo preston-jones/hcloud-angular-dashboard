@@ -354,9 +354,18 @@ export class MyServersPage implements OnInit {
   // Use combined servers (real + user-created) with filtering and sorting
   myServers = computed(() => {
     const allServers = this.api.myServers();
+    const searchTerm = this.api.searchQuery().toLowerCase();
     
-    // Apply sorting (no status filtering anymore)
-    return this.sortServers(allServers);
+    // Apply search filtering by server name only (like create server page)
+    let filteredServers = allServers;
+    if (searchTerm) {
+      filteredServers = allServers.filter(server => 
+        server.name?.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Apply sorting
+    return this.sortServers(filteredServers);
   });
 
   ngOnInit() {
