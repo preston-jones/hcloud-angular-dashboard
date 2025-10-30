@@ -1,6 +1,15 @@
 # Hetzner Cloud Angular Dashboard
 
-A modern Angular dashboard for managing Hetzner Cloud servers with dual-mode operation (Mock/Production).
+A modern Angular 20 dashboard for managing Hetzner Cloud servers with dual-mode operation (Mock/Production).
+
+## 🚀 Technology Stack
+
+- **Angular 20.3** - Latest Angular with standalone components and modern features
+- **TypeScript 5.9** - Strong typing and modern JavaScript features  
+- **Angular Signals** - Reactive state management without RxJS complexity
+- **Tailwind CSS 3.4** - Utility-first CSS framework
+- **Angular Material 20** - UI component library
+- **ESLint 9** - Code quality and consistency
 
 ## 🔄 Complete Data Flow Chain - Step by Step
 
@@ -10,7 +19,7 @@ This document provides a detailed walkthrough of how data flows through the appl
 
 **What Happens:**
 ```
-Browser loads index.html → Angular starts → App component initializes → Services instantiate
+Browser loads index.html → Angular 20 starts → App component initializes → Services instantiate
 ```
 
 **Code Flow:**
@@ -46,7 +55,7 @@ loadServers(): void {
   
   // STEP 2A: Check if we have cached data
   if (this.mode() === 'mock') {
-    const persistedData = sessionStorage.getItem('hetzner_mock_servers');
+    const persistedData = sessionStorage.getItem(CACHE_KEYS.MOCK_SERVERS);
     if (persistedData) {
       console.log('📱 Found cached data in sessionStorage');
       const servers = JSON.parse(persistedData);
@@ -75,26 +84,15 @@ Determine endpoint → Make HTTP request → Process response
 **Code Flow:**
 ```typescript
 // STEP 3A: Determine endpoint based on mode
-const endpoint = this.getEndpoint('servers');
+const { endpoint, httpOptions } = this.prepareServerRequest();
 // Mock mode: '/assets/mock/servers.json'
 // Real mode: 'https://api.hetzner.cloud/v1/servers'
 
-// STEP 3B: Configure headers (auth for real mode)
-const headers = this.getAuthHeaders();
-const httpOptions = headers.Authorization ? { headers } : {};
-
-// STEP 3C: Make HTTP request
+// STEP 3B: Make HTTP request
 console.log('Loading servers from:', endpoint);
 this.http.get<any>(endpoint, httpOptions).pipe(
-  map(response => {
-    console.log('API response:', response);
-    return response.servers || [];  // Extract server array
-  }),
-  catchError(error => {
-    console.error('Loading failed:', error);
-    this.error.set(error.message);
-    return of([]); // Return empty array on error
-  })
+  map(response => this.processServerResponse(response)),
+  catchError(error => this.handleServerError(error))
 )
 ```
 
@@ -115,7 +113,7 @@ HTTP response arrives → Extract servers → Update signal → Cache in session
   console.log('Servers loaded:', servers.length);
   
   // STEP 4A: Update Angular signal (triggers reactivity)
-  this.servers.set(servers);
+  this.finalizeServerLoad(servers);
   // servers signal now contains: [
   //   { id: '4711', name: 'web-frontend-1', status: 'running' },
   //   { id: '4712', name: 'database-prod', status: 'running' },
@@ -123,10 +121,7 @@ HTTP response arrives → Extract servers → Update signal → Cache in session
   // ]
   
   // STEP 4B: Cache in sessionStorage (mock mode only)
-  if (this.mode() === 'mock') {
-    sessionStorage.setItem('hetzner_mock_servers', JSON.stringify(servers));
-    console.log('💾 Cached servers in sessionStorage');
-  }
+  console.log('💾 Cached servers in sessionStorage');
   
   this.loading.set(false);
 });
@@ -287,7 +282,7 @@ deleteServer(serverId: string): void {
   this.servers.set(filteredServers);
   
   // Update sessionStorage cache
-  sessionStorage.setItem('hetzner_mock_servers', JSON.stringify(filteredServers));
+  sessionStorage.setItem(CACHE_KEYS.MOCK_SERVERS, JSON.stringify(filteredServers));
   console.log('💾 Deletion cached in sessionStorage');
 }
 ```
@@ -367,10 +362,12 @@ ngOnInit() {
   this.servers = this.api.myServers; // Still [4712, 4713]
 }
 
+**Code Flow:**
+```typescript
 // STEP 10C: If loadServers() is called for any reason
 loadServers(): void {
   // Check sessionStorage first
-  const cached = sessionStorage.getItem('hetzner_mock_servers');
+  const cached = sessionStorage.getItem(CACHE_KEYS.MOCK_SERVERS);
   if (cached) {
     console.log('📱 Loading from cache, no HTTP request needed');
     const servers = JSON.parse(cached); // [4712, 4713]
@@ -402,14 +399,14 @@ User switches modes → Clear cache → Reload from new source → Update UI
 **Code Flow:**
 ```typescript
 // STEP 11A: User switches from mock to real mode
-setMode('real'): void {
+setMode(newMode: ApiMode): void {
   console.log('🔄 Switching to real mode');
   
   // Update mode signal
-  this.mode.set('real');
+  this.mode.set(newMode);
   
   // Clear mock data cache
-  sessionStorage.removeItem('hetzner_mock_servers');
+  sessionStorage.removeItem(CACHE_KEYS.MOCK_SERVERS);
   console.log('🗑️ Cleared mock cache');
   
   // Reload data from new source
@@ -419,11 +416,10 @@ setMode('real'): void {
 // STEP 11B: loadServers() in real mode
 loadServers(): void {
   // No sessionStorage check in real mode
-  const endpoint = 'https://api.hetzner.cloud/v1/servers';
-  const headers = { Authorization: `Bearer ${token}` };
+  const { endpoint, httpOptions } = this.prepareServerRequest();
   
-  this.http.get(endpoint, { headers }).subscribe(servers => {
-    this.servers.set(servers); // Real server data
+  this.http.get(endpoint, httpOptions).subscribe(servers => {
+    this.finalizeServerLoad(servers); // Real server data
     // No sessionStorage caching in real mode
   });
 }
@@ -448,7 +444,7 @@ Real Mode: [real-1, real-2, real-3] (fresh from API)
    └── servers.set() / servers()
 
 2. SessionStorage (Browser)       → Very fast
-   └── sessionStorage.getItem('hetzner_mock_servers')
+   └── sessionStorage.getItem(CACHE_KEYS.MOCK_SERVERS)
 
 3. JSON Files (Static Assets)     → Fast (cached by browser)
    └── /assets/mock/servers.json
@@ -474,11 +470,13 @@ Data Source → HTTP Client → Service Signal → Computed Signal → Component
 ```
 
 ### Performance Optimizations
-- **Signals**: Only update when data actually changes
+- **Angular 20 Signals**: Only update when data actually changes
 - **SessionStorage**: Eliminates redundant HTTP requests  
 - **OnPush**: Reduces change detection cycles
 - **Computed**: Efficient derived state calculation
 - **Early Returns**: Skip unnecessary processing
+- **Extracted Models**: Centralized TypeScript interfaces
+- **Method Extraction**: Simplified service methods for better maintainability
 
 This step-by-step flow ensures a smooth, performant user experience with realistic demo behavior and seamless transitions between mock and production modes.
 
@@ -497,12 +495,15 @@ ng build
 
 ### Features
 - **Dual Mode Operation**: Mock mode for demos, Real mode for production
-- **Reactive State Management**: Angular signals with computed properties
+- **Reactive State Management**: Angular 20 signals with computed properties
 - **Persistent Demo Changes**: SessionStorage caching in mock mode
-- **Modern Angular**: Standalone components, control flow syntax
+- **Modern Angular**: Standalone components, new control flow syntax (@if, @for)
 - **Performance Optimized**: OnPush change detection, minimal HTTP requests
+- **Type Safety**: Full TypeScript integration with extracted model interfaces
 
 ### Architecture
-- **Service Layer**: `HetznerApiService` manages all data operations
-- **Component Layer**: Reactive components with signal bindings
+- **Service Layer**: `HetznerApiService` manages all data operations with Angular 20 signals
+- **Component Layer**: Reactive standalone components with signal bindings
 - **Data Layer**: JSON files (mock) + Real API + SessionStorage cache
+- **Model Layer**: TypeScript interfaces extracted to dedicated model files
+- **UI Layer**: Tailwind CSS with responsive design and modern Angular features
