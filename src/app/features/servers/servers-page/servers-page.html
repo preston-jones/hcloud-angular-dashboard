@@ -46,79 +46,71 @@
           </div>
 
           <div class="architecture-options">
-            <div class="architecture-row">
-              <!-- Shared Resources -->
-              <div class="architecture-category">
-                <h3>Shared Resources</h3>
-                <div class="architecture-cards">
-                  <div class="architecture-option" 
-                       [class.selected]="selectedArchitecture() === 'cost-optimized'"
-                       (click)="selectArchitecture('cost-optimized')">
-                    <div class="option-header">
-                      <h4>Cost-Optimized</h4>
-                      <span class="availability-badge limited">Limitierte Verfügbarkeit</span>
-                    </div>
-                    <p>Ideal für Entwicklung und Tests</p>
-                    
-                    <!-- Architecture Selection for Cost-Optimized -->
-                    <div class="arch-selection">
-                      <div class="arch-option" 
-                           [class.selected]="selectedCpuArchitecture() === 'x86'"
-                           (click)="selectCpuArchitecture('x86')">
-                        <input type="radio" name="cost-optimized-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                        <span>x86 (Intel/AMD)</span>
-                      </div>
-                      <div class="arch-option"
-                           [class.selected]="selectedCpuArchitecture() === 'arm64'"
-                           (click)="selectCpuArchitecture('arm64')">
-                        <input type="radio" name="cost-optimized-arch" value="arm64" [checked]="selectedCpuArchitecture() === 'arm64'">
-                        <span>Arm64 (Ampere)</span>
-                      </div>
-                    </div>
+            <!-- All Architecture Cards in One Row -->
+            <div class="architecture-cards-row">
+              <div class="architecture-option" 
+                   [class.selected]="selectedArchitecture() === 'cost-optimized'"
+                   (click)="selectArchitecture('cost-optimized')">
+                <div class="option-header">
+                  <h4>Cost-Optimized</h4>
+                  <span class="availability-badge limited">Limitierte Verfügbarkeit</span>
+                </div>
+                <p>Ideal für Entwicklung und Tests</p>
+                <div class="arch-category-label">Shared Resources</div>
+                
+                <!-- Architecture Selection for Cost-Optimized -->
+                <div class="arch-selection">
+                  <div class="arch-option" 
+                       [class.selected]="selectedCpuArchitecture() === 'x86'"
+                       (click)="selectCpuArchitecture('x86')">
+                    <input type="radio" name="cost-optimized-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                    <span>x86 (Intel/AMD)</span>
                   </div>
-                  
-                  <div class="architecture-option" 
-                       [class.selected]="selectedArchitecture() === 'regular-performance'"
-                       (click)="selectArchitecture('regular-performance')">
-                    <div class="option-header">
-                      <h4>Regular Performance</h4>
-                    </div>
-                    <p>Ausgewogene Performance für die meisten Anwendungen</p>
-                    
-                    <!-- Architecture Selection for Regular Performance -->
-                    <div class="arch-selection">
-                      <div class="arch-option"
-                           [class.selected]="selectedCpuArchitecture() === 'x86'"
-                           (click)="selectCpuArchitecture('x86')">
-                        <input type="radio" name="regular-performance-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                        <span>x86 (AMD)</span>
-                      </div>
-                    </div>
+                  <div class="arch-option"
+                       [class.selected]="selectedCpuArchitecture() === 'arm64'"
+                       (click)="selectCpuArchitecture('arm64')">
+                    <input type="radio" name="cost-optimized-arch" value="arm64" [checked]="selectedCpuArchitecture() === 'arm64'">
+                    <span>Arm64 (Ampere)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="architecture-option" 
+                   [class.selected]="selectedArchitecture() === 'regular-performance'"
+                   (click)="selectArchitecture('regular-performance')">
+                <div class="option-header">
+                  <h4>Regular Performance</h4>
+                </div>
+                <p>Ausgewogene Performance für die meisten Anwendungen</p>
+                <div class="arch-category-label">Shared Resources</div>
+                
+                <!-- Architecture Selection for Regular Performance -->
+                <div class="arch-selection">
+                  <div class="arch-option"
+                       [class.selected]="selectedCpuArchitecture() === 'x86'"
+                       (click)="selectCpuArchitecture('x86')">
+                    <input type="radio" name="regular-performance-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                    <span>x86 (AMD)</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Dedicated Resources -->
-              <div class="architecture-category">
-                <h3>Dedicated Resources</h3>
-                <div class="architecture-cards">
-                  <div class="architecture-option" 
-                       [class.selected]="selectedArchitecture() === 'general-purpose'"
-                       (click)="selectArchitecture('general-purpose')">
-                    <div class="option-header">
-                      <h4>General Purpose</h4>
-                    </div>
-                    <p>Dedizierte CPU-Performance für produktive Workloads</p>
-                    
-                    <!-- Architecture Selection for General Purpose -->
-                    <div class="arch-selection">
-                      <div class="arch-option"
-                           [class.selected]="selectedCpuArchitecture() === 'x86'"
-                           (click)="selectCpuArchitecture('x86')">
-                        <input type="radio" name="general-purpose-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                        <span>x86 (AMD)</span>
-                      </div>
-                    </div>
+              <div class="architecture-option" 
+                   [class.selected]="selectedArchitecture() === 'general-purpose'"
+                   (click)="selectArchitecture('general-purpose')">
+                <div class="option-header">
+                  <h4>General Purpose</h4>
+                </div>
+                <p>Dedizierte CPU-Performance für produktive Workloads</p>
+                <div class="arch-category-label">Dedicated Resources</div>
+                
+                <!-- Architecture Selection for General Purpose -->
+                <div class="arch-selection">
+                  <div class="arch-option"
+                       [class.selected]="selectedCpuArchitecture() === 'x86'"
+                       (click)="selectCpuArchitecture('x86')">
+                    <input type="radio" name="general-purpose-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                    <span>x86 (AMD)</span>
                   </div>
                 </div>
               </div>
