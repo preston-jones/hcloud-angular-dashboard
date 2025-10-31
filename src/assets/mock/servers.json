@@ -267,6 +267,262 @@
       "ingoing_traffic": 0,
       "outgoing_traffic": 0,
       "created": "2025-10-31T07:52:52Z"
+    },
+    {
+      "id": 111897045,
+      "name": "web-server-prod",
+      "status": "running",
+      "server_type": {
+        "id": 115,
+        "name": "cx33",
+        "architecture": "x86",
+        "cores": 4,
+        "cpu_type": "shared",
+        "category": "cost_optimized",
+        "deprecated": false,
+        "deprecation": null,
+        "description": "CX 33",
+        "disk": 80,
+        "memory": 8,
+        "prices": [
+          {
+            "location": "fsn1",
+            "price_hourly": {
+              "gross": "0.0114240000000000",
+              "net": "0.0096000000"
+            },
+            "price_monthly": {
+              "gross": "7.1162000000000000",
+              "net": "5.9800000000"
+            },
+            "included_traffic": 21990232555520,
+            "price_per_tb_traffic": {
+              "gross": "1.1900000000000000",
+              "net": "1.0000000000"
+            }
+          }
+        ],
+        "storage_type": "local",
+        "locations": [
+          {
+            "id": 1,
+            "name": "fsn1",
+            "deprecation": null
+          }
+        ]
+      },
+      "datacenter": {
+        "id": 1,
+        "description": "Falkenstein 1 virtual DC 2",
+        "location": {
+          "id": 1,
+          "name": "fsn1",
+          "description": "Falkenstein DC Park 1",
+          "city": "Falkenstein",
+          "country": "DE",
+          "latitude": 50.47612,
+          "longitude": 12.370071,
+          "network_zone": "eu-central"
+        },
+        "name": "fsn1-dc2",
+        "server_types": {
+          "available": [114, 115, 116],
+          "available_for_migration": [114, 115, 116],
+          "supported": [114, 115, 116]
+        }
+      },
+      "image": {
+        "id": 161547269,
+        "type": "system",
+        "name": "ubuntu-24.04",
+        "architecture": "x86",
+        "bound_to": null,
+        "created_from": null,
+        "deprecated": null,
+        "description": "Ubuntu 24.04",
+        "disk_size": 5,
+        "image_size": null,
+        "labels": {},
+        "os_flavor": "ubuntu",
+        "os_version": "24.04",
+        "protection": {
+          "delete": false
+        },
+        "rapid_deploy": true,
+        "status": "available",
+        "created": "2024-04-25T13:26:27Z",
+        "deleted": null
+      },
+      "iso": null,
+      "primary_disk_size": 80,
+      "labels": {
+        "environment": "production",
+        "role": "web-server"
+      },
+      "protection": {
+        "delete": true,
+        "rebuild": false
+      },
+      "backup_window": null,
+      "rescue_enabled": false,
+      "locked": false,
+      "placement_group": null,
+      "public_net": {
+        "firewalls": [
+          {
+            "id": 10142014,
+            "status": "applied"
+          }
+        ],
+        "floating_ips": [],
+        "ipv4": {
+          "id": 105661994,
+          "ip": "95.217.32.142",
+          "blocked": false,
+          "dns_ptr": "web-prod.example.com"
+        },
+        "ipv6": {
+          "id": 105661995,
+          "ip": "2a01:4f9:c012:b0dc::/64",
+          "blocked": false,
+          "dns_ptr": []
+        }
+      },
+      "private_net": [],
+      "load_balancers": [],
+      "volumes": [],
+      "included_traffic": 21990232555520,
+      "ingoing_traffic": 1048576000,
+      "outgoing_traffic": 2097152000,
+      "created": "2025-10-15T14:30:22Z"
+    },
+    {
+      "id": 111897046,
+      "name": "database-staging",
+      "status": "stopped",
+      "server_type": {
+        "id": 116,
+        "name": "cx43",
+        "architecture": "x86",
+        "cores": 8,
+        "cpu_type": "shared",
+        "category": "cost_optimized",
+        "deprecated": false,
+        "deprecation": null,
+        "description": "CX 43",
+        "disk": 160,
+        "memory": 16,
+        "prices": [
+          {
+            "location": "nbg1",
+            "price_hourly": {
+              "gross": "0.0228480000000000",
+              "net": "0.0192000000"
+            },
+            "price_monthly": {
+              "gross": "14.2324000000000000",
+              "net": "11.9600000000"
+            },
+            "included_traffic": 21990232555520,
+            "price_per_tb_traffic": {
+              "gross": "1.1900000000000000",
+              "net": "1.0000000000"
+            }
+          }
+        ],
+        "storage_type": "local",
+        "locations": [
+          {
+            "id": 2,
+            "name": "nbg1",
+            "deprecation": null
+          }
+        ]
+      },
+      "datacenter": {
+        "id": 2,
+        "description": "Nuremberg 1 virtual DC 2",
+        "location": {
+          "id": 2,
+          "name": "nbg1",
+          "description": "Nuremberg DC Park 1",
+          "city": "Nuremberg",
+          "country": "DE",
+          "latitude": 49.452102,
+          "longitude": 11.076665,
+          "network_zone": "eu-central"
+        },
+        "name": "nbg1-dc2",
+        "server_types": {
+          "available": [114, 115, 116],
+          "available_for_migration": [114, 115, 116],
+          "supported": [114, 115, 116]
+        }
+      },
+      "image": {
+        "id": 161547270,
+        "type": "system",
+        "name": "debian-12",
+        "architecture": "x86",
+        "bound_to": null,
+        "created_from": null,
+        "deprecated": null,
+        "description": "Debian 12",
+        "disk_size": 5,
+        "image_size": null,
+        "labels": {},
+        "os_flavor": "debian",
+        "os_version": "12",
+        "protection": {
+          "delete": false
+        },
+        "rapid_deploy": true,
+        "status": "available",
+        "created": "2024-04-25T13:26:27Z",
+        "deleted": null
+      },
+      "iso": null,
+      "primary_disk_size": 160,
+      "labels": {
+        "environment": "staging",
+        "role": "database"
+      },
+      "protection": {
+        "delete": false,
+        "rebuild": true
+      },
+      "backup_window": null,
+      "rescue_enabled": false,
+      "locked": false,
+      "placement_group": null,
+      "public_net": {
+        "firewalls": [
+          {
+            "id": 10142015,
+            "status": "applied"
+          }
+        ],
+        "floating_ips": [],
+        "ipv4": {
+          "id": 105661996,
+          "ip": "88.198.45.123",
+          "blocked": false,
+          "dns_ptr": "db-staging.internal.example.com"
+        },
+        "ipv6": {
+          "id": 105661997,
+          "ip": "2a01:4f9:c012:b0dd::/64",
+          "blocked": false,
+          "dns_ptr": []
+        }
+      },
+      "private_net": [],
+      "load_balancers": [],
+      "volumes": [],
+      "included_traffic": 21990232555520,
+      "ingoing_traffic": 0,
+      "outgoing_traffic": 0,
+      "created": "2025-10-20T09:15:11Z"
     }
   ],
   "meta": {
@@ -276,7 +532,7 @@
       "page": 1,
       "per_page": 25,
       "previous_page": null,
-      "total_entries": 1
+      "total_entries": 3
     }
   }
 }

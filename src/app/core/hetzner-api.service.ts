@@ -16,8 +16,10 @@ export class HetznerApiService {
   // =============================================================================
 
   servers = signal<Server[] | null>(null);
-  serverTypes = signal<Server[] | null>(null);
+  serverTypes = signal<any[] | null>(null);
   locations = signal<any[] | null>(null);
+  datacenters = signal<any[] | null>(null);
+  images = signal<any[] | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
   searchQuery = signal('');
@@ -35,7 +37,7 @@ export class HetznerApiService {
 
   availableServerTypes = computed(() => {
     const types = this.serverTypes();
-    return types?.filter(s => s.status === 'available') || [];
+    return types || [];
   });
 
   // =============================================================================
@@ -71,7 +73,10 @@ export class HetznerApiService {
     this.hasLoadedInitialData = false;
     
     this.loadServers();
+    this.loadServerTypes();
     this.loadLocations();
+    this.loadDatacenters();
+    this.loadImages();
   }
 
   // =============================================================================
@@ -100,18 +105,12 @@ export class HetznerApiService {
 
   /** Extract incoming traffic from server (works with both mock and real API) */
   getServerIncomingTraffic(server: Server): number {
-    return server.ingoing_traffic || 
-           server.public_net?.ingoing_traffic || 
-           server.traffic?.ingoing || 
-           0;
+    return server.ingoing_traffic || 0;
   }
 
   /** Extract outgoing traffic from server (works with both mock and real API) */
   getServerOutgoingTraffic(server: Server): number {
-    return server.outgoing_traffic || 
-           server.public_net?.outgoing_traffic || 
-           server.traffic?.outgoing || 
-           0;
+    return server.outgoing_traffic || 0;
   }
 
   /** Format bytes to human readable string */
@@ -316,6 +315,36 @@ export class HetznerApiService {
     });
   }
 
+  /** Load datacenters from current mode (mock or real API) */
+  loadDatacenters() {
+    const endpoint = this.getEndpoint('datacenters');
+    const headers = this.getAuthHeaders();
+    const httpOptions = headers.Authorization ? { headers: { ...headers } } : {};
+
+    this.http.get<any>(endpoint, httpOptions).pipe(
+      catchError((err: HttpErrorResponse) => {
+        return of({ datacenters: [] });
+      })
+    ).subscribe(res => {
+      this.datacenters.set(res?.datacenters ?? []);
+    });
+  }
+
+  /** Load images from current mode (mock or real API) */
+  loadImages() {
+    const endpoint = this.getEndpoint('images');
+    const headers = this.getAuthHeaders();
+    const httpOptions = headers.Authorization ? { headers: { ...headers } } : {};
+
+    this.http.get<any>(endpoint, httpOptions).pipe(
+      catchError((err: HttpErrorResponse) => {
+        return of({ images: [] });
+      })
+    ).subscribe(res => {
+      this.images.set(res?.images ?? []);
+    });
+  }
+
   // =============================================================================
   // SERVER OPERATIONS (MOCK MODE ONLY)
   // =============================================================================
@@ -326,30 +355,97 @@ export class HetznerApiService {
 
     const createdId = Date.now() + Math.floor(Math.random() * 1000);
     
-    // Use datacenter from serverType if available, otherwise pick from existing servers
+    // Select datacenter from loaded datacenters that supports this server type
     let datacenterToUse = serverType.datacenter;
     
     if (!datacenterToUse) {
-      // If serverType doesn't have datacenter, pick one from existing servers
-      const existingServers = this.servers() || [];
-      const serversWithDatacenters = existingServers.filter(s => s.datacenter);
-      if (serversWithDatacenters.length > 0) {
-        const randomExistingServer = serversWithDatacenters[Math.floor(Math.random() * serversWithDatacenters.length)];
-        datacenterToUse = randomExistingServer.datacenter;
+      const availableDatacenters = this.datacenters() || [];
+      const serverTypeId = serverType.server_type?.id;
+      
+      // Find datacenters that support this server type
+      const supportingDatacenters = availableDatacenters.filter(dc => 
+        dc.server_types?.available?.includes(serverTypeId) || 
+        dc.server_types?.supported?.includes(serverTypeId)
+      );
+      
+      if (supportingDatacenters.length > 0) {
+        // Pick a random supporting datacenter
+        datacenterToUse = supportingDatacenters[Math.floor(Math.random() * supportingDatacenters.length)];
+      } else if (availableDatacenters.length > 0) {
+        // Fallback to any available datacenter
+        datacenterToUse = availableDatacenters[Math.floor(Math.random() * availableDatacenters.length)];
       }
     }
     
-    // If still no datacenter, fall back to default location
+    // If still no datacenter, create a default one based on available locations
     if (!datacenterToUse) {
       const availableLocations = this.locations() || [];
       const defaultLocation = availableLocations.find(l => l.name === 'hel1') || availableLocations[0];
       if (defaultLocation) {
         datacenterToUse = {
           id: defaultLocation.id,
-          name: defaultLocation.name,
-          location: defaultLocation
+          description: `${defaultLocation.city} virtual DC 1`,
+          name: `${defaultLocation.name}-dc1`,
+          location: defaultLocation,
+          server_types: {
+            available: [serverType.server_type?.id || 114],
+            available_for_migration: [serverType.server_type?.id || 114],
+            supported: [serverType.server_type?.id || 114]
+          }
         };
       }
+    }
+    
+    // Select an appropriate image from loaded images
+    let imageToUse = serverType.image;
+    
+    if (!imageToUse) {
+      const availableImages = this.images() || [];
+      // Prefer Ubuntu LTS system images
+      const systemImages = availableImages.filter(img => 
+        img.type === 'system' && 
+        img.status === 'available' && 
+        (img.name?.includes('ubuntu') || img.os_flavor === 'ubuntu')
+      );
+      
+      if (systemImages.length > 0) {
+        // Prefer latest Ubuntu LTS
+        const ubuntuLTS = systemImages.find(img => img.name?.includes('24.04')) || 
+                          systemImages.find(img => img.name?.includes('22.04')) || 
+                          systemImages[0];
+        imageToUse = ubuntuLTS;
+      } else if (availableImages.length > 0) {
+        // Fallback to any available system image
+        const fallbackImage = availableImages.find(img => img.type === 'system' && img.status === 'available') || 
+                              availableImages[0];
+        imageToUse = fallbackImage;
+      }
+    }
+    
+    // Fallback image if none available
+    if (!imageToUse) {
+      imageToUse = {
+        id: 161547269,
+        type: 'system',
+        name: 'ubuntu-24.04',
+        architecture: 'x86',
+        bound_to: null,
+        created_from: null,
+        deprecated: null,
+        description: 'Ubuntu 24.04',
+        disk_size: 5,
+        image_size: null,
+        labels: {},
+        os_flavor: 'ubuntu',
+        os_version: '24.04',
+        protection: {
+          delete: false
+        },
+        rapid_deploy: true,
+        status: 'available',
+        created: '2024-04-25T13:26:27Z',
+        deleted: null
+      };
     }
     
     // Generate fallback server name (only used if no custom name provided)
@@ -363,16 +459,71 @@ export class HetznerApiService {
     
     const serverName = customName || generateFallbackName(serverType, datacenterToUse);
     
+    // Create comprehensive server structure matching API format
     const newServer: Server = {
-      ...serverType,
       id: createdId,
       name: serverName,
       status: 'running',
-      created: new Date().toISOString(),
+      server_type: serverType.server_type || {
+        id: 114,
+        name: 'cx23',
+        architecture: 'x86',
+        cores: 2,
+        cpu_type: 'shared',
+        category: 'cost_optimized',
+        deprecated: false,
+        deprecation: null,
+        description: 'CX 23',
+        disk: 40,
+        memory: 4,
+        prices: [],
+        storage_type: 'local',
+        locations: []
+      },
+      datacenter: datacenterToUse!,
+      image: imageToUse,
+      iso: null,
+      primary_disk_size: serverType.server_type?.disk || 40,
+      labels: {},
+      protection: {
+        delete: false,
+        rebuild: false
+      },
+      backup_window: null,
+      rescue_enabled: false,
+      locked: false,
+      placement_group: null,
+      public_net: {
+        firewalls: [
+          {
+            id: 10142013,
+            status: 'applied'
+          }
+        ],
+        floating_ips: [],
+        ipv4: {
+          id: createdId + 1000,
+          ip: this.generateRandomIP(),
+          blocked: false,
+          dns_ptr: `static.${this.generateRandomIP().split('.').reverse().join('.')}.clients.your-server.de`
+        },
+        ipv6: {
+          id: createdId + 2000,
+          ip: '2a01:4f9:c012:b0db::/64',
+          blocked: false,
+          dns_ptr: []
+        }
+      },
+      private_net: [],
+      load_balancers: [],
+      volumes: [],
+      included_traffic: serverType.included_traffic || this.getIncludedTrafficFromServerType(serverType),
       ingoing_traffic: 0,
       outgoing_traffic: 0,
-      included_traffic: serverType.included_traffic || this.getIncludedTrafficFromServerType(serverType),
-      datacenter: datacenterToUse,
+      created: new Date().toISOString(),
+      
+      // Add computed properties for backward compatibility
+      priceEur: this.calculateServerPrice(serverType)
     };
 
     this.addServerToState(newServer);
@@ -405,14 +556,26 @@ export class HetznerApiService {
     const currentServers = this.servers();
     if (currentServers) {
       const updatedServers = currentServers.map(server => 
-        server.id === serverId ? { ...server, protection: { delete: isProtected } } : server
+        server.id === serverId ? { 
+          ...server, 
+          protection: { 
+            delete: isProtected,
+            rebuild: server.protection?.rebuild || false
+          } 
+        } : server
       );
       this.servers.set(updatedServers);
       
       // Update only user-created servers in cache, not static mock data
       const userServers = this.getCachedUserServers();
       const updatedUserServers = userServers.map(server => 
-        server.id === serverId ? { ...server, protection: { delete: isProtected } } : server
+        server.id === serverId ? { 
+          ...server, 
+          protection: { 
+            delete: isProtected,
+            rebuild: server.protection?.rebuild || false
+          } 
+        } : server
       );
       sessionStorage.setItem(CACHE_KEYS.USER_SERVERS, JSON.stringify(updatedUserServers));
     }
@@ -513,12 +676,88 @@ export class HetznerApiService {
   }
 
   private createAvailableServer(serverType: any, price: any, index: number, priceIndex: number): Server {
+    const randomIP = this.generateRandomIP();
     return {
       id: Date.now() + index * 1000 + priceIndex,
       name: `${serverType.name.toUpperCase()} - ${serverType.description}`,
       status: 'available',
-      created: new Date().toISOString(),
       server_type: serverType,
+      datacenter: {
+        id: 1,
+        description: 'Falkenstein 1 virtual DC 2',
+        location: {
+          id: 1,
+          name: 'fsn1',
+          description: 'Falkenstein DC Park 1',
+          city: 'Falkenstein',
+          country: 'DE',
+          latitude: 50.47612,
+          longitude: 12.370071,
+          network_zone: 'eu-central'
+        },
+        name: 'fsn1-dc2',
+        server_types: {
+          available: [serverType.id],
+          available_for_migration: [serverType.id],
+          supported: [serverType.id]
+        }
+      },
+      image: {
+        id: 161547269,
+        type: 'system',
+        name: 'ubuntu-24.04',
+        architecture: 'x86',
+        bound_to: null,
+        created_from: null,
+        deprecated: null,
+        description: 'Ubuntu 24.04',
+        disk_size: 5,
+        image_size: null,
+        labels: {},
+        os_flavor: 'ubuntu',
+        os_version: '24.04',
+        protection: {
+          delete: false
+        },
+        rapid_deploy: true,
+        status: 'available',
+        created: '2024-04-25T13:26:27Z',
+        deleted: null
+      },
+      iso: null,
+      primary_disk_size: serverType.disk || 40,
+      labels: {},
+      protection: {
+        delete: false,
+        rebuild: false
+      },
+      backup_window: null,
+      rescue_enabled: false,
+      locked: false,
+      placement_group: null,
+      public_net: {
+        firewalls: [],
+        floating_ips: [],
+        ipv4: {
+          id: Date.now() + index * 1000 + priceIndex + 1000,
+          ip: randomIP,
+          blocked: false,
+          dns_ptr: `static.${randomIP.split('.').reverse().join('.')}.clients.your-server.de`
+        },
+        ipv6: {
+          id: Date.now() + index * 1000 + priceIndex + 2000,
+          ip: '2a01:4f9:c012:b0db::/64',
+          blocked: false,
+          dns_ptr: []
+        }
+      },
+      private_net: [],
+      load_balancers: [],
+      volumes: [],
+      included_traffic: price.included_traffic || DEFAULT_INCLUDED_TRAFFIC,
+      ingoing_traffic: 0,
+      outgoing_traffic: 0,
+      created: new Date().toISOString(),
       priceEur: parseFloat(price.price_monthly?.gross || this.calculatePrice(serverType).toString())
     };
   }
@@ -532,12 +771,11 @@ export class HetznerApiService {
     return +(basePrice + cpuPrice + memPrice).toFixed(2);
   }
 
-  /** Calculate price for a server using its pricing data */
-  private calculateServerPrice(server: any): number {
-    if (!server?.server_type?.prices) return 0;
+    /** Calculate price for a server using its pricing data */
+  calculateServerPrice(server: Server): number {
+    if (!server.server_type?.prices) return 0;
     
-    // Get the server location
-    const serverLocation = server.datacenter?.location?.name;
+    const serverLocation = server.datacenter?.location?.name || server.location;
     
     // Find pricing for the server's location
     const pricing = server.server_type.prices.find((p: any) => p.location === serverLocation);
@@ -546,8 +784,39 @@ export class HetznerApiService {
       return parseFloat(pricing.price_monthly.gross);
     }
     
-    // Fallback to calculated price
-    return this.calculatePrice(server.server_type);
+    // Fallback to first available pricing if exact location not found
+    const firstPricing = server.server_type.prices[0];
+    if (firstPricing?.price_monthly?.gross) {
+      return parseFloat(firstPricing.price_monthly.gross);
+    }
+    
+    return 0;
+  }
+
+  /** Check if a server type is available in any location */
+  isServerTypeAvailable(server: Server): boolean {
+    if (!server.server_type?.prices) return true; // Default to available if no pricing info
+    
+    // Check if any location has availability (missing available field means available by default)
+    return server.server_type.prices.some((price: any) => price.available !== false);
+  }
+
+  /** Get available locations for a server type */
+  getAvailableLocations(server: Server): string[] {
+    if (!server.server_type?.prices) return [];
+    
+    return server.server_type.prices
+      .filter((price: any) => price.available !== false)
+      .map((price: any) => price.location);
+  }
+
+  /** Get sold out locations for a server type */
+  getSoldOutLocations(server: Server): string[] {
+    if (!server.server_type?.prices) return [];
+    
+    return server.server_type.prices
+      .filter((price: any) => price.available === false)
+      .map((price: any) => price.location);
   }
 
   /** Get user-created servers from cache (for write operations only) */
@@ -582,5 +851,14 @@ export class HetznerApiService {
     }
     // Default fallback (20TB in bytes)
     return DEFAULT_INCLUDED_TRAFFIC;
+  }
+
+  /** Generate a random IP address for mock servers */
+  private generateRandomIP(): string {
+    const octet1 = Math.floor(Math.random() * 223) + 1; // 1-223 (avoid reserved ranges)
+    const octet2 = Math.floor(Math.random() * 255);
+    const octet3 = Math.floor(Math.random() * 255);
+    const octet4 = Math.floor(Math.random() * 254) + 1; // 1-254 (avoid .0 and .255)
+    return `${octet1}.${octet2}.${octet3}.${octet4}`;
   }
 }

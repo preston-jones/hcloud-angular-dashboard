@@ -237,7 +237,8 @@
             "price_per_tb_traffic": {
               "net": "1.0000000000",
               "gross": "1.1900000000000000"
-            }
+            },
+            "available": false
           },
           {
             "location": "sin",
@@ -355,7 +356,8 @@
             "price_per_tb_traffic": {
               "net": "7.4000000000",
               "gross": "8.8060000000000000"
-            }
+            },
+            "available": false
           },
           {
             "location": "ash",
@@ -575,7 +577,8 @@
             "price_per_tb_traffic": {
               "net": "1.0000000000",
               "gross": "1.1900000000000000"
-            }
+            },
+            "available": false
           },
           {
             "location": "hil",
@@ -1011,7 +1014,8 @@
             "price_per_tb_traffic": {
               "net": "1.0000000000",
               "gross": "1.1900000000000000"
-            }
+            },
+            "available": false
           }
         ]
       },
@@ -1339,7 +1343,8 @@
             "price_per_tb_traffic": {
               "net": "1.0000000000",
               "gross": "1.1900000000000000"
-            }
+            },
+            "available": false
           },
           {
             "location": "nbg1",
@@ -2147,7 +2152,8 @@
             "price_per_tb_traffic": {
               "net": "1.0000000000",
               "gross": "1.1900000000000000"
-            }
+            },
+            "available": false
           },
           {
             "location": "hel1",

@@ -156,7 +156,16 @@ export class ServersPage implements OnInit {
 
   // Selection methods
   selectServer(server: Server): void {
-    this.selectedServerId.set(server.id);
+    // Prevent selection of sold out servers
+    if (!this.isServerAvailable(server)) {
+      return;
+    }
+    
+    if (this.selectedServerId() === server.id) {
+      this.selectedServerId.set(null);
+    } else {
+      this.selectedServerId.set(server.id);
+    }
   }
 
   isSelected(server: Server): boolean {
@@ -235,6 +244,46 @@ export class ServersPage implements OnInit {
     const fullCity = server.datacenter?.location?.city || server.datacenter?.location?.name || 'Unknown';
     // Remove state abbreviations like ", VA", ", OR", etc.
     return fullCity.replace(/,\s*[A-Z]{2}$/, '');
+  }
+
+  // Availability helpers
+  isServerAvailable(server: Server): boolean {
+    return this.api.isServerTypeAvailable(server);
+  }
+
+  getAvailabilityStatus(server: Server): string {
+    if (!this.isServerAvailable(server)) {
+      return 'sold-out';
+    }
+    
+    const soldOutLocations = this.api.getSoldOutLocations(server);
+    if (soldOutLocations.length > 0) {
+      return 'limited';
+    }
+    
+    return 'available';
+  }
+
+  getAvailabilityText(server: Server): string {
+    const soldOutLocations = this.api.getSoldOutLocations(server);
+    const availableLocations = this.api.getAvailableLocations(server);
+    
+    if (availableLocations.length === 0) {
+      return 'Sold out';
+    }
+    
+    if (soldOutLocations.length > 0) {
+      return `Limited (${soldOutLocations.length} locations sold out)`;
+    }
+    
+    return 'Available';
+  }
+
+  getSoldOutTooltip(server: Server): string {
+    const soldOutLocations = this.api.getSoldOutLocations(server);
+    if (soldOutLocations.length === 0) return '';
+    
+    return `Sold out in: ${soldOutLocations.join(', ').toUpperCase()}`;
   }
 
   // Hardware specs helpers - using structured data only

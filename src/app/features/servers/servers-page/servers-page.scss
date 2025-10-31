@@ -107,6 +107,8 @@
   &.stopped { background: #9ca3af; }   /* Grau */
   &.error   { background: #ef4444; }   /* Rot */
   &.available { background: #3b82f6; } /* Blau für verfügbare Server-Typen */
+  &.sold-out { background: #ef4444; }  /* Rot für ausverkauft */
+  &.limited { background: #f59e0b; }   /* Orange für begrenzt verfügbar */
 }
 
 /* Mobile Karten */
@@ -123,6 +125,14 @@
 .server-card.selected {
   border-color: var(--primary);
   background: color-mix(in oklab, var(--primary) 5%, var(--surface-elev));
+}
+.server-card.sold-out-card {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: color-mix(in oklab, var(--surface-elev) 95%, var(--text-soft));
+}
+.server-card.sold-out-card:hover {
+  background: color-mix(in oklab, var(--surface-elev) 95%, var(--text-soft));
 }
 .server-card .name { color: var(--primary); font-weight: 600; }
 .server-card .meta { color: var(--text-soft); font-size: 0.875rem; }

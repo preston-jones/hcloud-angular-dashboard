@@ -15,35 +15,35 @@ export class ServerDisplayService {
 
   // Get server type display name
   getServerType(server: Server): string {
-    return server.server_type?.name || server.type || 'Unknown';
+    return server.server_type.name || 'Unknown';
   }
 
   // Hardware specs helpers
   getCpuCount(server: Server): string {
-    return this.api.getCpuCount(server);
+    return server.server_type.cores ? `${server.server_type.cores}` : '0';
   }
 
   getRamSize(server: Server): string {
-    return this.api.getRamSize(server);
+    return server.server_type.memory ? `${server.server_type.memory} GB` : '0 GB';
   }
 
   getDiskSize(server: Server): string {
-    return this.api.getDiskSize(server);
+    return server.server_type.disk ? `${server.server_type.disk} GB` : '0 GB';
   }
 
   // Get server architecture
   getArchitecture(server: Server): string {
-    return server.server_type?.architecture || server.architecture || 'x86';
+    return server.server_type.architecture || 'x86';
   }
 
   // Get network zone
   getNetworkZone(server: Server): string {
-    return server.datacenter?.location?.network_zone || 'unknown';
+    return server.datacenter.location.network_zone || 'unknown';
   }
 
   // Get public IP address
   getPublicIP(server: Server): string {
-    return server.public_net?.ipv4?.ip || 'No IP';
+    return server.public_net.ipv4.ip || 'No IP';
   }
 
   // Get creation time in German format
@@ -77,8 +77,8 @@ export class ServerDisplayService {
 
   // Location helpers
   getLocationWithFlag(server: Server): string {
-    const city: string = server.datacenter?.location?.city || server.datacenter?.location?.name || server.location || 'Unknown';
-    if (server.datacenter?.location?.country) {
+    const city: string = server.datacenter.location.city || server.datacenter.location.name || 'Unknown';
+    if (server.datacenter.location.country) {
       const flag = this.api.getCountryFlag(server.datacenter.location.country);
       return `${flag} ${city}`;
     }

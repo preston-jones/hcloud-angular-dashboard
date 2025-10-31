@@ -21,6 +21,16 @@ export interface ServerTypePricing {
     net: string; 
     gross: string; 
   };
+  available?: boolean; // Whether this server type is available in this location
+}
+
+/**
+ * Location reference
+ */
+export interface LocationReference {
+  id: number;
+  name: string;
+  deprecation?: any;
 }
 
 /**
@@ -29,14 +39,18 @@ export interface ServerTypePricing {
 export interface ServerType {
   id: number;
   name: string;
+  architecture: string;
   cores: number;
-  memory: number;
+  cpu_type: string;
+  category: string;
+  deprecated: boolean;
+  deprecation?: any;
+  description: string;
   disk: number;
-  description?: string;
-  cpu_type?: string;
-  storage_type?: string;
-  architecture?: string;
-  prices?: ServerTypePricing[];
+  memory: number;
+  prices: ServerTypePricing[];
+  storage_type: string;
+  locations: LocationReference[];
 }
 
 /**
@@ -45,12 +59,21 @@ export interface ServerType {
 export interface Location {
   id: number;
   name: string;
+  description: string;
   city: string;
   country: string;
-  description: string;
   latitude: number;
   longitude: number;
-  network_zone?: string;
+  network_zone: string;
+}
+
+/**
+ * Server types availability in datacenter
+ */
+export interface DatacenterServerTypes {
+  available: number[];
+  available_for_migration: number[];
+  supported: number[];
 }
 
 /**
@@ -58,8 +81,41 @@ export interface Location {
  */
 export interface Datacenter {
   id: number;
-  name: string;
+  description: string;
   location: Location;
+  name: string;
+  server_types: DatacenterServerTypes;
+}
+
+/**
+ * Image protection settings
+ */
+export interface ImageProtection {
+  delete: boolean;
+}
+
+/**
+ * Server image information
+ */
+export interface ServerImage {
+  id: number;
+  type: string;
+  name: string;
+  architecture: string;
+  bound_to?: any;
+  created_from?: any;
+  deprecated?: any;
+  description: string;
+  disk_size: number;
+  image_size?: any;
+  labels: { [key: string]: string };
+  os_flavor: string;
+  os_version: string;
+  protection: ImageProtection;
+  rapid_deploy: boolean;
+  status: string;
+  created: string;
+  deleted?: any;
 }
 
 /**
@@ -69,7 +125,7 @@ export interface IPv4Config {
   id: number;
   ip: string;
   blocked: boolean;
-  dns_ptr?: string;
+  dns_ptr: string;
 }
 
 /**
@@ -79,27 +135,25 @@ export interface IPv6Config {
   id: number;
   ip: string;
   blocked: boolean;
-  dns_ptr?: string[];
+  dns_ptr: string[];
+}
+
+/**
+ * Firewall reference
+ */
+export interface FirewallReference {
+  id: number;
+  status: string;
 }
 
 /**
  * Public network configuration
  */
 export interface PublicNetwork {
-  ipv4?: IPv4Config;
-  ipv6?: IPv6Config;
-  floating_ips?: any[];
-  // Traffic data may be nested in public_net in some API responses
-  ingoing_traffic?: number;
-  outgoing_traffic?: number;
-}
-
-/**
- * Traffic information
- */
-export interface TrafficInfo {
-  ingoing?: number;
-  outgoing?: number;
+  firewalls: FirewallReference[];
+  floating_ips: any[];
+  ipv4: IPv4Config;
+  ipv6: IPv6Config;
 }
 
 /**
@@ -107,7 +161,7 @@ export interface TrafficInfo {
  */
 export interface ServerProtection {
   delete: boolean;
-  rebuild?: boolean;
+  rebuild: boolean;
 }
 
 /**
@@ -117,19 +171,27 @@ export interface Server {
   id: number;
   name: string;
   status: ServerStatus;
-  created?: string;
-  server_type?: ServerType;
-  datacenter?: Datacenter;
-  public_net?: PublicNetwork;
-  protection?: ServerProtection;
+  server_type: ServerType;
+  datacenter: Datacenter;
+  image: ServerImage;
+  iso?: any;
+  primary_disk_size: number;
+  labels: { [key: string]: string };
+  protection: ServerProtection;
+  backup_window?: any;
+  rescue_enabled: boolean;
+  locked: boolean;
+  placement_group?: any;
+  public_net: PublicNetwork;
+  private_net: any[];
+  load_balancers: any[];
+  volumes: any[];
+  included_traffic: number;
+  ingoing_traffic: number;
+  outgoing_traffic: number;
+  created: string;
   
-  // Traffic properties (may be at root level or nested)
-  traffic?: TrafficInfo;
-  included_traffic?: number;
-  ingoing_traffic?: number;
-  outgoing_traffic?: number;
-  
-  // Computed properties for compatibility
+  // Computed properties for backward compatibility
   type?: string;
   location?: string;
   priceEur?: number;
