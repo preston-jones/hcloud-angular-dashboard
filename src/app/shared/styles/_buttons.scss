@@ -1,0 +1,91 @@
+/* Shared Button Styles */
+
+/* Action Buttons */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.action-btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.action-btn-primary:hover {
+  background: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.action-btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.action-btn-secondary:hover {
+  background: color-mix(in oklab, var(--surface) 92%, var(--text) 8%);
+  border-color: var(--border-hover);
+}
+
+.action-btn-danger {
+  background: var(--surface);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.action-btn-danger:hover {
+  background: color-mix(in oklab, #ef4444 10%, var(--surface) 90%);
+  border-color: #dc2626;
+}
+
+/* Option Button Cards */
+.option-button-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-elev);
+  transition: all 0.2s ease;
+  cursor: not-allowed;
+  width: 100%;
+  text-align: center;
+}
+
+.option-button-card:disabled {
+  opacity: 0.4;
+  background: color-mix(in oklab, var(--surface) 90%, var(--text-soft) 10%);
+  border-color: color-mix(in oklab, var(--border) 70%, transparent 30%);
+  color: var(--text-soft);
+  cursor: not-allowed;
+}
+
+.option-button-card:disabled .option-action {
+  color: var(--text-soft);
+  opacity: 0.7;
+}
+
+.option-button-card .option-action {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+/* Responsive Design for Buttons */
+@media (max-width: 768px) {
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

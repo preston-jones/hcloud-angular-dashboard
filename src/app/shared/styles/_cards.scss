@@ -1,0 +1,164 @@
+/* Shared Card Styles */
+
+/* Basic Card Styles */
+.card {
+  background: var(--surface-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  background: color-mix(in oklab, var(--surface-elev) 98%, var(--text) 2%);
+}
+
+.card-compact {
+  padding: 16px;
+  border-radius: 8px;
+}
+
+/* Specification Cards */
+.spec-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.spec-card:hover {
+  background: color-mix(in oklab, var(--surface) 96%, var(--text) 4%);
+  border-color: var(--border-hover);
+}
+
+.spec-icon {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.spec-content {
+  flex: 1;
+}
+
+.spec-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-soft);
+  margin-bottom: 2px;
+}
+
+.spec-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.spec-detail {
+  font-size: 11px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+/* Metric Cards */
+.metric-card {
+  background: var(--surface-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.metric-card:hover {
+  border-color: var(--border-hover);
+  background: color-mix(in oklab, var(--surface-elev) 96%, var(--text) 4%);
+}
+
+.metric-card .metric-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.metric-card .metric-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.metric-card .metric-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Option Items */
+.option-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.option-item:hover {
+  border-color: var(--border-hover);
+  background: color-mix(in oklab, var(--surface) 94%, var(--text) 6%);
+}
+
+.option-item .option-content {
+  flex: 1;
+}
+
+.option-item .option-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.option-item .option-status {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.option-item .option-button {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.option-item .option-button:hover {
+  background: color-mix(in oklab, var(--primary) 10%, transparent 90%);
+}
+
+/* Responsive Design for Cards */
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+  }
+  
+  .spec-card {
+    padding: 12px;
+  }
+}
