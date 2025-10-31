@@ -1,310 +1,473 @@
-<section class="space-y-4">
-  <!-- Toolbar -->
-  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <h1 class="text-xl font-semibold text-ink">Server List</h1>
+<section class="section">
+  <div class="section-header">
+    <h1 class="section-title">Server erstellen</h1>
+    <p class="section-description">Erstellen Sie einen neuen Cloud-Server mit dem Server-Assistenten</p>
+  </div>
 
-    <div class="flex flex-wrap gap-2 items-center">
-      <span class="text-sm text-soft">Available server configurations</span>
-
-      <button 
-        class="px-4 py-2 rounded-lg transition-colors"
-        [class]="hasSelection() ? 'text-white bg-primary hover:bg-primary-700' : 'text-gray-400 bg-gray-200 cursor-not-allowed'"
-        [disabled]="!hasSelection()"
-        (click)="createSelectedServer()">
-        Create Server
-      </button>
-    </div>
-  </header>
-
-  <!-- SKELETON (Table with card rows) -->
-  @if (loading()) {
-    <div class="hidden md:block space-y-4">
-      <!-- Skeleton Header -->
-      <div class="bg-[color-mix(in_oklab,_var(--surface)_92%,_black)] rounded-lg border border-ui/30 px-4 py-3">
-        <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4">
-          <div class="skeleton h-4 w-12"></div>
-          <div class="skeleton h-4 w-10"></div>
-          <div class="skeleton h-4 w-8"></div>
-          <div class="skeleton h-4 w-8"></div>
-          <div class="skeleton h-4 w-8"></div>
-          <div class="skeleton h-4 w-16"></div>
-          <div class="skeleton h-4 w-12"></div>
-          <div class="skeleton h-4 w-12"></div>
+  <!-- Main Wizard Layout -->
+  <div class="wizard-layout">
+    <!-- Left Side: Scrollable Wizard Steps -->
+    <div class="wizard-main">
+      
+      <!-- Wizard Progress -->
+      <div class="wizard-progress">
+        <div class="progress-steps">
+          <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture')">
+            <div class="step-number">1</div>
+            <div class="step-label">Architektur</div>
+          </div>
+          <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
+            <div class="step-number">2</div>
+            <div class="step-label">Standort</div>
+          </div>
+          <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
+            <div class="step-number">3</div>
+            <div class="step-label">Image</div>
+          </div>
+          <div class="progress-step" [class.active]="currentStep() === 'type'" [class.completed]="isStepCompleted('type')">
+            <div class="step-number">4</div>
+            <div class="step-label">Server-Typ</div>
+          </div>
+          <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
+            <div class="step-number">5</div>
+            <div class="step-label">Zusammenfassung</div>
+          </div>
         </div>
       </div>
 
-      <!-- Skeleton Rows -->
-      <div class="space-y-3">
-        @for (_ of skeletonRows; track $index) {
-          <div class="server-card">
-            <div class="grid grid-cols-[2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center">
-              <div class="skeleton h-5 w-3/4"></div>
-              <div class="skeleton h-5 w-1/2"></div>
-              <div class="skeleton h-5 w-full"></div>
-              <div class="skeleton h-5 w-full"></div>
-              <div class="skeleton h-5 w-full"></div>
-              <div class="skeleton h-5 w-2/3"></div>
-              <div class="skeleton h-5 w-1/2"></div>
-              <div class="skeleton h-5 w-1/2"></div>
+      <!-- Scrollable Steps Container -->
+      <div class="wizard-steps-container">
+        
+        <!-- Step 1: Architecture Selection -->
+        <div class="wizard-step" id="step-architecture">
+          <div class="step-header">
+            <h2 class="step-title">1. Architektur wählen</h2>
+            <p class="step-description">Wählen Sie die gewünschte Server-Architektur</p>
+          </div>
+
+          <div class="architecture-options">
+            <div class="architecture-row">
+              <!-- Shared Resources -->
+              <div class="architecture-category">
+                <h3>Shared Resources</h3>
+                <div class="architecture-cards">
+                  <div class="architecture-option" 
+                       [class.selected]="selectedArchitecture() === 'cost-optimized'"
+                       (click)="selectArchitecture('cost-optimized')">
+                    <div class="option-header">
+                      <h4>Cost-Optimized</h4>
+                      <span class="availability-badge limited">Limitierte Verfügbarkeit</span>
+                    </div>
+                    <p>Ideal für Entwicklung und Tests</p>
+                    
+                    <!-- Architecture Selection for Cost-Optimized -->
+                    <div class="arch-selection">
+                      <div class="arch-option" 
+                           [class.selected]="selectedCpuArchitecture() === 'x86'"
+                           (click)="selectCpuArchitecture('x86')">
+                        <input type="radio" name="cost-optimized-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                        <span>x86 (Intel/AMD)</span>
+                      </div>
+                      <div class="arch-option"
+                           [class.selected]="selectedCpuArchitecture() === 'arm64'"
+                           (click)="selectCpuArchitecture('arm64')">
+                        <input type="radio" name="cost-optimized-arch" value="arm64" [checked]="selectedCpuArchitecture() === 'arm64'">
+                        <span>Arm64 (Ampere)</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="architecture-option" 
+                       [class.selected]="selectedArchitecture() === 'regular-performance'"
+                       (click)="selectArchitecture('regular-performance')">
+                    <div class="option-header">
+                      <h4>Regular Performance</h4>
+                    </div>
+                    <p>Ausgewogene Performance für die meisten Anwendungen</p>
+                    
+                    <!-- Architecture Selection for Regular Performance -->
+                    <div class="arch-selection">
+                      <div class="arch-option"
+                           [class.selected]="selectedCpuArchitecture() === 'x86'"
+                           (click)="selectCpuArchitecture('x86')">
+                        <input type="radio" name="regular-performance-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                        <span>x86 (AMD)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dedicated Resources -->
+              <div class="architecture-category">
+                <h3>Dedicated Resources</h3>
+                <div class="architecture-cards">
+                  <div class="architecture-option" 
+                       [class.selected]="selectedArchitecture() === 'general-purpose'"
+                       (click)="selectArchitecture('general-purpose')">
+                    <div class="option-header">
+                      <h4>General Purpose</h4>
+                    </div>
+                    <p>Dedizierte CPU-Performance für produktive Workloads</p>
+                    
+                    <!-- Architecture Selection for General Purpose -->
+                    <div class="arch-selection">
+                      <div class="arch-option"
+                           [class.selected]="selectedCpuArchitecture() === 'x86'"
+                           (click)="selectCpuArchitecture('x86')">
+                        <input type="radio" name="general-purpose-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                        <span>x86 (AMD)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        }
-      </div>
-    </div>
 
-    <!-- Mobile Skeleton -->
-    <div class="md:hidden space-y-3">
-      @for (_ of skeletonRows; track $index) {
-        <div class="server-card">
-          <div class="flex items-center justify-between mb-2">
-            <div class="skeleton h-5 w-32"></div>
-            <div class="skeleton h-3 w-3 rounded-full"></div>
-          </div>
-          <div class="skeleton h-4 w-full"></div>
-          <div class="skeleton h-3 w-3/4 mt-1"></div>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- ERROR STATE -->
-  @if (!loading() && error()) {
-    <div class="text-center py-12">
-      <div class="text-red-500 text-4xl mb-4">⚠️</div>
-      <h2 class="text-lg font-medium text-ink mb-2">Failed to load servers</h2>
-      <p class="text-soft mb-4">{{ error() }}</p>
-      <button 
-        class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
-        (click)="retry()">
-        Retry
-      </button>
-    </div>
-  }
-
-  <!-- EMPTY STATE -->
-  @if (!loading() && !error() && view().length === 0) {
-    <div class="text-center py-12">
-      <div class="text-4xl mb-4">�</div>
-      <h2 class="text-lg font-medium text-ink mb-2">No server types available</h2>
-      <p class="text-soft mb-6">
-        @if (isUsingMockData) {
-          Mock data is not available or the file could not be loaded.
-        } @else {
-          Could not load available server configurations from Hetzner Cloud API.
-        }
-      </p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <button 
-          class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
-          (click)="retry()">
-          Retry
-        </button>
-        @if (!isUsingMockData) {
-          <a 
-            href="https://console.hetzner.cloud/" 
-            target="_blank"
-            class="px-4 py-2 rounded-lg border border-slate-300 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
-            Open Hetzner Console
-          </a>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- TABLE WITH CARD ROWS (md+) -->
-  @if (!loading() && !error() && view().length > 0) {
-    <div class="hidden md:block space-y-4">
-      <!-- Table Header -->
-      <div class="px-4 py-3">
-        <div class="grid grid-cols-[auto_2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 text-sm text-soft font-bold">
-          <span></span> <!-- Empty space for checkbox column -->
-          <button 
-            class="sortable-header text-left"
-            [class.sorted]="isColumnSorted('name')"
-            (click)="onSort('name')"
-            [attr.aria-label]="'Sort by name ' + (sortColumn() === 'name' ? sortDirection() : 'none')"
-            type="button">
-            <span>Name</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('name') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('name') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left"
-            [class.sorted]="isColumnSorted('type')"
-            (click)="onSort('type')"
-            [attr.aria-label]="'Sort by type ' + (sortColumn() === 'type' ? sortDirection() : 'none')"
-            type="button">
-            <span>Type</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('type') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('type') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left text-xs"
-            [class.sorted]="isColumnSorted('vcpus')"
-            (click)="onSort('vcpus')"
-            [attr.aria-label]="'Sort by vCPUs ' + (sortColumn() === 'vcpus' ? sortDirection() : 'none')"
-            type="button">
-            <span>vCPUs</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('vcpus') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('vcpus') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left text-xs"
-            [class.sorted]="isColumnSorted('ram')"
-            (click)="onSort('ram')"
-            [attr.aria-label]="'Sort by RAM ' + (sortColumn() === 'ram' ? sortDirection() : 'none')"
-            type="button">
-            <span>RAM</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('ram') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('ram') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left text-xs"
-            [class.sorted]="isColumnSorted('ssd')"
-            (click)="onSort('ssd')"
-            [attr.aria-label]="'Sort by SSD storage ' + (sortColumn() === 'ssd' ? sortDirection() : 'none')"
-            type="button">
-            <span>SSD</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('ssd') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('ssd') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left"
-            [class.sorted]="isColumnSorted('location')"
-            (click)="onSort('location')"
-            [attr.aria-label]="'Sort by location ' + (sortColumn() === 'location' ? sortDirection() : 'none')"
-            type="button">
-            <span>Location</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('location') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('location') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-left"
-            [class.sorted]="isColumnSorted('status')"
-            (click)="onSort('status')"
-            [attr.aria-label]="'Sort by status ' + (sortColumn() === 'status' ? sortDirection() : 'none')"
-            type="button">
-            <span>Status</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('status') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('status') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-          <button 
-            class="sortable-header text-right"
-            [class.sorted]="isColumnSorted('price')"
-            (click)="onSort('price')"
-            [attr.aria-label]="'Sort by price ' + (sortColumn() === 'price' ? sortDirection() : 'none')"
-            type="button">
-            <span>Price</span>
-            <span class="sort-arrow" aria-hidden="true">
-              <span class="sort-arrow-up" [style.display]="showUpArrow('price') ? 'block' : 'none'">▲</span>
-              <span class="sort-arrow-down" [style.display]="showDownArrow('price') ? 'block' : 'none'">▼</span>
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Table Rows as Cards -->
-      <div class="space-y-3">
-        @for (s of view(); track trackRow($index, s)) {
-          <div class="server-card cursor-pointer" 
-               (click)="isServerAvailable(s) ? selectServer(s) : null" 
-               [class.selected]="isSelected(s)"
-               [class.sold-out-card]="!isServerAvailable(s)">
-            <div class="grid grid-cols-[auto_2fr_1fr_0.5fr_0.5fr_0.5fr_1fr_1fr_1fr] gap-4 items-center text-sm">
-              <div class="flex items-center">
-                <input 
-                  type="radio" 
-                  [checked]="isSelected(s)"
-                  [disabled]="!isServerAvailable(s)"
-                  (click)="$event.stopPropagation(); isServerAvailable(s) ? selectServer(s) : null"
-                  class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <!-- Server Types Table under Architecture -->
+          @if (selectedArchitecture()) {
+          <div class="server-types-section">
+            <h3>Verfügbare Server-Typen</h3>
+            <div class="server-type-table">
+              <div class="table-header">
+                <div class="col-name">Name</div>
+                <div class="col-vcpus">vCPUs</div>
+                <div class="col-memory">RAM</div>
+                <div class="col-disk">Disk</div>
+                <div class="col-transfer">Transfer</div>
+                <div class="col-price">Preis/Monat</div>
               </div>
-              <div class="font-medium text-primary">{{ s.name }}</div>
-              <div class="text-soft">{{ s.type }}</div>
-              <div class="text-soft text-xs">{{ getCpuCount(s) }}</div>
-              <div class="text-soft text-xs">{{ getRamSize(s) }}</div>
-              <div class="text-soft text-xs">{{ getDiskSize(s) }}</div>
-              <div class="text-soft">
-                @if (hasCountryData(s)) {
-                  <span class="inline-flex items-center gap-2">
-                    <span class="text-base">{{ getCountryFlag(s) }}</span>
-                    <span>{{ getCleanCityName(s) }}</span>
-                  </span>
-                } @else {
-                  <span>{{ getCleanCityName(s) }}</span>
+
+              @for (server of filteredServers(); track server.id; let i = $index) {
+                @if (i < 6) {
+                <div class="table-row" 
+                     [class.selected]="selectedServerType() === server.server_type?.name" 
+                     [class.unavailable]="isServerTypeUnavailable(server.server_type?.name || '')"
+                     (click)="selectServerType(server.server_type?.name || '')">
+                  <div class="col-name">
+                    <strong>{{ server.server_type?.name || 'Unknown' }}</strong>
+                    @if (isServerTypeUnavailable(server.server_type?.name || '')) {
+                    <span class="unavailable-badge">Ausverkauft</span>
+                    }
+                  </div>
+                  <div class="col-vcpus">{{ server.server_type?.cores || 0 }}</div>
+                  <div class="col-memory">{{ server.server_type?.memory || 0 }} GB</div>
+                  <div class="col-disk">{{ server.server_type?.disk || 0 }} GB</div>
+                  <div class="col-transfer">20 TB</div>
+                  <div class="col-price">€{{ server.server_type?.prices?.[0]?.price_monthly?.gross || '0.00' }}</div>
+                </div>
                 }
-              </div>
-              <div>
-                <span class="inline-flex items-center gap-2" [title]="getSoldOutTooltip(s)">
-                  <span class="status-dot" [ngClass]="getAvailabilityStatus(s)"></span>
-                  <span class="capitalize">{{ getAvailabilityText(s) }}</span>
-                </span>
-              </div>
-              <div class="text-right text-soft">
-                €{{ (s.priceEur || 0).toFixed(2) }}/mo
-              </div>
+              }
             </div>
           </div>
-        }
-      </div>
-    </div>
-  }
+          }
+        </div>
 
-  <!-- MOBILE CARDS (sm) -->
-  @if (!loading() && !error() && view().length > 0) {
-    <div class="md:hidden space-y-3">
-      @for (s of view(); track trackRow($index, s)) {
-        <div class="server-card" 
-             (click)="isServerAvailable(s) ? selectServer(s) : null" 
-             [class.selected]="isSelected(s)"
-             [class.sold-out-card]="!isServerAvailable(s)">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <input 
-                type="radio" 
-                [checked]="isSelected(s)"
-                [disabled]="!isServerAvailable(s)"
-                (click)="$event.stopPropagation(); isServerAvailable(s) ? selectServer(s) : null"
-                class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              <div class="name">{{ s.name }}</div>
+        <!-- Step 2: Location Selection -->
+        <div class="wizard-step" id="step-location">
+          <div class="step-header">
+            <h2 class="step-title">2. Standort wählen</h2>
+            <p class="step-description">Wählen Sie den Standort für Ihren Server</p>
+          </div>
+
+          <div class="location-grid">
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'fsn1'"
+                 (click)="selectLocation('fsn1')">
+              <div class="location-flag">🇩🇪</div>
+              <div class="location-info">
+                <h4>Falkenstein</h4>
+                <span class="location-code">fsn1</span>
+              </div>
+              <div class="location-badge">Deutschland</div>
             </div>
-            <div class="status-dot" [ngClass]="getAvailabilityStatus(s)" [title]="getSoldOutTooltip(s)"></div>
-          </div>
-          <div class="meta">
-            @if (hasCountryData(s)) {
-              {{ s.type }} • {{ getCountryFlag(s) }} {{ getCleanCityName(s) }} • €{{ (s.priceEur || 0).toFixed(2) }}/mo
-            } @else {
-              {{ s.type }} • {{ getCleanCityName(s) }} • €{{ (s.priceEur || 0).toFixed(2) }}/mo
-            }
-          </div>
-          <div class="hardware text-xs text-soft mt-1">
-            {{ getHardwareSpecs(s) }}
+
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'nbg1'"
+                 (click)="selectLocation('nbg1')">
+              <div class="location-flag">🇩🇪</div>
+              <div class="location-info">
+                <h4>Nürnberg</h4>
+                <span class="location-code">nbg1</span>
+              </div>
+              <div class="location-badge">Deutschland</div>
+            </div>
+
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'hel1'"
+                 (click)="selectLocation('hel1')">
+              <div class="location-flag">🇫🇮</div>
+              <div class="location-info">
+                <h4>Helsinki</h4>
+                <span class="location-code">hel1</span>
+              </div>
+              <div class="location-badge">Finnland</div>
+            </div>
+
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'ash'"
+                 (click)="selectLocation('ash')">
+              <div class="location-flag">🇺🇸</div>
+              <div class="location-info">
+                <h4>Ashburn</h4>
+                <span class="location-code">ash</span>
+              </div>
+              <div class="location-badge">USA</div>
+            </div>
+
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'hil'"
+                 (click)="selectLocation('hil')">
+              <div class="location-flag">🇺🇸</div>
+              <div class="location-info">
+                <h4>Hillsboro</h4>
+                <span class="location-code">hil</span>
+              </div>
+              <div class="location-badge">USA</div>
+            </div>
+
+            <div class="location-card" 
+                 [class.selected]="selectedLocation() === 'sin'"
+                 (click)="selectLocation('sin')">
+              <div class="location-flag">🇸🇬</div>
+              <div class="location-info">
+                <h4>Singapur</h4>
+                <span class="location-code">sin</span>
+              </div>
+              <div class="location-badge">Singapur</div>
+            </div>
           </div>
         </div>
-      }
+
+        <!-- Step 3: Image Selection -->
+        <div class="wizard-step" id="step-image">
+          <div class="step-header">
+            <h2 class="step-title">3. Image wählen</h2>
+            <p class="step-description">Wählen Sie ein Betriebssystem oder eine Anwendung</p>
+          </div>
+
+          <div class="image-tabs">
+            <button class="image-tab" 
+                    [class.active]="activeImageTab() === 'os'"
+                    (click)="setImageTab('os')">OS Images</button>
+            <button class="image-tab" 
+                    [class.active]="activeImageTab() === 'apps'"
+                    (click)="setImageTab('apps')">Apps</button>
+          </div>
+
+          @if (activeImageTab() === 'os') {
+          <div class="image-grid">
+            <div class="image-card" 
+                 [class.selected]="selectedImage() === 'ubuntu'"
+                 (click)="selectImage('ubuntu')">
+              <div class="image-icon">
+                <img src="/assets/mock/ubuntu-icon.svg" alt="Ubuntu">
+              </div>
+              <div class="image-info">
+                <h4>Ubuntu</h4>
+                <p>Ubuntu 22.04 LTS</p>
+              </div>
+            </div>
+
+            <div class="image-card" 
+                 [class.selected]="selectedImage() === 'fedora'"
+                 (click)="selectImage('fedora')">
+              <div class="image-icon">
+                <img src="/assets/mock/fedora-icon.svg" alt="Fedora">
+              </div>
+              <div class="image-info">
+                <h4>Fedora</h4>
+                <p>Fedora 38</p>
+              </div>
+            </div>
+
+            <div class="image-card" 
+                 [class.selected]="selectedImage() === 'debian'"
+                 (click)="selectImage('debian')">
+              <div class="image-icon">
+                <img src="/assets/mock/debian-icon.svg" alt="Debian">
+              </div>
+              <div class="image-info">
+                <h4>Debian</h4>
+                <p>Debian 12</p>
+              </div>
+            </div>
+
+            <div class="image-card" 
+                 [class.selected]="selectedImage() === 'centos'"
+                 (click)="selectImage('centos')">
+              <div class="image-icon">
+                <img src="/assets/mock/centos-icon.svg" alt="CentOS">
+              </div>
+              <div class="image-info">
+                <h4>CentOS</h4>
+                <p>CentOS Stream 9</p>
+              </div>
+            </div>
+          </div>
+          }
+
+          @if (activeImageTab() === 'apps') {
+          <div class="image-grid">
+            <div class="image-card"
+                 [class.selected]="selectedImage() === 'docker'"
+                 (click)="selectImage('docker')">
+              <div class="image-icon">
+                <img src="/assets/mock/docker-icon.svg" alt="Docker">
+              </div>
+              <div class="image-info">
+                <h4>Docker</h4>
+                <p>Docker auf Ubuntu 22.04</p>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <!-- Step 4: Final Configuration -->
+        <div class="wizard-step" id="step-configuration">
+          <div class="step-header">
+            <h2 class="step-title">4. Konfiguration</h2>
+            <p class="step-description">Zusätzliche Einstellungen für Ihren Server</p>
+          </div>
+
+          <div class="configuration-options">
+            <div class="config-section">
+              <h4>SSH-Schlüssel (Optional)</h4>
+              <p>Fügen Sie SSH-Schlüssel für sicheren Zugang hinzu</p>
+              <button class="btn btn-outline">SSH-Schlüssel hinzufügen</button>
+            </div>
+
+            <div class="config-section">
+              <h4>Backups</h4>
+              <label class="checkbox-label">
+                <input type="checkbox" [checked]="enableBackups()" (change)="toggleBackups()">
+                <span>Automatische Backups aktivieren (+20% der Server-Kosten)</span>
+              </label>
+            </div>
+
+            <div class="config-section">
+              <h4>Überwachung</h4>
+              <label class="checkbox-label">
+                <input type="checkbox" [checked]="enableMonitoring()" (change)="toggleMonitoring()">
+                <span>Server-Überwachung aktivieren (kostenlos)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="wizard-actions">
+          <button class="btn btn-secondary" (click)="resetWizard()">Abbrechen</button>
+          <button class="btn btn-primary" 
+                  [disabled]="!canCreateServer()"
+                  (click)="createServer()">Server erstellen</button>
+        </div>
+
+      </div>
     </div>
+
+    <!-- Right Side: Summary Card -->
+    <div class="wizard-sidebar">
+      <div class="summary-card">
+        <h3>Zusammenfassung</h3>
+        
+        <div class="summary-sections">
+          <div class="summary-section">
+            <div class="summary-label">Architektur</div>
+            <div class="summary-value">
+              @if (selectedArchitecture()) {
+                {{ getArchitectureDisplayName() }}
+              } @else {
+                <span class="text-muted">Nicht ausgewählt</span>
+              }
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <div class="summary-label">Standort</div>
+            <div class="summary-value">
+              @if (selectedLocation()) {
+                {{ getLocationDisplayName() }}
+              } @else {
+                <span class="text-muted">Nicht ausgewählt</span>
+              }
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <div class="summary-label">Image</div>
+            <div class="summary-value">
+              @if (selectedImage()) {
+                {{ getImageDisplayName() }}
+              } @else {
+                <span class="text-muted">Nicht ausgewählt</span>
+              }
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <div class="summary-label">Server-Typ</div>
+            <div class="summary-value">
+              @if (selectedServerType()) {
+                {{ selectedServerType() }}
+              } @else {
+                <span class="text-muted">Nicht ausgewählt</span>
+              }
+            </div>
+          </div>
+
+          @if (selectedServerType()) {
+          <div class="summary-section">
+            <div class="summary-label">Spezifikationen</div>
+            <div class="summary-specs">
+              <div>{{ getSelectedServerSpecs().vcpus }} vCPUs</div>
+              <div>{{ getSelectedServerSpecs().memory }} GB RAM</div>
+              <div>{{ getSelectedServerSpecs().disk }} GB Disk</div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-pricing">
+          <div class="pricing-row">
+            <span>Server</span>
+            <span>€{{ getServerPrice() }}/Monat</span>
+          </div>
+          
+          @if (enableBackups()) {
+          <div class="pricing-row">
+            <span>Backups</span>
+            <span>€{{ getBackupPrice() }}/Monat</span>
+          </div>
+          }
+
+          <div class="pricing-total">
+            <span>Gesamt</span>
+            <span class="total-price">€{{ getTotalPrice() }}/Monat</span>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          @if (canCreateServer()) {
+          <button class="btn btn-primary btn-full" (click)="createServer()">
+            Server für €{{ getTotalPrice() }}/Monat erstellen
+          </button>
+          } @else {
+          <div class="creation-hint">
+            <p>Wählen Sie Architektur, Standort und Image aus, um fortzufahren.</p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Server Name Dialog -->
+  @if (showNameDialog()) {
+  <app-server-name-dialog (confirm)="onServerNameConfirmedWizard($event)" (cancel)="showNameDialog.set(false)" />
   }
 </section>
-
-<!-- Server Name Dialog -->
-@if (showNameDialog() && getSelectedServer()) {
-  <app-server-name-dialog
-    [selectedServer]="getSelectedServer()!"
-    (confirm)="onServerNameConfirmed($event)"
-    (cancel)="onServerNameCancelled()">
-  </app-server-name-dialog>
-}
