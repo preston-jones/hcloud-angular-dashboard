@@ -1,15 +1,22 @@
-import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { Server } from '../../../core/models';
 import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/selection-actions/selection-actions';
 import { ServerSelectionService, ServerDisplayService, ServerSortingService } from '../../../shared/services';
+import { ServerStatusDotComponent } from '../../../shared/ui/server-status-dot';
+import { ServerSpecsDisplayComponent } from '../../../shared/ui/server-specs-display';
+import { ServerProtectionToggleComponent } from '../../../shared/ui/server-protection-toggle';
 
 @Component({
   selector: 'app-my-servers-page',
   standalone: true,
-  imports: [NgClass, SelectionActionsComponent],
+  imports: [
+    SelectionActionsComponent, 
+    ServerStatusDotComponent, 
+    ServerSpecsDisplayComponent, 
+    ServerProtectionToggleComponent
+  ],
   template: `
     <section class="space-y-12">
       <!-- Toolbar -->
@@ -160,32 +167,18 @@ import { ServerSelectionService, ServerDisplayService, ServerSortingService } fr
                   </div>
                   <div class="flex items-center gap-2">
                     <!-- Status dot -->
-                    <span class="status-dot flex-shrink-0" [ngClass]="s.status"></span>
-                    <div class="space-y-1">
-                      <!-- Server name -->
-                      <div class="font-medium text-primary">
-                        {{ s.name }}
-                      </div>
-                      <!-- Server specs line -->
-                      <div class="text-soft text-xs">
-                        {{ getServerType(s) }} | {{ getArchitecture(s) }} | {{ getDiskSize(s) }} | {{ getNetworkZone(s) }}
-                      </div>
-                    </div>
+                    <app-server-status-dot [status]="s.status"></app-server-status-dot>
+                    <app-server-specs-display [server]="s"></app-server-specs-display>
                   </div>
                   <div class="text-soft">{{ getPublicIP(s) }}</div>
                   <div class="text-soft">{{ getLocationWithFlag(s) }}</div>
                   <div class="text-soft text-xs">{{ getCreatedTimeAgo(s) }}</div>
                   <!-- Protection icon -->
                   <div class="flex items-center justify-center">
-                    <button 
-                      class="text-sm hover:scale-110 transition-transform p-1"
-                      [class.text-blue-600]="s.protection?.delete"
-                      [class.text-gray-400]="!s.protection?.delete"
-                      (click)="toggleServerProtection(s.id, $event)"
-                      [attr.aria-label]="s.protection?.delete ? 'Remove protection from ' + s.name : 'Protect ' + s.name"
-                      type="button">
-                      {{ s.protection?.delete ? '🛡' : '🔓' }}
-                    </button>
+                    <app-server-protection-toggle 
+                      [server]="s" 
+                      (toggle)="onProtectionToggle($event)">
+                    </app-server-protection-toggle>
                   </div>
                 </div>
               </div>
@@ -368,6 +361,11 @@ export class MyServersPage implements OnInit {
     selectedServers.forEach(server => {
       this.api.updateServerProtection(server.id, false);
     });
+  }
+
+  // Toggle protection for individual server (updated for new component)
+  onProtectionToggle(event: { serverId: number; event: Event }): void {
+    this.toggleServerProtection(event.serverId, event.event);
   }
 
   // Toggle protection for individual server

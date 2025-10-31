@@ -98,17 +98,6 @@
   font-weight: bold;
 }
 
-/* Statuspunkte */
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  &.running { background: #22c55e; }   /* Grün */
-  &.stopped { background: #9ca3af; }   /* Grau */
-  &.error   { background: #ef4444; }   /* Rot */
-  &.available { background: #3b82f6; } /* Blau für verfügbare Server-Typen */
-}
-
 /* Mobile Karten */
 .server-card {
   background: var(--surface-elev);
