@@ -314,12 +314,6 @@ export class MyServersPage implements OnInit {
     return serverIds.length > 0 && serverIds.every(id => this.selectedServerIds().has(id));
   }
 
-  isPartiallySelected(): boolean {
-    const serverIds = this.myServers().map(s => s.id);
-    const selectedCount = serverIds.filter(id => this.selectedServerIds().has(id)).length;
-    return selectedCount > 0 && selectedCount < serverIds.length;
-  }
-
   toggleSelectAll(): void {
     const serverIds = this.myServers().map(s => s.id);
     if (this.isAllSelected()) {
@@ -367,19 +361,15 @@ export class MyServersPage implements OnInit {
   // Protection operations on selected servers
   activateProtectionSelectedServers(): void {
     const selectedServers = this.getSelectedServers();
-    console.log(`Activating protection for ${selectedServers.length} servers`);
     selectedServers.forEach(server => {
       this.api.updateServerProtection(server.id, true);
-      console.log(`Activated protection for server: ${server.name}`);
     });
   }
 
   deactivateProtectionSelectedServers(): void {
     const selectedServers = this.getSelectedServers();
-    console.log(`Deactivating protection for ${selectedServers.length} servers`);
     selectedServers.forEach(server => {
       this.api.updateServerProtection(server.id, false);
-      console.log(`Deactivated protection for server: ${server.name}`);
     });
   }
 
@@ -391,7 +381,6 @@ export class MyServersPage implements OnInit {
     if (server) {
       const isCurrentlyProtected = server.protection?.delete || false;
       this.api.updateServerProtection(serverId, !isCurrentlyProtected);
-      console.log(`${!isCurrentlyProtected ? 'Activated' : 'Deactivated'} protection for server: ${server.name}`);
     }
   }
 
@@ -484,10 +473,6 @@ export class MyServersPage implements OnInit {
   viewServerDetails(server: Server) {
     this.router.navigate(['/my-servers', server.id]);
   }
-
-
-
-
 
   // Get the monthly price for a server
   getServerPrice(server: Server): string {
