@@ -1,0 +1,39 @@
+/* Selection Footer - positioned like a footer, not absolute */
+.selection-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  transform: translateY(100%);
+  /* Match the exact sidebar transition timing and easing */
+  transition: 
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+    margin-left 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.selection-footer.active {
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.selection-content {
+  background: var(--surface-elev);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  .selection-content {
+    padding: 0.75rem 1rem;
+  }
+  
+  .selection-footer {
+    margin-left: 0 !important; /* Override sidebar margin on mobile */
+    /* Remove margin-left transition on mobile since sidebar is not visible */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

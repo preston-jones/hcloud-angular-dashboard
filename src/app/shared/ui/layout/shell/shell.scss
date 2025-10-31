@@ -5,4 +5,20 @@
   z-index: 10;
   background: var(--surface-elev);
   border-bottom: 1px solid var(--color-ui);
+  /* Match the exact sidebar transition timing and easing */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-content {
+  /* Match the exact sidebar transition timing and easing */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Mobile responsiveness for page header and main content */
+@media (max-width: 768px) {
+  .page-header,
+  .main-content {
+    margin-left: 0 !important; /* Override sidebar margin on mobile */
+    transition: none; /* Remove margin-left transition on mobile */
+  }
 }

@@ -6,6 +6,7 @@ import { SidebarComponent } from '../sidebar/sidebar';
 import { DemoRestrictionDialogComponent } from '../../demo-restriction-dialog/demo-restriction-dialog';
 import { HetznerApiService } from '../../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../../core/page-header.service';
+import { LayoutService } from '../../../services/layout.service';
 
 @Component({
   selector: 'app-shell',
@@ -16,44 +17,24 @@ import { PageHeaderService } from '../../../../core/page-header.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellComponent {
-  collapsed = signal(true); // Default to collapsed (small sidebar)
-  isPinned = signal(false); // Pin state
   api = inject(HetznerApiService);
   pageHeaderService = inject(PageHeaderService);
+  layoutService = inject(LayoutService);
 
-  // Computed sidebar width based on state
-  sidebarWidth = computed(() => {
-    if (this.isPinned() || !this.collapsed()) {
-      return '280px';
-    }
-    return '71px'; // Close gap with 72px minimal sidebar
-  });
-
-  getSidebarWidth(): string {
-    return this.sidebarWidth();
-  }
+  // Use layout service for sidebar state
+  collapsed = this.layoutService.isCollapsed;
+  isPinned = this.layoutService.isPinnedState;
 
   expandSidebar = () => {
-    if (!this.isPinned()) {
-      this.collapsed.set(false);
-    }
+    this.layoutService.expandSidebar();
   };
   
   collapseSidebar = () => {
-    if (!this.isPinned()) {
-      this.collapsed.set(true);
-    }
+    this.layoutService.collapseSidebar();
   };
 
   togglePin = () => {
-    this.isPinned.update(pinned => !pinned);
-    if (this.isPinned()) {
-      // When pinning, expand the sidebar
-      this.collapsed.set(false);
-    } else {
-      // When unpinning, collapse the sidebar
-      this.collapsed.set(true);
-    }
+    this.layoutService.togglePin();
   };
 
   onSearch(query: string) {

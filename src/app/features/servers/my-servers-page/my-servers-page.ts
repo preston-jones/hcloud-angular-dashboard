@@ -3,11 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } 
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/models';
+import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/selection-actions/selection-actions';
 
 @Component({
   selector: 'app-my-servers-page',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, SelectionActionsComponent],
   template: `
     <section class="space-y-12">
       <!-- Toolbar -->
@@ -193,61 +194,11 @@ import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/m
       }
     </section>
 
-    <!-- Selection Actions Container -->
-    <div class="selection-container" 
-         [class.active]="selectedCount() > 0"
-         [style.transform]="selectedCount() > 0 ? 'translateY(0)' : 'translateY(100%)'">
-      <div class="selection-content">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-medium text-ink">
-              {{ selectedCount() }} selected
-            </span>
-          </div>
-          
-          <div class="flex items-center gap-2">
-            <button 
-              class="flex flex-col items-center gap-1 px-3 py-2 text-xs hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors rounded-md"
-              (click)="startSelectedServers()"
-              [disabled]="!hasSelectedStoppedServers()"
-              [class.opacity-50]="!hasSelectedStoppedServers()">
-              <span class="text-sm">▶</span>
-              <span>Power On</span>
-            </button>
-            
-            <button 
-              class="flex flex-col items-center gap-1 px-3 py-2 text-xs hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors rounded-md"
-              (click)="stopSelectedServers()"
-              [disabled]="!hasSelectedRunningServers()"
-              [class.opacity-50]="!hasSelectedRunningServers()">
-              <span class="text-sm">⏸</span>
-              <span>Power Off</span>
-            </button>
-            
-            <button 
-              class="flex flex-col items-center gap-1 px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-md"
-              (click)="activateProtectionSelectedServers()">
-              <span class="text-sm">🛡</span>
-              <span>Activate Protection</span>
-            </button>
-            
-            <button 
-              class="flex flex-col items-center gap-1 px-3 py-2 text-xs hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors rounded-md"
-              (click)="deactivateProtectionSelectedServers()">
-              <span class="text-sm">🔒</span>
-              <span>Deactivate Protection</span>
-            </button>
-            
-            <button 
-              class="flex flex-col items-center gap-1 px-3 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors rounded-md"
-              (click)="deleteSelectedServers()">
-              <span class="text-sm">🗑</span>
-              <span>Delete</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Shared Selection Actions Component -->
+    <app-selection-actions 
+      [selectedCount]="selectedCount()" 
+      [actions]="selectionActions()">
+    </app-selection-actions>
 
   `,
   styleUrls: ['./my-servers-page.scss'],
@@ -262,6 +213,47 @@ export class MyServersPage implements OnInit {
   
   // Computed for selection count
   selectedCount = computed(() => this.selectedServerIds().size);
+  
+  // Selection actions for the shared component
+  selectionActions = computed<SelectionAction[]>(() => [
+    {
+      id: 'power-on',
+      label: 'Power On',
+      icon: '▶',
+      disabled: !this.hasSelectedStoppedServers(),
+      hoverClass: 'hover:bg-green-50 dark:hover:bg-green-900/20',
+      action: () => this.startSelectedServers()
+    },
+    {
+      id: 'power-off',
+      label: 'Power Off',
+      icon: '⏸',
+      disabled: !this.hasSelectedRunningServers(),
+      hoverClass: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/20',
+      action: () => this.stopSelectedServers()
+    },
+    {
+      id: 'activate-protection',
+      label: 'Activate Protection',
+      icon: '🛡',
+      hoverClass: 'hover:bg-blue-50 dark:hover:bg-blue-900/20',
+      action: () => this.activateProtectionSelectedServers()
+    },
+    {
+      id: 'deactivate-protection',
+      label: 'Deactivate Protection',
+      icon: '🔒',
+      hoverClass: 'hover:bg-orange-50 dark:hover:bg-orange-900/20',
+      action: () => this.deactivateProtectionSelectedServers()
+    },
+    {
+      id: 'delete',
+      label: 'Delete',
+      icon: '🗑',
+      hoverClass: 'hover:bg-red-50 dark:hover:bg-red-900/20',
+      action: () => this.deleteSelectedServers()
+    }
+  ]);
   
   // Sorting state
   sortColumn = signal<string | null>('created');
