@@ -1,9 +1,10 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
-import { Server, StatusFilter, SortDirection, SortColumn } from '../../../core/models';
+import { Server } from '../../../core/models';
 import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/selection-actions/selection-actions';
+import { ServerSelectionService, ServerDisplayService, ServerSortingService } from '../../../shared/services';
 
 @Component({
   selector: 'app-my-servers-page',
@@ -126,14 +127,14 @@ import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/s
               </div>
               <button 
                 class="sortable-header text-left flex items-center"
-                [class.sorted]="isColumnSorted('created')"
-                (click)="onSort('created')"
-                [attr.aria-label]="'Sort by created date ' + (sortColumn() === 'created' ? sortDirection() : 'none')"
+                [class.sorted]="sortingService.isColumnSorted('created')"
+                (click)="sortingService.onSort('created')"
+                [attr.aria-label]="'Sort by created date ' + (sortingService.sortColumn() === 'created' ? sortingService.sortDirection() : 'none')"
                 type="button">
                 <span>Created</span>
                 <span class="sort-arrow" aria-hidden="true">
-                  <span class="sort-arrow-up" [style.display]="showUpArrow('created') ? 'block' : 'none'">▲</span>
-                  <span class="sort-arrow-down" [style.display]="showDownArrow('created') ? 'block' : 'none'">▼</span>
+                  <span class="sort-arrow-up" [style.display]="sortingService.showUpArrow('created') ? 'block' : 'none'">▲</span>
+                  <span class="sort-arrow-down" [style.display]="sortingService.showDownArrow('created') ? 'block' : 'none'">▼</span>
                 </span>
               </button>
               <div class="flex items-center justify-center">
@@ -146,15 +147,15 @@ import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/s
             @for (s of myServers(); track s.id) {
               <div 
                 class="server-card cursor-pointer"
-                [style.background]="isServerSelected(s.id) ? 'color-mix(in oklab, var(--primary) 8%, var(--surface-elev))' : ''"
+                [style.background]="isServerSelected(s.id.toString()) ? 'color-mix(in oklab, var(--primary) 8%, var(--surface-elev))' : ''"
                 (click)="viewServerDetails(s)">
                 <div class="grid grid-cols-[auto_3fr_1fr_1fr_1fr_auto] gap-4 items-center text-sm">
                   <div class="flex items-center" (click)="$event.stopPropagation()">
                     <input 
                       type="checkbox" 
                       class="rounded border border-ui"
-                      [checked]="isServerSelected(s.id)"
-                      (change)="toggleServerSelection(s.id)"
+                      [checked]="isServerSelected(s.id.toString())"
+                      (change)="toggleServerSelection(s.id.toString())"
                       [attr.aria-label]="'Select ' + s.name">
                   </div>
                   <div class="flex items-center gap-2">
@@ -207,12 +208,14 @@ import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/s
 export class MyServersPage implements OnInit {
   private api = inject(HetznerApiService);
   private router = inject(Router);
-
-  // UI state (removed status signal - no longer needed)
-  selectedServerIds = signal<Set<string>>(new Set());
   
-  // Computed for selection count
-  selectedCount = computed(() => this.selectedServerIds().size);
+  // Inject the new services (public for template access)
+  selectionService = inject(ServerSelectionService);
+  displayService = inject(ServerDisplayService);
+  sortingService = inject(ServerSortingService);
+
+  // Use selection service
+  selectedCount = this.selectionService.selectedCount;
   
   // Selection actions for the shared component
   selectionActions = computed<SelectionAction[]>(() => [
@@ -220,7 +223,7 @@ export class MyServersPage implements OnInit {
       id: 'power-on',
       label: 'Power On',
       icon: '▶',
-      disabled: !this.hasSelectedStoppedServers(),
+      disabled: !this.selectionService.hasSelectedStoppedServers(this.myServers()),
       hoverClass: 'hover:bg-green-50 dark:hover:bg-green-900/20',
       action: () => this.startSelectedServers()
     },
@@ -228,7 +231,7 @@ export class MyServersPage implements OnInit {
       id: 'power-off',
       label: 'Power Off',
       icon: '⏸',
-      disabled: !this.hasSelectedRunningServers(),
+      disabled: !this.selectionService.hasSelectedRunningServers(this.myServers()),
       hoverClass: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/20',
       action: () => this.stopSelectedServers()
     },
@@ -254,10 +257,6 @@ export class MyServersPage implements OnInit {
       action: () => this.deleteSelectedServers()
     }
   ]);
-  
-  // Sorting state
-  sortColumn = signal<string | null>('created');
-  sortDirection = signal<SortDirection>('desc');
 
   // API state
   get loading() { return this.api.loading; }
@@ -276,8 +275,8 @@ export class MyServersPage implements OnInit {
       );
     }
     
-    // Apply sorting
-    return this.sortServers(filteredServers);
+    // Apply sorting using the sorting service
+    return this.sortingService.sortServers(filteredServers);
   });
 
   ngOnInit() {
@@ -294,51 +293,39 @@ export class MyServersPage implements OnInit {
     this.router.navigate(['/servers']);
   }
 
-  // Selection methods
+  // Selection methods - delegate to selection service
   isServerSelected(serverId: string): boolean {
-    return this.selectedServerIds().has(serverId);
+    return this.selectionService.isServerSelected(serverId);
   }
 
   toggleServerSelection(serverId: string): void {
-    const selected = new Set(this.selectedServerIds());
-    if (selected.has(serverId)) {
-      selected.delete(serverId);
-    } else {
-      selected.add(serverId);
-    }
-    this.selectedServerIds.set(selected);
+    this.selectionService.toggleServerSelection(serverId);
   }
 
   isAllSelected(): boolean {
-    const serverIds = this.myServers().map(s => s.id);
-    return serverIds.length > 0 && serverIds.every(id => this.selectedServerIds().has(id));
+    return this.selectionService.isAllSelected(this.myServers());
   }
 
   toggleSelectAll(): void {
-    const serverIds = this.myServers().map(s => s.id);
-    if (this.isAllSelected()) {
-      this.selectedServerIds.set(new Set());
-    } else {
-      this.selectedServerIds.set(new Set(serverIds));
-    }
+    this.selectionService.toggleSelectAll(this.myServers());
   }
 
   // Clear selection
   clearSelection(): void {
-    this.selectedServerIds.set(new Set());
+    this.selectionService.clearSelection();
   }
 
   // Helper methods for selected servers
   getSelectedServers() {
-    return this.myServers().filter(server => this.selectedServerIds().has(server.id));
+    return this.selectionService.getSelectedServers(this.myServers());
   }
 
   hasSelectedRunningServers(): boolean {
-    return this.getSelectedServers().some(server => server.status === 'running');
+    return this.selectionService.hasSelectedRunningServers(this.myServers());
   }
 
   hasSelectedStoppedServers(): boolean {
-    return this.getSelectedServers().some(server => server.status === 'stopped');
+    return this.selectionService.hasSelectedStoppedServers(this.myServers());
   }
 
   // Bulk operations on selected servers
@@ -363,9 +350,8 @@ export class MyServersPage implements OnInit {
     
     // Only uncheck the servers that were actually deleted
     if (deletableServers.length > 0) {
-      const currentSelection = new Set(this.selectedServerIds());
-      deletableServers.forEach(server => currentSelection.delete(server.id));
-      this.selectedServerIds.set(currentSelection);
+      const deletedServerIds = deletableServers.map(server => server.id.toString());
+      this.selectionService.removeServersFromSelection(deletedServerIds);
     }
   }
 
@@ -395,170 +381,48 @@ export class MyServersPage implements OnInit {
     }
   }
 
-  // Sorting handler
-  onSort(column: string) {
-    const currentColumn = this.sortColumn();
-    const currentDirection = this.sortDirection();
-
-    if (currentColumn === column) {
-      this.cycleSortDirection();
-    } else {
-      this.setSortColumn(column, 'asc');
-    }
-  }
-
-  private cycleSortDirection(): void {
-    const current = this.sortDirection();
-    switch (current) {
-      case 'none':
-        this.sortDirection.set('asc');
-        break;
-      case 'asc':
-        this.sortDirection.set('desc');
-        break;
-      case 'desc':
-        this.resetSort();
-        break;
-    }
-  }
-
-  private setSortColumn(column: string, direction: 'asc' | 'desc'): void {
-    this.sortColumn.set(column);
-    this.sortDirection.set(direction);
-  }
-
-  private resetSort(): void {
-    this.sortColumn.set(null);
-    this.sortDirection.set('none');
-  }
-
-  // Get sort value for a server based on column
-  private getSortValue(server: any, column: string): any {
-    switch (column) {
-      case 'created':
-        return server.created ? new Date(server.created).getTime() : 0;
-      default:
-        return '';
-    }
-  }
-
-  // Sort servers array
-  private sortServers(servers: any[]): any[] {
-    const column = this.sortColumn();
-    const direction = this.sortDirection();
-
-    if (!column || direction === 'none') {
-      return servers;
-    }
-
-    return [...servers].sort((a, b) => {
-      const comparison = this.compareValues(a, b, column);
-      return direction === 'asc' ? comparison : -comparison;
-    });
-  }
-
-  private compareValues(a: any, b: any, column: string): number {
-    const aValue = this.getSortValue(a, column);
-    const bValue = this.getSortValue(b, column);
-    
-    if (aValue < bValue) return -1;
-    if (aValue > bValue) return 1;
-    return 0;
-  }
-
-  // Check if up arrow should be visible
-  showUpArrow(column: string): boolean {
-    return this.sortColumn() !== column || this.sortDirection() !== 'desc';
-  }
-
-  // Check if down arrow should be visible
-  showDownArrow(column: string): boolean {
-    return this.sortColumn() !== column || this.sortDirection() !== 'asc';
-  }
-
-  // Check if column is currently being sorted
-  isColumnSorted(column: string): boolean {
-    return this.sortColumn() === column && this.sortDirection() !== 'none';
-  }
-
   viewServerDetails(server: Server) {
     this.router.navigate(['/my-servers', server.id]);
   }
 
-  // Get the monthly price for a server
+  // Display methods - delegate to display service
   getServerPrice(server: Server): string {
-    return this.api.getServerPriceFormatted(server);
+    return this.displayService.getServerPrice(server);
   }
 
-  // Get server type display name
   getServerType(server: Server): string {
-    return server.server_type?.name || server.type || 'Unknown';
+    return this.displayService.getServerType(server);
   }
 
-  // Hardware specs helpers
   getCpuCount(server: Server): string {
-    return this.api.getCpuCount(server);
+    return this.displayService.getCpuCount(server);
   }
 
   getRamSize(server: Server): string {
-    return this.api.getRamSize(server);
+    return this.displayService.getRamSize(server);
   }
 
   getDiskSize(server: Server): string {
-    return this.api.getDiskSize(server);
+    return this.displayService.getDiskSize(server);
   }
 
-  // Get server architecture
   getArchitecture(server: Server): string {
-    return server.server_type?.architecture || server.architecture || 'x86';
+    return this.displayService.getArchitecture(server);
   }
 
-  // Get network zone
   getNetworkZone(server: Server): string {
-    return server.datacenter?.location?.network_zone || 'unknown';
+    return this.displayService.getNetworkZone(server);
   }
 
-  // Get public IP address
   getPublicIP(server: Server): string {
-    return server.public_net?.ipv4?.ip || 'No IP';
+    return this.displayService.getPublicIP(server);
   }
 
-  // Get creation time in German format
   getCreatedTimeAgo(server: Server): string {
-    if (!server.created) return 'Unbekannt';
-    
-    const createdDate = new Date(server.created);
-    const now = new Date();
-    const diffMs = now.getTime() - createdDate.getTime();
-    
-    // Convert to different time units
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays > 0) {
-      return `vor ${diffDays} ${diffDays === 1 ? 'Tag' : 'Tage'}`;
-    } else if (diffHours > 0) {
-      const remainingMinutes = diffMinutes % 60;
-      if (remainingMinutes > 0) {
-        return `vor ${diffHours} ${diffHours === 1 ? 'Stunde' : 'Stunden'} ${remainingMinutes} ${remainingMinutes === 1 ? 'Minute' : 'Minuten'}`;
-      } else {
-        return `vor ${diffHours} ${diffHours === 1 ? 'Stunde' : 'Stunden'}`;
-      }
-    } else if (diffMinutes > 0) {
-      return `vor ${diffMinutes} ${diffMinutes === 1 ? 'Minute' : 'Minuten'}`;
-    } else {
-      return 'gerade eben';
-    }
+    return this.displayService.getCreatedTimeAgo(server);
   }
 
-  // Location helpers
   getLocationWithFlag(server: Server): string {
-    const city: string = server.datacenter?.location?.city || server.datacenter?.location?.name || server.location || 'Unknown';
-    if (server.datacenter?.location?.country) {
-      const flag = this.api.getCountryFlag(server.datacenter.location.country);
-      return `${flag} ${city}`;
-    }
-    return city;
+    return this.displayService.getLocationWithFlag(server);
   }
 }
