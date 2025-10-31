@@ -354,8 +354,19 @@ export class MyServersPage implements OnInit {
 
   deleteSelectedServers(): void {
     const selectedServers = this.getSelectedServers();
-    selectedServers.forEach(server => this.api.deleteServer(server.id));
-    this.clearSelection();
+    
+    // Get servers that can actually be deleted (not protected)
+    const deletableServers = selectedServers.filter(server => !server.protection?.delete);
+    
+    // Delete only the non-protected servers
+    deletableServers.forEach(server => this.api.deleteServer(server.id));
+    
+    // Only uncheck the servers that were actually deleted
+    if (deletableServers.length > 0) {
+      const currentSelection = new Set(this.selectedServerIds());
+      deletableServers.forEach(server => currentSelection.delete(server.id));
+      this.selectedServerIds.set(currentSelection);
+    }
   }
 
   // Protection operations on selected servers
