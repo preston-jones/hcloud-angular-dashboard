@@ -1,9 +1,49 @@
 {
-  "error": {
-    "message": "API functionality was removed",
-    "code": "deprecated_api_endpoint",
-    "details": {
-      "announcement": "https://docs.hetzner.cloud/changelog#2025-01-30-listing-arbitrary-actions-in-the-actions-list-endpoint-is-removed"
+ "actions": [
+  {
+   "id": 589673246647991,
+   "command": "create_server",
+   "started": "2025-10-31T07:52:52Z",
+   "finished": "2025-10-31T07:53:09Z",
+   "progress": 100,
+   "status": "success",
+   "resources": [
+    {
+     "id": 111897044,
+     "type": "server"
+    },
+    {
+     "id": 161547269,
+     "type": "image"
     }
+   ],
+   "error": null
+  },
+  {
+   "id": 589673246647992,
+   "command": "start_server",
+   "started": "2025-10-31T07:52:52Z",
+   "finished": "2025-10-31T07:53:19Z",
+   "progress": 100,
+   "status": "success",
+   "resources": [
+    {
+     "id": 111897044,
+     "type": "server"
+    }
+   ],
+   "parent_id": 589673246647991,
+   "error": null
   }
+ ],
+ "meta": {
+  "pagination": {
+   "last_page": 1,
+   "next_page": null,
+   "page": 1,
+   "per_page": 25,
+   "previous_page": null,
+   "total_entries": 2
+  }
+ }
 }
