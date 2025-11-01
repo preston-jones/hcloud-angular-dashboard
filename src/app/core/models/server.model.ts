@@ -151,9 +151,9 @@ export interface FirewallReference {
  */
 export interface PublicNetwork {
   firewalls: FirewallReference[];
-  floating_ips: any[];
-  ipv4: IPv4Config;
-  ipv6: IPv6Config;
+  floating_ips: [];
+  ipv4: IPv4Config | [];
+  ipv6: IPv6Config | [];
 }
 
 /**

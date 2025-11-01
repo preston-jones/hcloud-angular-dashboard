@@ -195,15 +195,15 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
 
   // IP address helpers
   getIPv4(server: Server): string | null {
-    return server.public_net?.ipv4?.ip || null;
+    return (server.public_net?.ipv4 && !Array.isArray(server.public_net.ipv4)) ? server.public_net.ipv4.ip : null;
   }
 
   getIPv6(server: Server): string | null {
-    return server.public_net?.ipv6?.ip || null;
+    return (server.public_net?.ipv6 && !Array.isArray(server.public_net.ipv6)) ? server.public_net.ipv6.ip : null;
   }
 
   hasPublicIPs(server: Server): boolean {
-    return !!(server.public_net?.ipv4?.ip || server.public_net?.ipv6?.ip);
+    return !!(this.getIPv4(server) || this.getIPv6(server));
   }
 
   // Get pricing information for the server's location

@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy, AfterViewInit, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
-import { ServerNameDialogComponent } from '../../../shared/ui/server-name-dialog/server-name-dialog';
 
 @Component({
   selector: 'app-servers-page',
   standalone: true,
-  imports: [ServerNameDialogComponent],
+  imports: [],
   templateUrl: './servers-page.html',
   styleUrls: ['./servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,7 +31,7 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   sortDirection = signal<'asc' | 'desc' | 'none'>('none');
 
   // Wizard state
-  currentStep = signal<'list' | 'architecture' | 'location' | 'image' | 'type' | 'summary'>('architecture');
+  currentStep = signal<'list' | 'architecture' | 'location' | 'image' | 'type' | 'networking' | 'security' | 'extras' | 'labels' | 'name' | 'summary'>('architecture');
   
   // Scroll spy state
   activeSection = signal<string>('step-architecture');
@@ -49,11 +48,43 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   // Additional configuration options
   enableBackups = signal(false);
-  enableMonitoring = signal(true);
+  enablePublicIPv4 = signal(true);
+  enablePublicIPv6 = signal(true);
+  
+  // Backup window selection
+  selectedBackupWindow = signal<string>('22-02');
+  availableBackupWindows = [
+    { value: '22-02', label: '22:00 - 02:00 UTC (Late Night)' },
+    { value: '02-06', label: '02:00 - 06:00 UTC (Early Morning)' },
+    { value: '06-10', label: '06:00 - 10:00 UTC (Morning)' },
+    { value: '10-14', label: '10:00 - 14:00 UTC (Midday)' },
+    { value: '14-18', label: '14:00 - 18:00 UTC (Afternoon)' },
+    { value: '18-22', label: '18:00 - 22:00 UTC (Evening)' }
+  ];
+
+  selectedBackupWindowLabel = computed(() => {
+    return this.availableBackupWindows.find(w => w.value === this.selectedBackupWindow())?.label || '';
+  });
+  
+  // Firewall selection
+  selectedFirewalls = signal<number[]>([]);
+
+  // Labels management
+  serverLabels = signal<Array<{key: string, value: string}>>([]);
+  labelsTextarea = signal<string>('');
+
+  // Server name management
+  serverName = signal<string>('');
+  nameError = signal<string>('');
+
+  constructor() {
+    // No auto-generation of suggestions - keep it simple
+  }
 
       // Get data from service
   servers = this.api.availableServerTypes;  // Use server types for creation page
   locations = this.api.locations;
+  firewalls = this.api.firewalls;
   loading = this.api.loading;
   error = this.api.error;
   searchQuery = this.api.searchQuery;
@@ -68,6 +99,9 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     
     // Load server types (available configurations) for this page
     this.api.loadServerTypes();
+    
+    // Load saved firewall selection
+    this.loadFirewallSelection();
   }
 
   ngOnDestroy() {
@@ -268,7 +302,14 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   onServerNameConfirmed(serverName: string): void {
     const selected = this.getSelectedServer();
     if (selected) {
-      this.api.createServerFromType(selected, serverName);
+      const serverConfig = {
+        enableIPv4: this.enablePublicIPv4(),
+        enableIPv6: this.enablePublicIPv6(),
+        enableBackups: this.enableBackups(),
+        backupWindow: this.enableBackups() ? this.selectedBackupWindow() : null,
+        selectedFirewalls: this.selectedFirewalls()
+      };
+      this.api.createServerFromType(selected, serverName, serverConfig);
       this.showNameDialog.set(false);
       
       // Only navigate back if we're in mock mode (actual creation happened)
@@ -426,6 +467,11 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
       case 'location': return !!this.selectedLocation();
       case 'image': return !!this.selectedImage();
       case 'type': return !!this.selectedServerType();
+      case 'networking': return this.enablePublicIPv4() || this.enablePublicIPv6();
+      case 'security': return this.selectedFirewalls().length > 0;
+      case 'extras': return this.enableBackups();
+      case 'labels': return this.serverLabels().length > 0;
+      case 'name': return !!this.serverName().trim(); // Red when name is provided, green when empty
       case 'summary': return false; // Never completed until server is created
       default: return false;
     }
@@ -559,9 +605,44 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    // Show name dialog for server creation
-    this.selectedServerId.set(selectedServer.id);
-    this.showNameDialog.set(true);
+    // Use provided name or generate one using Hetzner style
+    let finalName = this.serverName().trim();
+    if (!finalName) {
+      finalName = this.generateHetznerStyleName();
+      this.serverName.set(finalName);
+    }
+
+    // Validate the name
+    if (!this.validateServerName()) {
+      console.error('Invalid server name');
+      return;
+    }
+
+    // Create server directly with all configuration
+    this.createServerWithConfig(selectedServer, finalName);
+  }
+
+  private createServerWithConfig(selectedServer: any, serverName: string): void {
+    // Create server using the API service with all configuration options
+    const serverConfig = {
+      enableIPv4: this.enablePublicIPv4(),
+      enableIPv6: this.enablePublicIPv6(),
+      enableBackups: this.enableBackups(),
+      backupWindow: this.enableBackups() ? this.selectedBackupWindow() : null,
+      selectedFirewalls: this.selectedFirewalls()
+    };
+    
+    this.api.createServerFromType(selectedServer, serverName, serverConfig);
+    
+    // Reset wizard state
+    this.resetWizard();
+    
+    // Only navigate back if we're in mock mode (actual creation happened)
+    if (this.api.getCurrentMode() === 'mock') {
+      setTimeout(() => {
+        this.router.navigate(['/servers']);
+      }, 100);
+    }
   }
 
   startWizard(): void {
@@ -584,8 +665,15 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   onServerNameConfirmedWizard(serverName: string): void {
     const selected = this.getSelectedServer();
     if (selected && serverName.trim()) {
-      // Create server using the API service
-      this.api.createServerFromType(selected, serverName);
+      // Create server using the API service with all configuration options
+      const serverConfig = {
+        enableIPv4: this.enablePublicIPv4(),
+        enableIPv6: this.enablePublicIPv6(),
+        enableBackups: this.enableBackups(),
+        backupWindow: this.enableBackups() ? this.selectedBackupWindow() : null,
+        selectedFirewalls: this.selectedFirewalls()
+      };
+      this.api.createServerFromType(selected, serverName, serverConfig);
       this.showNameDialog.set(false);
       
       // Reset wizard state
@@ -604,13 +692,182 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     this.enableBackups.set(!this.enableBackups());
   }
 
-  toggleMonitoring(): void {
-    this.enableMonitoring.set(!this.enableMonitoring());
+  togglePublicIPv4(): void {
+    this.enablePublicIPv4.set(!this.enablePublicIPv4());
+  }
+
+  togglePublicIPv6(): void {
+    this.enablePublicIPv6.set(!this.enablePublicIPv6());
+  }
+
+  selectBackupWindow(window: string): void {
+    this.selectedBackupWindow.set(window);
+  }
+
+  toggleFirewall(firewallId: number): void {
+    const current = this.selectedFirewalls();
+    const index = current.indexOf(firewallId);
+    
+    if (index > -1) {
+      // Remove firewall if already selected
+      this.selectedFirewalls.set(current.filter(id => id !== firewallId));
+    } else {
+      // Add firewall if not selected
+      this.selectedFirewalls.set([...current, firewallId]);
+    }
+    
+    // Persist to session storage
+    this.persistFirewallSelection();
+  }
+
+  private persistFirewallSelection(): void {
+    const selectedIds = this.selectedFirewalls();
+    sessionStorage.setItem('selectedFirewalls', JSON.stringify(selectedIds));
+  }
+
+  private loadFirewallSelection(): void {
+    const saved = sessionStorage.getItem('selectedFirewalls');
+    if (saved) {
+      try {
+        const selectedIds = JSON.parse(saved);
+        if (Array.isArray(selectedIds)) {
+          this.selectedFirewalls.set(selectedIds);
+        }
+      } catch (e) {
+        console.warn('Failed to parse saved firewall selection');
+      }
+    }
+  }
+
+  // Labels management methods
+  removeLabel(key: string): void {
+    const currentLabels = this.serverLabels();
+    this.serverLabels.set(currentLabels.filter(label => label.key !== key));
+  }
+
+  updateLabelsTextarea(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.labelsTextarea.set(target.value);
+    
+    // Auto-parse labels as user types for real-time validation
+    this.parseLabelsFromTextareaRealtime();
+  }
+
+  parseLabelsFromTextarea(): void {
+    const text = this.labelsTextarea().trim();
+    if (!text) return;
+
+    const lines = text.split('\n');
+    const newLabels: Array<{key: string, value: string}> = [];
+    const currentLabels = this.serverLabels();
+    const existingKeys = new Set(currentLabels.map(l => l.key));
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+
+      const [key, ...valueParts] = trimmedLine.split('=');
+      const value = valueParts.join('=').trim();
+      
+      if (key && value && !existingKeys.has(key.trim())) {
+        newLabels.push({ key: key.trim(), value });
+        existingKeys.add(key.trim());
+      }
+    }
+
+    if (newLabels.length > 0) {
+      this.serverLabels.set([...currentLabels, ...newLabels]);
+      this.labelsTextarea.set('');
+    }
+  }
+
+  parseLabelsFromTextareaRealtime(): void {
+    const text = this.labelsTextarea().trim();
+    if (!text) {
+      // If textarea is empty, clear all labels that came from textarea
+      this.serverLabels.set([]);
+      return;
+    }
+
+    const lines = text.split('\n');
+    const validLabels: Array<{key: string, value: string}> = [];
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+
+      const [key, ...valueParts] = trimmedLine.split('=');
+      const value = valueParts.join('=').trim();
+      
+      if (key && value) {
+        const trimmedKey = key.trim();
+        // Check if this key already exists in validLabels
+        if (!validLabels.some(label => label.key === trimmedKey)) {
+          validLabels.push({ key: trimmedKey, value });
+        }
+      }
+    }
+
+    // Update serverLabels with the valid labels from textarea
+    this.serverLabels.set(validLabels);
+  }
+
+  // Server name management methods
+  updateServerName(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.serverName.set(target.value);
+    this.nameError.set(''); // Clear error when typing
+  }
+
+  validateServerName(): boolean {
+    const name = this.serverName().trim();
+    
+    // If no name provided, that's fine - we'll auto-generate
+    if (!name) {
+      this.nameError.set('');
+      return true;
+    }
+    
+    if (name.length < 3 || name.length > 63) {
+      this.nameError.set('Name must be 3-63 characters long');
+      return false;
+    }
+    
+    // Basic validation: alphanumeric, hyphens, no consecutive hyphens
+    const validPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+    if (!validPattern.test(name)) {
+      this.nameError.set('Name must contain only alphanumeric characters and hyphens');
+      return false;
+    }
+    
+    this.nameError.set('');
+    return true;
+  }
+
+  generateHetznerStyleName(): string {
+    const image = this.selectedImage() || 'server';
+    const location = this.selectedLocation() || 'dc';
+    
+    // Get RAM size from selected server type
+    const servers = this.availableServers();
+    const selectedServer = servers.find(s => 
+      s.name?.toLowerCase().includes((this.selectedServerType() || '').toLowerCase())
+    );
+    const memory = selectedServer?.server_type?.memory || 4;
+    
+    // Get datacenter ID (simulate with random number for now)
+    const datacenterId = Math.floor(Math.random() * 9) + 1;
+    
+    // Format: image-memory-location-id (e.g., ubuntu-4gb-hel1-3)
+    return `${image}-${memory}gb-${location}-${datacenterId}`;
   }
 
   // Validation method
   canCreateServer(): boolean {
-    return !!(this.selectedArchitecture() && this.selectedLocation() && this.selectedImage());
+    const hasRequiredSelections = !!(this.selectedArchitecture() && this.selectedLocation() && this.selectedImage());
+    const hasValidName = this.serverName().trim().length > 0;
+    
+    return hasRequiredSelections && (hasValidName || true); // Allow auto-generation of name
   }
 
   // Display name helpers
@@ -715,7 +972,7 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   // Scroll spy functionality
   private setupScrollSpy(): void {
-    const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-configuration'];
+    const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-networking', 'step-security', 'step-extras'];
     
     this.intersectionObserver = new IntersectionObserver((entries) => {
       // Find the section that's closest to the top

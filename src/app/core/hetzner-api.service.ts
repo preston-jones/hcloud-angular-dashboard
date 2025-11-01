@@ -15,11 +15,12 @@ export class HetznerApiService {
   // STATE SIGNALS
   // =============================================================================
 
-  servers = signal<Server[] | null>(null);
+  servers = signal<any[] | null>(null);
   serverTypes = signal<any[] | null>(null);
   locations = signal<any[] | null>(null);
   datacenters = signal<any[] | null>(null);
   images = signal<any[] | null>(null);
+  firewalls = signal<any[] | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
   searchQuery = signal('');
@@ -77,6 +78,7 @@ export class HetznerApiService {
     this.loadLocations();
     this.loadDatacenters();
     this.loadImages();
+    this.loadFirewalls();
   }
 
   // =============================================================================
@@ -164,6 +166,7 @@ export class HetznerApiService {
     this.loadServers();
     this.loadServerTypes();
     this.loadLocations();
+    this.loadFirewalls();
   }
 
   isUsingMockData(): boolean {
@@ -345,12 +348,32 @@ export class HetznerApiService {
     });
   }
 
+  loadFirewalls() {
+    const endpoint = this.getEndpoint('firewalls');
+    const headers = this.getAuthHeaders();
+    const httpOptions = headers.Authorization ? { headers: { ...headers } } : {};
+
+    this.http.get<any>(endpoint, httpOptions).pipe(
+      catchError((err: HttpErrorResponse) => {
+        return of({ firewalls: [] });
+      })
+    ).subscribe(res => {
+      this.firewalls.set(res?.firewalls ?? []);
+    });
+  }
+
   // =============================================================================
   // SERVER OPERATIONS (MOCK MODE ONLY)
   // =============================================================================
 
   /** Create a new server from a server type configuration */
-  createServerFromType(serverType: Server, customName?: string): void {
+  createServerFromType(serverType: Server, customName?: string, serverConfig?: { 
+    enableIPv4?: boolean, 
+    enableIPv6?: boolean,
+    enableBackups?: boolean,
+    backupWindow?: string | null,
+    selectedFirewalls?: number[]
+  }): void {
     if (!this.checkWritePermission()) return;
 
     const createdId = Date.now() + Math.floor(Math.random() * 1000);
@@ -489,30 +512,28 @@ export class HetznerApiService {
         delete: false,
         rebuild: false
       },
-      backup_window: null,
+      backup_window: serverConfig?.enableBackups ? (serverConfig.backupWindow || '22-02') : null,
       rescue_enabled: false,
       locked: false,
       placement_group: null,
       public_net: {
-        firewalls: [
-          {
-            id: 10142013,
-            status: 'applied'
-          }
-        ],
+        firewalls: serverConfig?.selectedFirewalls?.map(id => ({
+          id: id,
+          status: 'applied' as const
+        })) || [],
         floating_ips: [],
-        ipv4: {
+        ipv4: serverConfig?.enableIPv4 !== false ? {
           id: createdId + 1000,
           ip: this.generateRandomIP(),
           blocked: false,
           dns_ptr: `static.${this.generateRandomIP().split('.').reverse().join('.')}.clients.your-server.de`
-        },
-        ipv6: {
+        } : [],
+        ipv6: serverConfig?.enableIPv6 !== false ? {
           id: createdId + 2000,
-          ip: '2a01:4f9:c012:b0db::/64',
+          ip: this.generateRandomIPv6(),
           blocked: false,
           dns_ptr: []
-        }
+        } : []
       },
       private_net: [],
       load_balancers: [],
@@ -746,7 +767,7 @@ export class HetznerApiService {
         },
         ipv6: {
           id: Date.now() + index * 1000 + priceIndex + 2000,
-          ip: '2a01:4f9:c012:b0db::/64',
+          ip: this.generateRandomIPv6(),
           blocked: false,
           dns_ptr: []
         }
@@ -853,12 +874,35 @@ export class HetznerApiService {
     return DEFAULT_INCLUDED_TRAFFIC;
   }
 
-  /** Generate a random IP address for mock servers */
+  /** Generate a realistic IPv4 address for mock servers using Hetzner's actual IP ranges */
   private generateRandomIP(): string {
-    const octet1 = Math.floor(Math.random() * 223) + 1; // 1-223 (avoid reserved ranges)
-    const octet2 = Math.floor(Math.random() * 255);
-    const octet3 = Math.floor(Math.random() * 255);
+    // Hetzner's actual IPv4 ranges
+    const hetznerRanges = [
+      { base: [37, 27], range: [0, 255] }, // 37.27.x.x
+      { base: [88, 198], range: [0, 255] }, // 88.198.x.x
+      { base: [95, 217], range: [0, 255] }, // 95.217.x.x
+      { base: [78, 46], range: [0, 255] }, // 78.46.x.x
+      { base: [116, 202], range: [0, 255] }, // 116.202.x.x
+      { base: [135, 181], range: [0, 255] }, // 135.181.x.x
+      { base: [168, 119], range: [0, 255] }, // 168.119.x.x
+    ];
+    
+    const selectedRange = hetznerRanges[Math.floor(Math.random() * hetznerRanges.length)];
+    const octet3 = Math.floor(Math.random() * (selectedRange.range[1] - selectedRange.range[0] + 1)) + selectedRange.range[0];
     const octet4 = Math.floor(Math.random() * 254) + 1; // 1-254 (avoid .0 and .255)
-    return `${octet1}.${octet2}.${octet3}.${octet4}`;
+    
+    return `${selectedRange.base[0]}.${selectedRange.base[1]}.${octet3}.${octet4}`;
+  }
+
+  /** Generate a realistic IPv6 address for mock servers using Hetzner's IPv6 range */
+  private generateRandomIPv6(): string {
+    // Hetzner's IPv6 range: 2a01:4f8::/32 and 2a01:4f9::/32
+    const prefixes = ['2a01:4f8', '2a01:4f9'];
+    const selectedPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    
+    // Generate random subnet identifier (4 hex digits)
+    const subnet = Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0');
+    
+    return `${selectedPrefix}:c012:${subnet}::/64`;
   }
 }

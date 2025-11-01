@@ -43,7 +43,9 @@ export class ServerDisplayService {
 
   // Get public IP address
   getPublicIP(server: Server): string {
-    return server.public_net.ipv4.ip || 'No IP';
+    return (server.public_net?.ipv4 && !Array.isArray(server.public_net.ipv4)) 
+      ? server.public_net.ipv4.ip 
+      : 'No IP';
   }
 
   // Get creation time in German format
