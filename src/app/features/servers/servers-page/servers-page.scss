@@ -125,15 +125,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #10b981;
   color: white;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin-right: 0.75rem;
   transition: all .2s ease;
+  padding: 0;
 }
 
 .step-icon-header.completed {
@@ -751,8 +752,8 @@
   flex-shrink: 0;
 
   .step-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: #10b981;
     border: 2px solid #10b981;
@@ -760,6 +761,7 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    font-size: 0.9rem;
     color: white;
     transition: all .2s ease;
   }
