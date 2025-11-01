@@ -13,7 +13,7 @@ export class LayoutService {
     if (this.isPinned() || !this.collapsed()) {
       return '280px';
     }
-    return '72px';
+    return '74px';
   });
 
   // Getters for read access
