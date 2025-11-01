@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../core/page-header.service';
@@ -13,7 +13,7 @@ import { ServerNameDialogComponent } from '../../../shared/ui/server-name-dialog
   styleUrls: ['./servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServersPage implements OnInit, OnDestroy {
+export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   private api = inject(HetznerApiService);
   private router = inject(Router);
   private pageHeaderService = inject(PageHeaderService);
@@ -33,6 +33,10 @@ export class ServersPage implements OnInit, OnDestroy {
 
   // Wizard state
   currentStep = signal<'list' | 'architecture' | 'location' | 'image' | 'type' | 'summary'>('architecture');
+  
+  // Scroll spy state
+  activeSection = signal<string>('step-architecture');
+  private intersectionObserver?: IntersectionObserver;
   
   // Selection state for wizard
   selectedArchitecture = signal<string | null>(null);
@@ -68,6 +72,11 @@ export class ServersPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.pageHeaderService.clearHeader();
+    this.cleanupScrollSpy();
+  }
+
+  ngAfterViewInit() {
+    this.setupScrollSpy();
   }
 
   retry(): void {
@@ -90,26 +99,29 @@ export class ServersPage implements OnInit, OnDestroy {
     const cpuArch = this.selectedCpuArchitecture();
     
     return available.filter(server => {
-      const serverType = server.server_type?.name?.toLowerCase() || '';
+      // Use the actual mock data fields instead of parsing server type names
+      const serverCategory = server.server_type?.category;
+      const serverArchitecture = server.server_type?.architecture;
       
-      // First filter by server architecture
+      // Map UI selection to mock data categories
       let matchesArchitecture = false;
       if (arch === 'cost-optimized') {
-        matchesArchitecture = serverType.includes('cx') || serverType.includes('cpx');
+        matchesArchitecture = serverCategory === 'cost_optimized';
       } else if (arch === 'regular-performance') {
-        matchesArchitecture = serverType.includes('cx') && !serverType.includes('cpx');
+        matchesArchitecture = serverCategory === 'regular_purpose';
       } else if (arch === 'general-purpose') {
-        matchesArchitecture = serverType.includes('ccx');
+        matchesArchitecture = serverCategory === 'general_purpose';
       }
       
-      // Then filter by CPU architecture (simplified for demo)
-      // In a real app, this would check actual server specifications
-      if (matchesArchitecture && cpuArch === 'arm64') {
-        // Only cost-optimized supports Arm64 in this demo
-        return arch === 'cost-optimized' && serverType.includes('cax');
+      // Filter by CPU architecture using actual mock data
+      let matchesCpuArch = false;
+      if (cpuArch === 'x86') {
+        matchesCpuArch = serverArchitecture === 'x86';
+      } else if (cpuArch === 'arm64') {
+        matchesCpuArch = serverArchitecture === 'arm';
       }
       
-      return matchesArchitecture;
+      return matchesArchitecture && matchesCpuArch;
     });
   });
 
@@ -422,6 +434,11 @@ export class ServersPage implements OnInit, OnDestroy {
   // Architecture selection
   selectArchitecture(architecture: string): void {
     this.selectedArchitecture.set(architecture);
+    
+    // Automatically set CPU architecture based on selection
+    if (architecture === 'regular-performance' || architecture === 'general-purpose') {
+      this.selectedCpuArchitecture.set('x86');
+    }
   }
 
   // CPU Architecture selection
@@ -694,5 +711,56 @@ export class ServersPage implements OnInit, OnDestroy {
         behavior: 'smooth'
       });
     }
+  }
+
+  // Scroll spy functionality
+  private setupScrollSpy(): void {
+    const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-configuration'];
+    
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      // Find the section that's closest to the top
+      let closestSection = '';
+      let closestDistance = Infinity;
+      
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const rect = entry.boundingClientRect;
+          const distanceFromTop = Math.abs(rect.top - 100); // Account for header offset
+          
+          if (distanceFromTop < closestDistance) {
+            closestDistance = distanceFromTop;
+            closestSection = entry.target.id;
+          }
+        }
+      });
+      
+      if (closestSection) {
+        this.activeSection.set(closestSection);
+      }
+    }, {
+      root: document.querySelector('.main-content'),
+      rootMargin: '-100px 0px -80% 0px', // Trigger when headline is near the top
+      threshold: [0, 0.1, 0.2, 0.3]
+    });
+
+    // Observe all step sections
+    stepIds.forEach(stepId => {
+      const element = document.getElementById(stepId);
+      if (element) {
+        this.intersectionObserver?.observe(element);
+      }
+    });
+  }
+
+  private cleanupScrollSpy(): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = undefined;
+    }
+  }
+
+  // Check if a summary section is currently active
+  isSectionActive(stepId: string): boolean {
+    return this.activeSection() === stepId;
   }
 }

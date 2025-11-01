@@ -655,7 +655,7 @@ export class HetznerApiService {
   private transformServerTypesToServers(serverTypes: any[]): Server[] {
     const servers: Server[] = [];
     
-    serverTypes.slice(0, 5).forEach((st: any, index: number) => {
+    serverTypes.slice(0, 20).forEach((st: any, index: number) => {
       const serverVariants = this.createServerVariants(st, index);
       servers.push(...serverVariants);
     });

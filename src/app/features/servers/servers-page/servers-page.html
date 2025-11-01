@@ -38,17 +38,20 @@
                 
                 <!-- Architecture Selection for Cost-Optimized -->
                 <div class="arch-selection">
-                  <div class="arch-option" 
-                       [class.selected]="selectedCpuArchitecture() === 'x86'"
-                       (click)="selectCpuArchitecture('x86')">
-                    <input type="radio" name="cost-optimized-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                    <span>x86 (Intel/AMD)</span>
-                  </div>
-                  <div class="arch-option"
-                       [class.selected]="selectedCpuArchitecture() === 'arm64'"
-                       (click)="selectCpuArchitecture('arm64')">
-                    <input type="radio" name="cost-optimized-arch" value="arm64" [checked]="selectedCpuArchitecture() === 'arm64'">
-                    <span>Arm64 (Ampere)</span>
+                  <div class="arch-selection-header">Architecture</div>
+                  <div class="arch-options">
+                    <div class="arch-option" 
+                         [class.selected]="selectedCpuArchitecture() === 'x86'"
+                         (click)="selectCpuArchitecture('x86')">
+                      <input type="radio" name="cost-optimized-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
+                      <span>x86 (Intel/AMD)</span>
+                    </div>
+                    <div class="arch-option"
+                         [class.selected]="selectedCpuArchitecture() === 'arm64'"
+                         (click)="selectCpuArchitecture('arm64')">
+                      <input type="radio" name="cost-optimized-arch" value="arm64" [checked]="selectedCpuArchitecture() === 'arm64'">
+                      <span>Arm64 (Ampere)</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -64,11 +67,11 @@
                 
                 <!-- Architecture Selection for Regular Performance -->
                 <div class="arch-selection">
-                  <div class="arch-option"
-                       [class.selected]="selectedCpuArchitecture() === 'x86'"
-                       (click)="selectCpuArchitecture('x86')">
-                    <input type="radio" name="regular-performance-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                    <span>x86 (AMD)</span>
+                  <div class="arch-selection-header">Architecture</div>
+                  <div class="arch-options">
+                    <div class="arch-option selected">
+                      <span>x86 (AMD)</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -84,11 +87,11 @@
                 
                 <!-- Architecture Selection for General Purpose -->
                 <div class="arch-selection">
-                  <div class="arch-option"
-                       [class.selected]="selectedCpuArchitecture() === 'x86'"
-                       (click)="selectCpuArchitecture('x86')">
-                    <input type="radio" name="general-purpose-arch" value="x86" [checked]="selectedCpuArchitecture() === 'x86'">
-                    <span>x86 (AMD)</span>
+                  <div class="arch-selection-header">Architecture</div>
+                  <div class="arch-options">
+                    <div class="arch-option selected">
+                      <span>x86 (AMD)</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -362,7 +365,7 @@
         <h3>Server Configuration</h3>
         
         <div class="summary-sections">
-          <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()" (click)="scrollToStep('step-architecture')">
+          <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()" [class.active]="isSectionActive('step-architecture')" (click)="scrollToStep('step-architecture')">
             <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
               <div class="step-icon">
                 @if (isStepCompleted('architecture') && selectedServerType()) {
@@ -382,7 +385,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('location')" (click)="scrollToStep('step-location')">
+          <div class="summary-section" [class.completed]="isStepCompleted('location')" [class.active]="isSectionActive('step-location')" (click)="scrollToStep('step-location')">
             <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
               <div class="step-icon">
                 @if (isStepCompleted('location')) {
@@ -402,7 +405,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('image')" (click)="scrollToStep('step-image')">
+          <div class="summary-section" [class.completed]="isStepCompleted('image')" [class.active]="isSectionActive('step-image')" (click)="scrollToStep('step-image')">
             <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
               <div class="step-icon">
                 @if (isStepCompleted('image')) {
@@ -422,7 +425,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('summary')" (click)="scrollToStep('step-configuration')">
+          <div class="summary-section" [class.completed]="isStepCompleted('summary')" [class.active]="isSectionActive('step-configuration')" (click)="scrollToStep('step-configuration')">
             <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
               <div class="step-icon">
                 @if (isStepCompleted('summary')) {

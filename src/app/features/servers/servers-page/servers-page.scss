@@ -3,7 +3,6 @@
   display: grid;
   grid-template-columns: 1fr 360px;
   gap: 2rem;
-  max-width: 1400px;
   margin: 0 auto;
   min-height: calc(100vh - 200px)
 }
@@ -256,6 +255,20 @@
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  gap: .5rem
+}
+
+.arch-selection-header {
+  font-size: .75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.arch-options {
+  display: flex;
+  flex-direction: row;
   gap: .5rem
 }
 
@@ -711,6 +724,13 @@
   padding: 0.75rem 0;
   position: relative;
   cursor: pointer;
+}
+
+.summary-section.active {
+  background-color: var(--surface-muted, rgba(0, 0, 0, 0.05));
+  border-radius: 6px;
+  margin: 0 -0.5rem;
+  padding: 0.75rem 0.5rem;
 }
 
 .summary-content {
