@@ -300,7 +300,8 @@
   padding: .5rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all .2s ease
+  transition: all .2s ease;
+  white-space: nowrap;
 }
 
 .arch-option:hover {
