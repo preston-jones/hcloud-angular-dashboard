@@ -678,4 +678,21 @@ export class ServersPage implements OnInit, OnDestroy {
     const backupPrice = this.enableBackups() ? parseFloat(this.getBackupPrice()) : 0;
     return (basePrice + backupPrice).toFixed(2);
   }
+
+  // Navigation helper for summary card
+  scrollToStep(stepId: string): void {
+    const element = document.getElementById(stepId);
+    const mainContent = document.querySelector('.main-content');
+    
+    if (element && mainContent) {
+      const elementTop = element.offsetTop;
+      const headerHeight = 100; // Increased header height offset
+      const scrollPosition = elementTop - headerHeight;
+      
+      mainContent.scrollTo({
+        top: Math.max(0, scrollPosition), // Ensure we don't scroll to negative position
+        behavior: 'smooth'
+      });
+    }
+  }
 }

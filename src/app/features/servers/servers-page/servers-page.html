@@ -18,7 +18,7 @@
                   !
                 }
               </span>
-              Choose Architecture
+              Architecture
             </h2>
             <p class="step-description">Select the desired server architecture</p>
           </div>
@@ -145,7 +145,7 @@
                   !
                 }
               </span>
-              Choose Location
+              Location
             </h2>
             <p class="step-description">Select the location for your server</p>
           </div>
@@ -224,7 +224,7 @@
                   !
                 }
               </span>
-              Choose Image
+              Image
             </h2>
             <p class="step-description">Select an operating system or application</p>
           </div>
@@ -362,7 +362,7 @@
         <h3>Server Configuration</h3>
         
         <div class="summary-sections">
-          <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
+          <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()" (click)="scrollToStep('step-architecture')">
             <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
               <div class="step-icon">
                 @if (isStepCompleted('architecture') && selectedServerType()) {
@@ -382,7 +382,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('location')">
+          <div class="summary-section" [class.completed]="isStepCompleted('location')" (click)="scrollToStep('step-location')">
             <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
               <div class="step-icon">
                 @if (isStepCompleted('location')) {
@@ -402,7 +402,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('image')">
+          <div class="summary-section" [class.completed]="isStepCompleted('image')" (click)="scrollToStep('step-image')">
             <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
               <div class="step-icon">
                 @if (isStepCompleted('image')) {
@@ -422,7 +422,7 @@
             </div>
           </div>
 
-          <div class="summary-section" [class.completed]="isStepCompleted('summary')">
+          <div class="summary-section" [class.completed]="isStepCompleted('summary')" (click)="scrollToStep('step-configuration')">
             <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
               <div class="step-icon">
                 @if (isStepCompleted('summary')) {
