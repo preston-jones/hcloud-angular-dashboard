@@ -10,7 +10,16 @@
         <!-- Step 1: Architecture Selection -->
         <div class="wizard-step" id="step-architecture">
           <div class="step-header">
-            <h2 class="step-title">1. Choose Architecture</h2>
+            <h2 class="step-title">
+              <span class="step-icon-header" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
+                @if (isStepCompleted('architecture') && selectedServerType()) {
+                  ✓
+                } @else {
+                  !
+                }
+              </span>
+              Choose Architecture
+            </h2>
             <p class="step-description">Select the desired server architecture</p>
           </div>
 
@@ -128,7 +137,16 @@
         <!-- Step 2: Location Selection -->
         <div class="wizard-step" id="step-location">
           <div class="step-header">
-            <h2 class="step-title">2. Choose Location</h2>
+            <h2 class="step-title">
+              <span class="step-icon-header" [class.completed]="isStepCompleted('location')">
+                @if (isStepCompleted('location')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </span>
+              Choose Location
+            </h2>
             <p class="step-description">Select the location for your server</p>
           </div>
 
@@ -198,7 +216,16 @@
         <!-- Step 3: Image Selection -->
         <div class="wizard-step" id="step-image">
           <div class="step-header">
-            <h2 class="step-title">3. Choose Image</h2>
+            <h2 class="step-title">
+              <span class="step-icon-header" [class.completed]="isStepCompleted('image')">
+                @if (isStepCompleted('image')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </span>
+              Choose Image
+            </h2>
             <p class="step-description">Select an operating system or application</p>
           </div>
 
@@ -283,7 +310,16 @@
         <!-- Step 4: Final Configuration -->
         <div class="wizard-step" id="step-configuration">
           <div class="step-header">
-            <h2 class="step-title">4. Configuration (Optional)</h2>
+            <h2 class="step-title">
+              <span class="step-icon-header" [class.completed]="isStepCompleted('summary')">
+                @if (isStepCompleted('summary')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </span>
+              Configuration (Optional)
+            </h2>
             <p class="step-description">Additional settings for your server</p>
           </div>
 
@@ -328,65 +364,81 @@
         <div class="summary-sections">
           <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
             <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
-              <div class="step-number">1</div>
-            </div>
-            <div class="summary-content">
-              <div class="summary-label">Architecture & Type</div>
-              <div class="summary-value">
-                @if (selectedArchitecture() && selectedServerType()) {
-                  {{ getArchitectureDisplayName() }} - {{ selectedServerType() }}
+              <div class="step-icon">
+                @if (isStepCompleted('architecture') && selectedServerType()) {
+                  ✓
                 } @else {
-                  <span class="text-muted">Not selected</span>
+                  !
                 }
               </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (selectedArchitecture() && selectedServerType()) {
+                  {{ selectedServerType() }}
+                }
+              </div>
+              <div class="summary-label">Type</div>
             </div>
           </div>
 
           <div class="summary-section" [class.completed]="isStepCompleted('location')">
             <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
-              <div class="step-number">2</div>
+              <div class="step-icon">
+                @if (isStepCompleted('location')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </div>
             </div>
             <div class="summary-content">
-              <div class="summary-label">Location</div>
               <div class="summary-value">
                 @if (selectedLocation()) {
                   {{ getLocationDisplayName() }}
-                } @else {
-                  <span class="text-muted">Not selected</span>
                 }
               </div>
+              <div class="summary-label">Location</div>
             </div>
           </div>
 
           <div class="summary-section" [class.completed]="isStepCompleted('image')">
             <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
-              <div class="step-number">3</div>
+              <div class="step-icon">
+                @if (isStepCompleted('image')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </div>
             </div>
             <div class="summary-content">
-              <div class="summary-label">Image</div>
               <div class="summary-value">
                 @if (selectedImage()) {
                   {{ getImageDisplayName() }}
-                } @else {
-                  <span class="text-muted">Not selected</span>
                 }
               </div>
+              <div class="summary-label">Image</div>
             </div>
           </div>
 
           <div class="summary-section" [class.completed]="isStepCompleted('summary')">
             <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
-              <div class="step-number">4</div>
+              <div class="step-icon">
+                @if (isStepCompleted('summary')) {
+                  ✓
+                } @else {
+                  !
+                }
+              </div>
             </div>
             <div class="summary-content">
-              <div class="summary-label">Configuration</div>
               <div class="summary-value">
                 @if (currentStep() === 'summary') {
                   <span class="text-primary">In Progress</span>
-                } @else {
-                  <span class="text-muted">Not selected</span>
                 }
               </div>
+              <div class="summary-label">Configuration</div>
             </div>
           </div>
 

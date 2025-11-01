@@ -121,6 +121,25 @@
   color: var(--text)
 }
 
+.step-icon-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-right: 0.75rem;
+  transition: all .2s ease;
+}
+
+.step-icon-header.completed {
+  background: #ef4444;
+}
+
 .wizard-steps-container {
   display: flex;
   flex-direction: column;
@@ -686,25 +705,10 @@
 .summary-section {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
   padding: 0.75rem 0;
   position: relative
-}
-
-.summary-section:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  bottom: -0.375rem;
-  left: 20px;
-  width: 1px;
-  height: 0.75rem;
-  background: var(--border)
-}
-
-.summary-section.completed:not(:last-child)::after {
-  background: var(--primary);
-  width: 2px
 }
 
 .summary-content {
@@ -721,15 +725,17 @@
 }
 
 .summary-label {
-  font-size: .875rem;
-  font-weight: 500;
-  color: var(--text-muted)
+  font-size: .75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .summary-value {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text)
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .summary-value .text-muted {
@@ -743,33 +749,32 @@
   gap: 8px;
   flex-shrink: 0;
 
-  .step-number {
+  .step-icon {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: var(--surface-elev);
-    border: 2px solid var(--border);
+    background: #10b981;
+    border: 2px solid #10b981;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    color: var(--text-muted);
+    color: white;
     transition: all .2s ease;
   }
-
-  &.active .step-number {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-
-  &.completed .step-number {
-    background: var(--primary);
-    border-color: var(--primary);
+  
+  &.active .step-icon {
+    background: #10b981;
+    border-color: #10b981;
     color: white;
   }
-}
-
-.step-label {
+  
+  &.completed .step-icon {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+  }
+}.step-label {
   font-size: .875rem;
   font-weight: 500;
   color: var(--text-muted);
