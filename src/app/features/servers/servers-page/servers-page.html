@@ -4,40 +4,14 @@
     <!-- Left Side: Scrollable Wizard Steps -->
     <div class="wizard-main">
       
-      <!-- Wizard Progress -->
-      <div class="wizard-progress">
-        <div class="progress-steps">
-          <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture')">
-            <div class="step-number">1</div>
-            <div class="step-label">Architektur</div>
-          </div>
-          <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
-            <div class="step-number">2</div>
-            <div class="step-label">Standort</div>
-          </div>
-          <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
-            <div class="step-number">3</div>
-            <div class="step-label">Image</div>
-          </div>
-          <div class="progress-step" [class.active]="currentStep() === 'type'" [class.completed]="isStepCompleted('type')">
-            <div class="step-number">4</div>
-            <div class="step-label">Server-Typ</div>
-          </div>
-          <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
-            <div class="step-number">5</div>
-            <div class="step-label">Zusammenfassung</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Scrollable Steps Container -->
       <div class="wizard-steps-container">
         
         <!-- Step 1: Architecture Selection -->
         <div class="wizard-step" id="step-architecture">
           <div class="step-header">
-            <h2 class="step-title">1. Architektur wählen</h2>
-            <p class="step-description">Wählen Sie die gewünschte Server-Architektur</p>
+            <h2 class="step-title">1. Choose Architecture</h2>
+            <p class="step-description">Select the desired server architecture</p>
           </div>
 
           <div class="architecture-options">
@@ -48,7 +22,7 @@
                    (click)="selectArchitecture('cost-optimized')">
                 <div class="option-header">
                   <h4>Cost-Optimized</h4>
-                  <span class="availability-badge limited">Limitierte Verfügbarkeit</span>
+                  <span class="availability-badge limited">Limited Availability</span>
                 </div>
                 <p>Ideal für Entwicklung und Tests</p>
                 <div class="arch-category-label">Shared Resources</div>
@@ -115,7 +89,7 @@
           <!-- Server Types Table under Architecture -->
           @if (selectedArchitecture()) {
           <div class="server-types-section">
-            <h3>Verfügbare Server-Typen</h3>
+            <h3>Available Server Types</h3>
             <div class="server-type-table">
               <div class="table-header">
                 <div class="col-name">Name</div>
@@ -154,8 +128,8 @@
         <!-- Step 2: Location Selection -->
         <div class="wizard-step" id="step-location">
           <div class="step-header">
-            <h2 class="step-title">2. Standort wählen</h2>
-            <p class="step-description">Wählen Sie den Standort für Ihren Server</p>
+            <h2 class="step-title">2. Choose Location</h2>
+            <p class="step-description">Select the location for your server</p>
           </div>
 
           <div class="location-grid">
@@ -166,7 +140,7 @@
               <div class="location-info">
                 <h4>Falkenstein</h4>
               </div>
-              <div class="location-badge">Deutschland</div>
+              <div class="location-badge">Germany</div>
             </div>
 
             <div class="location-card" 
@@ -176,7 +150,7 @@
               <div class="location-info">
                 <h4>Nürnberg</h4>
               </div>
-              <div class="location-badge">Deutschland</div>
+              <div class="location-badge">Germany</div>
             </div>
 
             <div class="location-card" 
@@ -186,7 +160,7 @@
               <div class="location-info">
                 <h4>Helsinki</h4>
               </div>
-              <div class="location-badge">Finnland</div>
+              <div class="location-badge">Finland</div>
             </div>
 
             <div class="location-card" 
@@ -214,9 +188,9 @@
                  (click)="selectLocation('sin')">
               <div class="location-flag">🇸🇬</div>
               <div class="location-info">
-                <h4>Singapur</h4>
+                <h4>Singapore</h4>
               </div>
-              <div class="location-badge">Singapur</div>
+              <div class="location-badge">Singapore</div>
             </div>
           </div>
         </div>
@@ -224,8 +198,8 @@
         <!-- Step 3: Image Selection -->
         <div class="wizard-step" id="step-image">
           <div class="step-header">
-            <h2 class="step-title">3. Image wählen</h2>
-            <p class="step-description">Wählen Sie ein Betriebssystem oder eine Anwendung</p>
+            <h2 class="step-title">3. Choose Image</h2>
+            <p class="step-description">Select an operating system or application</p>
           </div>
 
           <div class="image-tabs">
@@ -309,30 +283,30 @@
         <!-- Step 4: Final Configuration -->
         <div class="wizard-step" id="step-configuration">
           <div class="step-header">
-            <h2 class="step-title">4. Konfiguration</h2>
-            <p class="step-description">Zusätzliche Einstellungen für Ihren Server</p>
+            <h2 class="step-title">4. Configuration (Optional)</h2>
+            <p class="step-description">Additional settings for your server</p>
           </div>
 
           <div class="configuration-options">
             <div class="config-section">
-              <h4>SSH-Schlüssel (Optional)</h4>
-              <p>Fügen Sie SSH-Schlüssel für sicheren Zugang hinzu</p>
-              <button class="btn btn-outline">SSH-Schlüssel hinzufügen</button>
+              <h4>SSH Keys (Optional)</h4>
+              <p>Add SSH keys for secure access</p>
+              <button class="btn btn-outline">Add SSH Key</button>
             </div>
 
             <div class="config-section">
               <h4>Backups</h4>
               <label class="checkbox-label">
                 <input type="checkbox" [checked]="enableBackups()" (change)="toggleBackups()">
-                <span>Automatische Backups aktivieren (+20% der Server-Kosten)</span>
+                <span>Enable automatic backups (+20% of server costs)</span>
               </label>
             </div>
 
             <div class="config-section">
-              <h4>Überwachung</h4>
+              <h4>Monitoring</h4>
               <label class="checkbox-label">
                 <input type="checkbox" [checked]="enableMonitoring()" (change)="toggleMonitoring()">
-                <span>Server-Überwachung aktivieren (kostenlos)</span>
+                <span>Enable server monitoring (free)</span>
               </label>
             </div>
           </div>
@@ -349,63 +323,86 @@
     <!-- Right Side: Summary Card -->
     <div class="wizard-sidebar">
       <div class="summary-card">
-        <h3>Zusammenfassung</h3>
+        <h3>Server Configuration</h3>
         
         <div class="summary-sections">
-          <div class="summary-section">
-            <div class="summary-label">Architektur</div>
-            <div class="summary-value">
-              @if (selectedArchitecture()) {
-                {{ getArchitectureDisplayName() }}
-              } @else {
-                <span class="text-muted">Nicht ausgewählt</span>
-              }
+          <div class="summary-section" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
+            <div class="progress-step" [class.active]="currentStep() === 'architecture'" [class.completed]="isStepCompleted('architecture') && selectedServerType()">
+              <div class="step-number">1</div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-label">Architecture & Type</div>
+              <div class="summary-value">
+                @if (selectedArchitecture() && selectedServerType()) {
+                  {{ getArchitectureDisplayName() }} - {{ selectedServerType() }}
+                } @else {
+                  <span class="text-muted">Not selected</span>
+                }
+              </div>
             </div>
           </div>
 
-          <div class="summary-section">
-            <div class="summary-label">Standort</div>
-            <div class="summary-value">
-              @if (selectedLocation()) {
-                {{ getLocationDisplayName() }}
-              } @else {
-                <span class="text-muted">Nicht ausgewählt</span>
-              }
+          <div class="summary-section" [class.completed]="isStepCompleted('location')">
+            <div class="progress-step" [class.active]="currentStep() === 'location'" [class.completed]="isStepCompleted('location')">
+              <div class="step-number">2</div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-label">Location</div>
+              <div class="summary-value">
+                @if (selectedLocation()) {
+                  {{ getLocationDisplayName() }}
+                } @else {
+                  <span class="text-muted">Not selected</span>
+                }
+              </div>
             </div>
           </div>
 
-          <div class="summary-section">
-            <div class="summary-label">Image</div>
-            <div class="summary-value">
-              @if (selectedImage()) {
-                {{ getImageDisplayName() }}
-              } @else {
-                <span class="text-muted">Nicht ausgewählt</span>
-              }
+          <div class="summary-section" [class.completed]="isStepCompleted('image')">
+            <div class="progress-step" [class.active]="currentStep() === 'image'" [class.completed]="isStepCompleted('image')">
+              <div class="step-number">3</div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-label">Image</div>
+              <div class="summary-value">
+                @if (selectedImage()) {
+                  {{ getImageDisplayName() }}
+                } @else {
+                  <span class="text-muted">Not selected</span>
+                }
+              </div>
             </div>
           </div>
 
-          <div class="summary-section">
-            <div class="summary-label">Server-Typ</div>
-            <div class="summary-value">
-              @if (selectedServerType()) {
-                {{ selectedServerType() }}
-              } @else {
-                <span class="text-muted">Nicht ausgewählt</span>
-              }
+          <div class="summary-section" [class.completed]="isStepCompleted('summary')">
+            <div class="progress-step" [class.active]="currentStep() === 'summary'" [class.completed]="isStepCompleted('summary')">
+              <div class="step-number">4</div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-label">Configuration</div>
+              <div class="summary-value">
+                @if (currentStep() === 'summary') {
+                  <span class="text-primary">In Progress</span>
+                } @else {
+                  <span class="text-muted">Not selected</span>
+                }
+              </div>
             </div>
           </div>
 
-          @if (selectedServerType()) {
-          <div class="summary-section">
-            <div class="summary-label">Spezifikationen</div>
+          <div class="summary-divider"></div>
+          <div class="summary-section specs-section">
+            <div class="summary-label">Specifications</div>
             <div class="summary-specs">
-              <div>{{ getSelectedServerSpecs().vcpus }} vCPUs</div>
-              <div>{{ getSelectedServerSpecs().memory }} GB RAM</div>
-              <div>{{ getSelectedServerSpecs().disk }} GB Disk</div>
+              @if (selectedServerType()) {
+                <div>{{ getSelectedServerSpecs().vcpus }} vCPUs</div>
+                <div>{{ getSelectedServerSpecs().memory }} GB RAM</div>
+                <div>{{ getSelectedServerSpecs().disk }} GB Disk</div>
+              } @else {
+                <div class="text-muted">Not yet available</div>
+              }
             </div>
           </div>
-          }
         </div>
 
         <div class="summary-divider"></div>
@@ -413,19 +410,19 @@
         <div class="summary-pricing">
           <div class="pricing-row">
             <span>Server</span>
-            <span>€{{ getServerPrice() }}/Monat</span>
+            <span>€{{ getServerPrice() }}/Month</span>
           </div>
           
           @if (enableBackups()) {
           <div class="pricing-row">
             <span>Backups</span>
-            <span>€{{ getBackupPrice() }}/Monat</span>
+            <span>€{{ getBackupPrice() }}/Month</span>
           </div>
           }
 
           <div class="pricing-total">
-            <span>Gesamt</span>
-            <span class="total-price">€{{ getTotalPrice() }}/Monat</span>
+            <span>Total</span>
+            <span class="total-price">€{{ getTotalPrice() }}/Month</span>
           </div>
         </div>
 
@@ -433,12 +430,12 @@
           <button class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
                   [disabled]="!canCreateServer()"
                   (click)="createServer()">
-            Server erstellen
+            Create Server
           </button>
           
           @if (!canCreateServer()) {
           <div class="creation-hint">
-            <p>Wählen Sie Architektur, Standort und Image aus, um fortzufahren.</p>
+            <p>Select architecture, location, and image to continue.</p>
           </div>
           }
         </div>
