@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 import { SelectionActionsComponent, SelectionAction } from '../../../shared/ui/selection-actions/selection-actions';
 import { ServerSelectionService, ServerDisplayService, ServerSortingService } from '../../../shared/services';
@@ -18,20 +19,21 @@ import { ServerProtectionToggleComponent } from '../../../shared/ui/server-prote
     ServerProtectionToggleComponent
   ],
   template: `
-    <section class="space-y-12">
-      <!-- Toolbar -->
-      <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-8">
-        <h1 class="text-xl font-semibold text-ink">Server</h1>
-
+    <!-- Header Template -->
+    <ng-template #headerTemplate>
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-6 py-4">
+        <h1 class="text-2xl font-bold text-ink">Servers</h1>
         <div class="flex flex-wrap gap-2 items-center">
           <button 
-            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors w-32 min-w-32"
+            class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"
             (click)="navigateToServerSelection()">
             Create Server
           </button>
         </div>
-      </header>
+      </div>
+    </ng-template>
 
+    <section class="space-y-12">
       <!-- SKELETON (Table with card rows) -->
       @if (loading()) {
         <div class="hidden md:block space-y-4">
@@ -198,9 +200,12 @@ import { ServerProtectionToggleComponent } from '../../../shared/ui/server-prote
   styleUrls: ['./my-servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyServersPage implements OnInit {
+export class MyServersPage implements OnInit, OnDestroy {
   private api = inject(HetznerApiService);
   private router = inject(Router);
+  private pageHeaderService = inject(PageHeaderService);
+
+  @ViewChild('headerTemplate', { static: true }) headerTemplate!: TemplateRef<any>;
   
   // Inject the new services (public for template access)
   selectionService = inject(ServerSelectionService);
@@ -273,8 +278,18 @@ export class MyServersPage implements OnInit {
   });
 
   ngOnInit() {
+    // Set up page header with template
+    this.pageHeaderService.setHeader({
+      title: 'Servers',
+      template: this.headerTemplate
+    });
+
     // Servers are automatically loaded by the service
     // No need to call loadServers() here since service manages loading
+  }
+
+  ngOnDestroy() {
+    this.pageHeaderService.clearHeader();
   }
 
   retry(): void {
