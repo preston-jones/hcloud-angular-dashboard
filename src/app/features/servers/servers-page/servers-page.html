@@ -170,7 +170,6 @@
               <div class="location-flag">🇩🇪</div>
               <div class="location-info">
                 <h4>Falkenstein</h4>
-                <span class="location-code">fsn1</span>
               </div>
               <div class="location-badge">Deutschland</div>
             </div>
@@ -181,7 +180,6 @@
               <div class="location-flag">🇩🇪</div>
               <div class="location-info">
                 <h4>Nürnberg</h4>
-                <span class="location-code">nbg1</span>
               </div>
               <div class="location-badge">Deutschland</div>
             </div>
@@ -192,7 +190,6 @@
               <div class="location-flag">🇫🇮</div>
               <div class="location-info">
                 <h4>Helsinki</h4>
-                <span class="location-code">hel1</span>
               </div>
               <div class="location-badge">Finnland</div>
             </div>
@@ -203,7 +200,6 @@
               <div class="location-flag">🇺🇸</div>
               <div class="location-info">
                 <h4>Ashburn</h4>
-                <span class="location-code">ash</span>
               </div>
               <div class="location-badge">USA</div>
             </div>
@@ -214,7 +210,6 @@
               <div class="location-flag">🇺🇸</div>
               <div class="location-info">
                 <h4>Hillsboro</h4>
-                <span class="location-code">hil</span>
               </div>
               <div class="location-badge">USA</div>
             </div>
@@ -225,7 +220,6 @@
               <div class="location-flag">🇸🇬</div>
               <div class="location-info">
                 <h4>Singapur</h4>
-                <span class="location-code">sin</span>
               </div>
               <div class="location-badge">Singapur</div>
             </div>
@@ -254,7 +248,7 @@
                  [class.selected]="selectedImage() === 'ubuntu'"
                  (click)="selectImage('ubuntu')">
               <div class="image-icon">
-                <img src="/assets/mock/ubuntu-icon.svg" alt="Ubuntu">
+                <img src="/assets/icons/ubuntu-icon.svg" alt="Ubuntu">
               </div>
               <div class="image-info">
                 <h4>Ubuntu</h4>
@@ -266,7 +260,7 @@
                  [class.selected]="selectedImage() === 'fedora'"
                  (click)="selectImage('fedora')">
               <div class="image-icon">
-                <img src="/assets/mock/fedora-icon.svg" alt="Fedora">
+                <img src="/assets/icons/fedora-icon.svg" alt="Fedora">
               </div>
               <div class="image-info">
                 <h4>Fedora</h4>
@@ -278,7 +272,7 @@
                  [class.selected]="selectedImage() === 'debian'"
                  (click)="selectImage('debian')">
               <div class="image-icon">
-                <img src="/assets/mock/debian-icon.svg" alt="Debian">
+                <img src="/assets/icons/debian-icon.svg" alt="Debian">
               </div>
               <div class="image-info">
                 <h4>Debian</h4>
@@ -290,7 +284,7 @@
                  [class.selected]="selectedImage() === 'centos'"
                  (click)="selectImage('centos')">
               <div class="image-icon">
-                <img src="/assets/mock/centos-icon.svg" alt="CentOS">
+                <img src="/assets/icons/centos-icon.svg" alt="CentOS">
               </div>
               <div class="image-info">
                 <h4>CentOS</h4>
@@ -352,9 +346,6 @@
         <!-- Action Buttons -->
         <div class="wizard-actions">
           <button class="btn btn-secondary" (click)="resetWizard()">Abbrechen</button>
-          <button class="btn btn-primary" 
-                  [disabled]="!canCreateServer()"
-                  (click)="createServer()">Server erstellen</button>
         </div>
 
       </div>
@@ -444,11 +435,13 @@
         </div>
 
         <div class="summary-actions">
-          @if (canCreateServer()) {
-          <button class="btn btn-primary btn-full" (click)="createServer()">
-            Server für €{{ getTotalPrice() }}/Monat erstellen
+          <button class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
+                  [disabled]="!canCreateServer()"
+                  (click)="createServer()">
+            Server erstellen
           </button>
-          } @else {
+          
+          @if (!canCreateServer()) {
           <div class="creation-hint">
             <p>Wählen Sie Architektur, Standort und Image aus, um fortzufahren.</p>
           </div>

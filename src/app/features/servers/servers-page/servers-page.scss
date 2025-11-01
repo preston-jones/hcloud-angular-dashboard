@@ -722,8 +722,12 @@
 }
 
 .summary-actions {
-  .btn-full {
-    width: 100%;
+  button {
+    margin-bottom: 0.75rem;
+    
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 }
 

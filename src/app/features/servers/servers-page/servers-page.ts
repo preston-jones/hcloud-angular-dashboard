@@ -614,7 +614,7 @@ export class ServersPage implements OnInit {
       case 'ash': return 'Ashburn (ash)';
       case 'hil': return 'Hillsboro (hil)';
       case 'sin': return 'Singapur (sin)';
-      default: return location || '';
+      default: return 'Nicht ausgewählt';
     }
   }
 
