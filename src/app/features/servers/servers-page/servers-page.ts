@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 import { ServerNameDialogComponent } from '../../../shared/ui/server-name-dialog/server-name-dialog';
 
@@ -12,9 +13,10 @@ import { ServerNameDialogComponent } from '../../../shared/ui/server-name-dialog
   styleUrls: ['./servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServersPage implements OnInit {
+export class ServersPage implements OnInit, OnDestroy {
   private api = inject(HetznerApiService);
   private router = inject(Router);
+  private pageHeaderService = inject(PageHeaderService);
 
   // UI state
   status = signal<'all' | 'running' | 'stopped'>('all');
@@ -54,8 +56,18 @@ export class ServersPage implements OnInit {
   get isUsingMockData() { return this.api.isUsingMockData(); }
 
   ngOnInit() {
+    // Set up page header
+    this.pageHeaderService.setHeader({
+      title: 'Create Server',
+      subtitle: 'Configure your new cloud server'
+    });
+    
     // Load server types (available configurations) for this page
     this.api.loadServerTypes();
+  }
+
+  ngOnDestroy() {
+    this.pageHeaderService.clearHeader();
   }
 
   retry(): void {
