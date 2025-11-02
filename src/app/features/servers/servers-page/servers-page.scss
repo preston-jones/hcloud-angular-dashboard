@@ -4,7 +4,9 @@
   grid-template-columns: 1fr 360px;
   gap: 2rem;
   margin: 0 auto;
-  min-height: calc(100vh - 200px)
+  min-height: calc(100vh - 140px); /* Adjusted for better header clearance */
+  max-height: calc(100vh - 140px); /* Constrain total height */
+  overflow: hidden; /* Prevent outer scroll */
 }
 
 @media(max-width:1024px) {
@@ -17,7 +19,29 @@
 .wizard-main {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem
+  gap: 1.5rem;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: calc(100vh - 140px); /* Match parent height */
+  padding-right: 8px; /* Space for scrollbar */
+  
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--surface-elev);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+    
+    &:hover {
+      background: var(--text-muted);
+    }
+  }
 }
 
 .wizard-progress {
@@ -151,7 +175,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  scroll-margin-top: 120px
+  scroll-margin-top: 140px; /* Increased to match header offset */
 }
 
 .step-header {
@@ -616,6 +640,12 @@
   padding: 2rem 0;
   border-top: 1px solid var(--border);
   margin-top: 2rem
+}
+
+.wizard-bottom-spacing {
+  height: 50vh; /* Use viewport height for substantial spacing */
+  margin-top: 6rem; /* Large top margin for separation */
+  min-height: 400px; /* Minimum height fallback */
 }
 
 @media(max-width:768px) {

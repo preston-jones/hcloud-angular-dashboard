@@ -956,11 +956,11 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   // Navigation helper for summary card
   scrollToStep(stepId: string): void {
     const element = document.getElementById(stepId);
-    const mainContent = document.querySelector('.main-content');
+    const mainContent = document.querySelector('.wizard-main');
     
     if (element && mainContent) {
       const elementTop = element.offsetTop;
-      const headerHeight = 100; // Increased header height offset
+      const headerHeight = 140; // Match scroll-margin-top
       const scrollPosition = elementTop - headerHeight;
       
       mainContent.scrollTo({
@@ -972,48 +972,52 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   // Scroll spy functionality
   private setupScrollSpy(): void {
-    const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-networking', 'step-security', 'step-extras'];
+    const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-networking', 'step-security', 'step-extras', 'step-labels', 'step-name'];
+    const scrollContainer = document.querySelector('.wizard-main');
     
-    this.intersectionObserver = new IntersectionObserver((entries) => {
-      // Find the section that's closest to the top
-      let closestSection = '';
-      let closestDistance = Infinity;
+    if (!scrollContainer) return;
+    
+    const checkActiveSection = () => {
+      const headerOffset = 160; // Checkpoint position below header
+      let activeStep = '';
       
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const rect = entry.boundingClientRect;
-          const distanceFromTop = Math.abs(rect.top - 100); // Account for header offset
+      // Check each step from bottom to top to find which one has passed the checkpoint
+      for (let i = stepIds.length - 1; i >= 0; i--) {
+        const element = document.getElementById(stepIds[i]);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const containerRect = scrollContainer.getBoundingClientRect();
           
-          if (distanceFromTop < closestDistance) {
-            closestDistance = distanceFromTop;
-            closestSection = entry.target.id;
+          // Check if the step has passed the checkpoint (top of step is above checkpoint)
+          const stepTop = rect.top - containerRect.top + scrollContainer.scrollTop;
+          const checkpointPosition = scrollContainer.scrollTop + headerOffset;
+          
+          if (stepTop <= checkpointPosition) {
+            activeStep = stepIds[i];
+            break;
           }
         }
-      });
+      }
       
-      if (closestSection) {
-        this.activeSection.set(closestSection);
+      // Default to first step if none found
+      if (!activeStep && stepIds.length > 0) {
+        activeStep = stepIds[0];
       }
-    }, {
-      root: document.querySelector('.main-content'),
-      rootMargin: '-100px 0px -80% 0px', // Trigger when headline is near the top
-      threshold: [0, 0.1, 0.2, 0.3]
-    });
-
-    // Observe all step sections
-    stepIds.forEach(stepId => {
-      const element = document.getElementById(stepId);
-      if (element) {
-        this.intersectionObserver?.observe(element);
+      
+      if (activeStep && activeStep !== this.activeSection()) {
+        this.activeSection.set(activeStep);
       }
-    });
+    };
+    
+    // Use scroll event instead of intersection observer
+    scrollContainer.addEventListener('scroll', checkActiveSection, { passive: true });
+    
+    // Initial check
+    checkActiveSection();
   }
 
   private cleanupScrollSpy(): void {
-    if (this.intersectionObserver) {
-      this.intersectionObserver.disconnect();
-      this.intersectionObserver = undefined;
-    }
+    // No longer using intersection observer, cleanup handled elsewhere if needed
   }
 
   // Check if a summary section is currently active
