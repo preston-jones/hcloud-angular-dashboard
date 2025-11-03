@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, OnDestroy, AfterViewInit, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
-import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 
 @Component({
@@ -15,7 +14,6 @@ import { Server } from '../../../core/models';
 export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   private api = inject(HetznerApiService);
   private router = inject(Router);
-  private pageHeaderService = inject(PageHeaderService);
 
   // UI state
   status = signal<'all' | 'running' | 'stopped'>('all');
@@ -35,7 +33,7 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   
   // Scroll spy state
   activeSection = signal<string>('step-architecture');
-  private intersectionObserver?: IntersectionObserver;
+  private scrollEventListener?: () => void;
   
   // Selection state for wizard
   selectedArchitecture = signal<string | null>(null);
@@ -91,12 +89,6 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   get isUsingMockData() { return this.api.isUsingMockData(); }
 
   ngOnInit() {
-    // Set up page header
-    this.pageHeaderService.setHeader({
-      title: 'Create Server',
-      subtitle: 'Configure your new cloud server'
-    });
-    
     // Load server types (available configurations) for this page
     this.api.loadServerTypes();
     
@@ -105,7 +97,6 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.pageHeaderService.clearHeader();
     this.cleanupScrollSpy();
   }
 
@@ -312,11 +303,10 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
       this.api.createServerFromType(selected, serverName, serverConfig);
       this.showNameDialog.set(false);
       
-      // Only navigate back if we're in mock mode (actual creation happened)
-      if (this.api.getCurrentMode() === 'mock') {
-        // Navigate back to my servers
+      // Navigate back to my servers after creation
+      setTimeout(() => {
         this.router.navigate(['/my-servers']);
-      }
+      }, 100);
       // In API mode, the demo dialog will show and user stays on the current page
     }
   }
@@ -637,12 +627,10 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     // Reset wizard state
     this.resetWizard();
     
-    // Only navigate back if we're in mock mode (actual creation happened)
-    if (this.api.getCurrentMode() === 'mock') {
-      setTimeout(() => {
-        this.router.navigate(['/servers']);
-      }, 100);
-    }
+    // Navigate to servers list page after creation
+    setTimeout(() => {
+      this.router.navigate(['/my-servers']);
+    }, 100);
   }
 
   startWizard(): void {
@@ -679,11 +667,10 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
       // Reset wizard state
       this.resetWizard();
       
-      // Only navigate back if we're in mock mode (actual creation happened)
-      if (this.api.getCurrentMode() === 'mock') {
-        // Navigate back to my servers
+      // Navigate back to my servers after creation
+      setTimeout(() => {
         this.router.navigate(['/my-servers']);
-      }
+      }, 100);
     }
   }
 
@@ -916,21 +903,6 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // Server specs helper
-  getSelectedServerSpecs(): { vcpus: number; memory: number; disk: number } {
-    const serverType = this.selectedServerType();
-    if (!serverType) return { vcpus: 0, memory: 0, disk: 0 };
-
-    const servers = this.filteredServers();
-    const selected = servers.find(s => s.server_type?.name === serverType);
-    
-    return {
-      vcpus: selected?.server_type?.cores || 0,
-      memory: selected?.server_type?.memory || 0,
-      disk: selected?.server_type?.disk || 0
-    };
-  }
-
   // Pricing helpers
   getServerPrice(): string {
     const serverType = this.selectedServerType();
@@ -955,73 +927,151 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   // Navigation helper for summary card
   scrollToStep(stepId: string): void {
+    console.log('scrollToStep called with:', stepId);
     const element = document.getElementById(stepId);
     const mainContent = document.querySelector('.wizard-main');
     
+    console.log('Element found:', !!element);
+    console.log('Main content found:', !!mainContent);
+    
     if (element && mainContent) {
       const elementTop = element.offsetTop;
-      const headerHeight = 140; // Match scroll-margin-top
+      const headerHeight = 100; // Reduced header offset
       const scrollPosition = elementTop - headerHeight;
       
+      console.log('Scrolling to position:', scrollPosition);
+      
       mainContent.scrollTo({
-        top: Math.max(0, scrollPosition), // Ensure we don't scroll to negative position
+        top: Math.max(0, scrollPosition),
         behavior: 'smooth'
       });
+      
+      // Manually update active section when clicking
+      setTimeout(() => {
+        console.log('Setting active section to:', stepId);
+        this.activeSection.set(stepId);
+        console.log('Active section is now:', this.activeSection());
+      }, 100);
+    } else {
+      console.log('Failed to find element or main content for:', stepId);
     }
   }
 
   // Scroll spy functionality
   private setupScrollSpy(): void {
+    console.log('Setting up scroll spy...');
     const stepIds = ['step-architecture', 'step-location', 'step-image', 'step-networking', 'step-security', 'step-extras', 'step-labels', 'step-name'];
-    const scrollContainer = document.querySelector('.wizard-main');
+    const scrollContainer = document.querySelector('.wizard-main') as HTMLElement;
     
-    if (!scrollContainer) return;
+    if (!scrollContainer) {
+      console.log('Scroll container not found');
+      return;
+    }
     
-    const checkActiveSection = () => {
-      const headerOffset = 160; // Checkpoint position below header
-      let activeStep = '';
+    console.log('Scroll container found:', scrollContainer);
+    
+    const updateActiveSection = () => {
+      const scrollTop = scrollContainer.scrollTop;
+      let activeStep = stepIds[0]; // Default to first step
       
-      // Check each step from bottom to top to find which one has passed the checkpoint
+      console.log('Checking scroll position:', scrollTop);
+      
+      // Find the section that's currently most visible
       for (let i = stepIds.length - 1; i >= 0; i--) {
-        const element = document.getElementById(stepIds[i]);
+        const element = document.getElementById(stepIds[i]) as HTMLElement;
         if (element) {
-          const rect = element.getBoundingClientRect();
-          const containerRect = scrollContainer.getBoundingClientRect();
-          
-          // Check if the step has passed the checkpoint (top of step is above checkpoint)
-          const stepTop = rect.top - containerRect.top + scrollContainer.scrollTop;
-          const checkpointPosition = scrollContainer.scrollTop + headerOffset;
-          
-          if (stepTop <= checkpointPosition) {
+          const elementTop = element.offsetTop;
+          console.log(`${stepIds[i]} top:`, elementTop, 'threshold:', elementTop - 200);
+          // If we've scrolled past this element (with small offset)
+          if (scrollTop >= elementTop - 200) {
             activeStep = stepIds[i];
+            console.log('Active step set to:', activeStep);
             break;
           }
+        } else {
+          console.log('Element not found:', stepIds[i]);
         }
       }
       
-      // Default to first step if none found
-      if (!activeStep && stepIds.length > 0) {
-        activeStep = stepIds[0];
-      }
-      
-      if (activeStep && activeStep !== this.activeSection()) {
+      // Update if changed
+      if (activeStep !== this.activeSection()) {
+        console.log('Updating active section from', this.activeSection(), 'to', activeStep);
         this.activeSection.set(activeStep);
+        this.scrollSummaryToActiveStep(activeStep);
       }
     };
     
-    // Use scroll event instead of intersection observer
-    scrollContainer.addEventListener('scroll', checkActiveSection, { passive: true });
+    // Add throttled scroll listener
+    let ticking = false;
+    const onScroll = () => {
+      console.log('Scroll event triggered!');
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateActiveSection();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+    this.scrollEventListener = onScroll;
+    scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+    console.log('Scroll event listener attached');
     
     // Initial check
-    checkActiveSection();
+    setTimeout(() => updateActiveSection(), 300);
   }
 
   private cleanupScrollSpy(): void {
-    // No longer using intersection observer, cleanup handled elsewhere if needed
+    if (this.scrollEventListener) {
+      const scrollContainer = document.querySelector('.wizard-main');
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', this.scrollEventListener);
+      }
+      this.scrollEventListener = undefined;
+    }
+  }
+
+  // Scroll the summary sections to show the active step
+  private scrollSummaryToActiveStep(activeStepId: string): void {
+    const summaryContainer = document.querySelector('.summary-sections');
+    if (!summaryContainer) return;
+
+    // Find the corresponding summary section element
+    const summaryElements = summaryContainer.querySelectorAll('.summary-section');
+    const stepMapping: { [key: string]: number } = {
+      'step-architecture': 0,
+      'step-location': 1,
+      'step-image': 2,
+      'step-networking': 3,
+      'step-security': 4,
+      'step-extras': 5,
+      'step-labels': 6,
+      'step-name': 7
+    };
+
+    const activeIndex = stepMapping[activeStepId];
+    if (activeIndex !== undefined && summaryElements[activeIndex]) {
+      const activeElement = summaryElements[activeIndex] as HTMLElement;
+      
+      // Calculate scroll position to center the active element
+      const containerHeight = summaryContainer.clientHeight;
+      const elementHeight = activeElement.offsetHeight;
+      const elementTop = activeElement.offsetTop;
+      
+      const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
+      
+      summaryContainer.scrollTo({
+        top: Math.max(0, scrollPosition),
+        behavior: 'smooth'
+      });
+    }
   }
 
   // Check if a summary section is currently active
   isSectionActive(stepId: string): boolean {
-    return this.activeSection() === stepId;
+    const isActive = this.activeSection() === stepId;
+    console.log(`isSectionActive(${stepId}):`, isActive, 'current activeSection:', this.activeSection());
+    return isActive;
   }
 }
