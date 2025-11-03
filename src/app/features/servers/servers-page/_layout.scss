@@ -1,0 +1,65 @@
+/* =============================================================================
+   WIZARD LAYOUT FOUNDATION
+   Core layout structure for the server creation wizard
+   ============================================================================= */
+
+/* Main container */
+.section {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+/* Grid layout container */
+.wizard-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 2rem;
+  margin: 0 auto;
+  min-height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
+}
+
+/* Main content area */
+.wizard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 140px);
+  padding-right: 8px;
+  
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Sidebar container */
+.wizard-sidebar {
+  position: sticky;
+  top: 0;
+  height: fit-content;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { 
+    background: var(--border);
+    border-radius: 3px;
+    &:hover { background: var(--border-hover); }
+  }
+}
+
+/* Responsive layout */
+@media(max-width:1024px) {
+  .wizard-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .wizard-sidebar {
+    position: static;
+    order: -1;
+  }
+}

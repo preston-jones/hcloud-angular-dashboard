@@ -1,0 +1,178 @@
+/* =============================================================================
+   CONFIGURATION & FORM COMPONENTS
+   Steps 5-7 networking, firewall, and backup configuration components
+   ============================================================================= */
+
+/* Configuration options container */
+.configuration-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Networking options */
+.networking-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* Checkbox styling */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text);
+  
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+  }
+}
+
+/* Firewall selection components */
+.firewall-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.firewall-card {
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 300px;
+  
+  &:hover {
+    border-color: #10b981;
+    background: var(--surface-elev);
+  }
+  
+  &.selected {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+  }
+}
+
+.firewall-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.firewall-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.firewall-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.firewall-description {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.firewall-rules {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* SSH key selection */
+.ssh-key-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ssh-key-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #10b981;
+    background: var(--surface-elev);
+  }
+  
+  &.selected {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+  }
+}
+
+.ssh-key-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #ef4444;
+}
+
+.ssh-key-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ssh-key-name {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.ssh-key-fingerprint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .firewall-card {
+    padding: 0.75rem;
+  }
+  
+  .ssh-key-item {
+    padding: 0.5rem;
+  }
+  
+  .ssh-key-fingerprint {
+    word-break: break-all;
+  }
+}
