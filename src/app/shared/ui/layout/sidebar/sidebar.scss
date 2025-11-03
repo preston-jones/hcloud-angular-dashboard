@@ -46,13 +46,14 @@
 }
 
 .nav-link:hover {
-  background: var(--surface-muted, #1b222c);
+  background: var(--sidebar-active);
 }
 
 /* aktiver roter Indikator links, wie in Hetzner */
 .nav-link.active {
-  background: var(--surface-muted, #1b222c);
-  color: #ffffff;
+  background: var(--sidebar-active);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .nav-link.active::before {
@@ -110,7 +111,7 @@
 
 .pin-button:hover {
   opacity: 1;
-  background-color: var(--surface-muted, #1b222c);
+  background-color: var(--sidebar-active);
 }
 
 .pin-button.pinned {
