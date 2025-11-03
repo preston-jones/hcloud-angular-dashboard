@@ -69,3 +69,8 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+# Backup files
+*.bak
+*.backup
+*-backup.*
+*-new.*
