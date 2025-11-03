@@ -1,0 +1,75 @@
+/* =============================================================================
+   WIZARD STEP COMPONENTS
+   Basic step structure and common step elements
+   ============================================================================= */
+
+/* Steps container */
+.wizard-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding-bottom: 2rem;
+}
+
+/* Individual step wrapper */
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scroll-margin-top: 140px;
+}
+
+/* Step header section */
+.step-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Step title with icon */
+.step-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Step description text */
+.step-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Step completion icon */
+.step-icon-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #10b981;
+  color: transparent; /* Hide content by default - empty circle like unchecked checkbox */
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+  transition: all 0.2s ease;
+  padding: 0;
+  
+  &.completed {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white; /* Show checkmark when completed */
+  }
+}
+
+/* Bottom spacing for last step */
+.wizard-bottom-spacing {
+  height: 50vh;
+  margin-top: 6rem;
+  min-height: 400px;
+}

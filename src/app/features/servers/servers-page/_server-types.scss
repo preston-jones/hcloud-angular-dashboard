@@ -1,0 +1,134 @@
+/* =============================================================================
+   SERVER TYPES & TABLES COMPONENTS
+   Step 2 components for server type selection tables
+   ============================================================================= */
+
+/* Server types section container */
+.server-types-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+  }
+}
+
+/* Server type table wrapper */
+.server-type-table {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Table header */
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--surface-elev);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text);
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    
+    .table-header > *:nth-child(5),
+    .table-header > *:nth-child(6) {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 2fr 1fr 1fr;
+    font-size: 0.75rem;
+    padding: 0.75rem;
+    
+    .table-header > *:nth-child(4),
+    .table-header > *:nth-child(5),
+    .table-header > *:nth-child(6) {
+      display: none;
+    }
+  }
+}
+
+/* Table rows */
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--surface-elev);
+  }
+  
+  &.selected {
+    background: rgba(239, 68, 68, 0.05);
+    border-left: 3px solid #ef4444;
+  }
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    
+    .table-row > *:nth-child(5),
+    .table-row > *:nth-child(6) {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 0.75rem;
+    
+    .table-row > *:nth-child(4),
+    .table-row > *:nth-child(5),
+    .table-row > *:nth-child(6) {
+      display: none;
+    }
+  }
+}
+
+/* Table cell content */
+.table-row .server-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.table-row .server-vcpu,
+.table-row .server-ram,
+.table-row .server-disk,
+.table-row .server-traffic,
+.table-row .server-price {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Price highlighting */
+.table-row .server-price {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Responsive table adjustments */
+@media (max-width: 640px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  
+  .table-header > *:nth-child(n+3),
+  .table-row > *:nth-child(n+3) {
+    display: none;
+  }
+}
