@@ -6,17 +6,17 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50:  '#fff1f5',
-          100: '#ffe4ea',
-          200: '#fec8d4',
-          300: '#fd9fb5',
-          400: '#fb6a8e',
-          500: '#f43f5e',
-          600: '#E40046',   // Hetzner Rot ❤️
-          700: '#be003a',
-          800: '#9a0031',
-          900: '#7a0229',
-          DEFAULT: '#E40046',
+          50:  '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6',
+          500: '#ec4899',
+          600: '#D71D36',   // Hetzner Rot (offiziell)
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
+          DEFAULT: '#D71D36',
         },
         accent: {
           50:  '#eff6ff',
@@ -44,6 +44,43 @@ module.exports = {
           900: '#14532d',
           DEFAULT: '#16A34A',
         },
+        // Hetzner spezifische Farben
+        hetzner: {
+          red: '#D71D36',
+          blue: '#2563EB',
+          gray: {
+            50: '#f8fafc',
+            100: '#f1f5f9',
+            200: '#e2e8f0',
+            300: '#cbd5e1',
+            400: '#94a3b8',
+            500: '#64748b',
+            600: '#475569',
+            700: '#334155',
+            800: '#1e293b',
+            900: '#0f172a',
+          }
+        },
+        // Surfaces & Background
+        surface: {
+          page: '#F5F6F7',          // Topbar/Page-Hintergrund ~ #f0f2f3–#f5f6f7
+          sidebar: '#F3EEEF',       // Sidebar-Hintergrund
+          card: '#FFFFFF',          // Karten/Paneele
+          muted: '#F4F4F5'          // Hover/ausgewählt hell
+        },
+        border: {
+          DEFAULT: '#E5E7EB',       // feine Borders
+          soft: '#ECEDEE'
+        },
+        text: {
+          DEFAULT: '#111827',       // Haupttext
+          soft: '#6B7280'           // Sekundär
+        },
+        // Controls
+        input: {
+          bg: '#F3F4F6',            // Inputs / Search
+          ring: '#E5E7EB'
+        },
         sidebar: '#1E293B',
         bg: '#F8FAFC',
       },
@@ -51,8 +88,12 @@ module.exports = {
         sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 10px 30px -15px rgba(2, 6, 23, 0.15)',
+        card: '0 1px 0 rgba(17, 24, 39, 0.04)', // sehr subtil wie Hetzner
+        hetzner: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
       },
+      borderRadius: {
+        hetzner: '8px',
+      }
     },
   },
   plugins: [],

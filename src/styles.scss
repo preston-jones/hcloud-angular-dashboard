@@ -64,28 +64,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Theme Tokens ===== */
+/* ===== Hetzner Theme Tokens (Updated) ===== */
 :root {
-  /* Surfaces & Text */
-  --surface: #F8FAFC;
-  /* Light BG */
-  --surface-elev: #FFFFFF;
-  /* Cards */
-  --text: #0F172A;
-  /* slate-900 */
-  --text-soft: #334155;
-  /* slate-600 */
-  --border: #E2E8F0;
-  /* slate-200 */
+  /* Surfaces & Text - Hetzner Light Theme */
+  --surface: theme('colors.surface.page');      /* #F5F6F7 */
+  --surface-elev: theme('colors.surface.card'); /* #FFFFFF */
+  --surface-muted: theme('colors.surface.muted'); /* #F4F4F5 */
+  
+  /* Text Colors - Hetzner Typography */
+  --text: theme('colors.text.DEFAULT');       /* #111827 */
+  --text-soft: theme('colors.text.soft');     /* #6B7280 */
+  --text-muted: #64748b;
+  
+  /* Borders - Hetzner Style */
+  --border: theme('colors.border.DEFAULT');   /* #E5E7EB */
+  --border-hover: #cbd5e1;
 
-  /* Brand */
-  --primary: #E40046;
-  --accent: #2563EB;
-  --success: #16A34A;
+  /* Brand - Official Hetzner Colors */
+  --primary: theme('colors.primary.DEFAULT'); /* #D71D36 */
+  --primary-hover: #b91c2e;
+  --accent: theme('colors.accent.DEFAULT');   /* #2563EB */
+  --success: theme('colors.success.DEFAULT'); /* #16A34A */
 
-  /* Sidebar */
-  --sidebar: #1E293B;
-  --sidebar-text: #E5E7EB;
+  /* Sidebar - Hetzner Light Navigation */
+  --sidebar: #FFFFFF;
+  --sidebar-text: #374151;
+  --sidebar-active: #F3F4F6;
+  
+  /* Toolbar */
+  --toolbar: theme('colors.surface.page');
 }
 
 :root.dark {
@@ -119,29 +126,332 @@
 
 /* ===== Minimal Utility Bridge (Tailwind-friendly) ===== */
 @layer base {
-
   html,
   body {
     height: 100%;
     background: var(--surface);
     color: var(--text);
     font-family: theme('fontFamily.sans');
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* ===== Hetzner Typography ===== */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0 0 1rem 0;
+    color: var(--text);
+  }
+
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.875rem; }
+  h3 { font-size: 1.5rem; }
+  h4 { font-size: 1.25rem; }
+  h5 { font-size: 1.125rem; }
+  h6 { font-size: 1rem; }
+
+  p {
+    margin: 0 0 1rem 0;
+    color: var(--text-soft);
   }
 }
 
 @layer components {
+  /* ===== Hetzner Buttons ===== */
+  .btn {
+    @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    min-height: 2.5rem;
+    cursor: pointer;
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+    
+    &:disabled {
+      background-color: color-mix(in srgb, var(--primary) 60%, transparent);
+    }
+  }
+
+  .btn-secondary {
+    background-color: var(--surface-elev);
+    border-color: var(--border);
+    color: var(--text);
+    
+    &:hover:not(:disabled) {
+      background-color: var(--surface-muted);
+      border-color: var(--border-hover);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--border) 20%, transparent);
+    }
+    
+    &:disabled {
+      background-color: var(--surface-muted);
+      color: var(--text-muted);
+    }
+  }
+
+  .btn-accent {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: color-mix(in srgb, var(--accent) 90%, black);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+  }
+
+  .btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: color-mix(in srgb, var(--success) 90%, black);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 20%, transparent);
+    }
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border-color: var(--border);
+    color: var(--text);
+    
+    &:hover:not(:disabled) {
+      background-color: var(--surface-muted);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--border) 20%, transparent);
+    }
+  }
+
+  .btn-outline-primary {
+    background-color: transparent;
+    border-color: var(--primary);
+    color: var(--primary);
+    
+    &:hover:not(:disabled) {
+      background-color: color-mix(in srgb, var(--primary) 5%, transparent);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+    min-height: 2rem;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+    min-height: 3rem;
+  }
+
+  /* ===== Hetzner Form Controls ===== */
+  .form-label {
+    @apply block text-sm font-medium mb-2;
+    color: var(--text);
+  }
+
+  .input, .select, .textarea {
+    @apply w-full px-3 py-2 border rounded-lg transition-colors duration-200;
+    border-color: var(--border);
+    background-color: var(--surface-elev);
+    color: var(--text);
+    min-height: 2.5rem;
+    
+    &::placeholder {
+      color: var(--text-muted);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+    }
+    
+    &:disabled {
+      background-color: var(--surface-muted);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    
+    &.error {
+      border-color: #ef4444;
+      
+      &:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px color-mix(in srgb, #ef4444 20%, transparent);
+      }
+    }
+  }
+
+  .select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .textarea {
+    min-height: 4rem;
+    resize: vertical;
+  }
+
+  .checkbox, .radio {
+    @apply h-4 w-4 rounded focus:ring-2;
+    color: var(--primary);
+    border-color: var(--border);
+    
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+  }
+
+  .radio {
+    @apply rounded-full;
+  }
 
   /* Panels/Card: kaum Schatten, feine Border */
   .card {
-    @apply rounded-xl p-5;
+    @apply rounded-xl p-6 transition-shadow duration-200;
     background: var(--surface-elev);
     border: 1px solid var(--border);
-    box-shadow: none;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    
+    &.card-interactive {
+      cursor: pointer;
+      
+      &:hover {
+        border-color: var(--border-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      }
+    }
+    
+    &.card-selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+  }
+
+  .card-header {
+    @apply flex items-center justify-between mb-4 pb-4;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    @apply text-lg font-semibold m-0;
+    color: var(--text);
+  }
+
+  .card-content {
+    @apply space-y-4;
+  }
+
+  .card-footer {
+    @apply flex items-center justify-between mt-6 pt-4;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ===== Hetzner Status & Badges ===== */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    background-color: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .badge-info {
+    background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+  }
+
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  /* ===== Status Indicators ===== */
+  .status-dot {
+    @apply inline-block w-2 h-2 rounded-full;
+    
+    &.status-running { background-color: var(--success); }
+    &.status-stopped { @apply bg-red-500; }
+    &.status-starting { @apply bg-yellow-500; }
+    &.status-stopping { @apply bg-orange-500; }
+    &.status-unknown { @apply bg-gray-400; }
+  }
+
+  /* ===== Hetzner Layout ===== */
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section {
+    @apply py-8;
+  }
+
+  .divider {
+    border-top: 1px solid var(--border);
+    @apply my-6;
   }
 
   /* Topbar */
   .topbar {
-    background: var(--toolbar);
+    background: var(--sidebar);
     border-bottom: 1px solid var(--border);
     backdrop-filter: saturate(120%) blur(6px);
     color: var(--text);
@@ -159,6 +469,7 @@
   /* Links im Darkmode */
   a {
     color: var(--accent);
+    transition: color 0.2s ease;
   }
 
   a:hover {
@@ -189,6 +500,37 @@
 
   .link {
     color: var(--accent);
+  }
+  
+  /* ===== Hetzner Utilities ===== */
+  .text-primary { color: var(--primary); }
+  .text-accent { color: var(--accent); }
+  .text-success { color: var(--success); }
+  .text-muted { color: var(--text-muted); }
+
+  .bg-surface { background-color: var(--surface); }
+  .bg-surface-elev { background-color: var(--surface-elev); }
+
+  .border-primary { border-color: var(--primary); }
+  .border-accent { border-color: var(--accent); }
+  
+  /* ===== Animations ===== */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(-10px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
   }
 }
 
@@ -262,4 +604,18 @@
   }
 
   /* w-44 */
+  
+  /* ===== Responsive Helpers ===== */
+  @media (max-width: 768px) {
+    .card {
+      @apply p-4;
+    }
+    
+    .btn {
+      @apply w-full justify-center;
+    }
+    
+    h1 { font-size: 1.875rem; }
+    h2 { font-size: 1.5rem; }
+  }
 }
