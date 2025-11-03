@@ -276,7 +276,7 @@
         <div class="image-grid">
           <div class="image-card" [class.selected]="selectedImage() === 'docker'" (click)="selectImage('docker')">
             <div class="image-icon">
-              <img src="/assets/mock/docker-icon.svg" alt="Docker">
+              <img src="/assets/icons/docker-icon.svg" alt="Docker">
             </div>
             <div class="image-info">
               <h4>Docker</h4>
@@ -638,20 +638,6 @@
             <div class="summary-label">Name</div>
           </div>
         </div>
-
-        <div class="summary-divider"></div>
-        <div class="summary-section specs-section">
-          <div class="summary-label">Specifications</div>
-          <div class="summary-specs">
-            @if (selectedServerType()) {
-            <div>{{ getSelectedServerSpecs().vcpus }} vCPUs</div>
-            <div>{{ getSelectedServerSpecs().memory }} GB RAM</div>
-            <div>{{ getSelectedServerSpecs().disk }} GB Disk</div>
-            } @else {
-            <div class="text-muted">Not yet available</div>
-            }
-          </div>
-        </div>
       </div>
 
       <div class="summary-divider"></div>
@@ -662,12 +648,10 @@
           <span>€{{ getServerPrice() }}/Month</span>
         </div>
 
-        @if (enableBackups()) {
-        <div class="pricing-row">
+        <div class="pricing-row backup-row" [style.visibility]="enableBackups() ? 'visible' : 'hidden'">
           <span>Backups</span>
           <span>€{{ getBackupPrice() }}/Month</span>
         </div>
-        }
 
         <div class="pricing-total">
           <span>Total</span>
