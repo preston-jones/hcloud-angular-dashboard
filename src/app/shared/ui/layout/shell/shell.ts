@@ -33,6 +33,19 @@ export class ShellComponent {
     this.layoutService.collapseSidebar();
   };
 
+  // Conditional methods that check if settings are open
+  onSidebarMouseEnter = (sidebar: SidebarComponent) => {
+    if (!sidebar.isSettingsOpen) {
+      this.expandSidebar();
+    }
+  };
+
+  onSidebarMouseLeave = (sidebar: SidebarComponent) => {
+    if (!sidebar.isSettingsOpen) {
+      this.collapseSidebar();
+    }
+  };
+
   togglePin = () => {
     this.layoutService.togglePin();
   };

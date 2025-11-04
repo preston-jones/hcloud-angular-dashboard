@@ -1,9 +1,4 @@
-/* Panel/Card wie Hetzner */
-.card {
-  background: var(--surface-elev);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
+/* Panel/Card wie Hetzner - removed duplicate .card definition since it's in global styles */
 
 /* Sortable Headers */
 .sortable-header {
@@ -112,15 +107,4 @@
 .server-card .name { color: var(--primary); font-weight: 600; }
 .server-card .meta { color: var(--text-soft); font-size: 0.875rem; }
 
-/* Skeleton (lokal; entferne diesen Block, wenn du ihn global hast) */
-.skeleton {
-  display: inline-block;
-  width: 100%;
-  border-radius: 6px;
-  background: color-mix(in oklab, var(--text) 10%, transparent);
-  animation: skeleton-pulse 1.4s ease-in-out infinite;
-}
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: .35; }
-  50%      { opacity: .85; }
-}
+/* Skeleton - removed duplicate definition since it's in global styles */

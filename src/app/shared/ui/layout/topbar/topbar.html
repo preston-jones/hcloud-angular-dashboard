@@ -1,50 +1,39 @@
-<header class="topbar h-16 flex items-center justify-between px-8 py-3">
-  <!-- Left: Brand -->
-  <div class="flex items-center gap-4">
-    <!-- Hetzner Logo -->
-    <span class="text-primary font-bold tracking-wide text-xl select-none">
-      HCLOUD<span class="text-ink"> Vision</span>
-    </span>
-  </div>
+<header class="topbar h-16">
+  <div class="container flex items-center justify-between py-3">
+    <!-- Left: Brand -->
+    <div class="flex items-center gap-4">
+      <!-- Hetzner Logo -->
+      <span class="text-primary font-bold tracking-wide text-xl select-none">
+        HCLOUD<span class="text-ink"> Vision</span>
+      </span>
+    </div>
 
-  <!-- Center: Search Bar -->
-  <div class="flex-1 flex justify-center max-w-lg mx-6">
-    <input
-      type="text"
-      placeholder="Search Server by Name"
-      class="rounded-lg border border-ui bg-surface-elev text-ink px-4 py-2.5 w-full max-w-md"
-      (input)="onSearchInput($event)"
-    />
-  </div>
+    <!-- Center: Search Bar -->
+    <div class="flex-1 flex justify-center max-w-lg mx-6">
+      <input
+        type="search"
+        placeholder="Search Server by Name"
+        autocomplete="off"
+        spellcheck="false"
+        class="rounded-lg border border-ui bg-surface text-ink px-4 py-2.5 w-full max-w-md"
+        (input)="onSearchInput($event)"
+      />
+    </div>
 
-  <!-- Right: Theme Toggle + Avatar -->
-  <div class="flex items-center gap-4">
-    <button
-      class="rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
-      (click)="toggleTheme()"
-      [attr.aria-pressed]="isDark()"
-      aria-label="Toggle dark mode">
-      @if (!isDark()) {
+    <!-- Right: Theme Toggle -->
+    <div class="flex items-center gap-4">
+      <button
+        class="rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
+        (click)="toggleTheme()"
+        [attr.aria-pressed]="isDark()"
+        aria-label="Toggle dark mode">
+        @if (!isDark()) {
         <span>🌙</span>
-      }
-      @if (isDark()) {
+        }
+        @if (isDark()) {
         <span>☀️</span>
-      }
-    </button>
-
-    <!-- Avatar / User Circle -->
-    <button 
-      class="w-8 h-8 rounded-full bg-[color-mix(in_oklab,_var(--text)_20%,_transparent)] hover:bg-[color-mix(in_oklab,_var(--text)_30%,_transparent)] transition-colors cursor-pointer"
-      (click)="openSettings()"
-      aria-label="Open settings">
-    </button>
+        }
+      </button>
+    </div>
   </div>
 </header>
-
-<!-- Settings Dialog -->
-@if (showSettings()) {
-  <app-settings-dialog 
-    (close)="closeSettings()" 
-    (saveAndClose)="saveSettings()">
-  </app-settings-dialog>
-}

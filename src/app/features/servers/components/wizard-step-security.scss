@@ -1,0 +1,115 @@
+/* Wizard Step Security - Component Specific Styles */
+
+/* Common step structure */
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scroll-margin-top: 140px;
+  
+  p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.step-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.step-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.step-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.step-icon-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #10b981;
+  color: transparent;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+  transition: all 0.2s ease;
+  padding: 0;
+  
+  &.completed {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+  }
+}
+
+/* Security/Firewall specific styles */
+.firewall-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.firewall-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--background);
+  
+  &:hover {
+    border-color: #10b981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+  }
+  
+  &.selected {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.15);
+  }
+}
+
+.firewall-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.firewall-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.firewall-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.firewall-details {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

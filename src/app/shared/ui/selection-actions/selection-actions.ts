@@ -1,14 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
-
-export interface SelectionAction {
-  id: string;
-  label: string;
-  icon: string;
-  disabled?: boolean;
-  hoverClass?: string;
-  action: () => void;
-}
+import { SelectionAction } from '../../models/component.model';
 
 @Component({
   selector: 'app-selection-actions',

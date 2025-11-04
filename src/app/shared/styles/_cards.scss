@@ -1,19 +1,6 @@
-/* Shared Card Styles */
+/* Shared Card Styles - removed duplicate .card definition since it's in global styles */
 
-/* Basic Card Styles */
-.card {
-  background: var(--surface-elev);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  border-color: var(--border-hover);
-  background: color-mix(in oklab, var(--surface-elev) 98%, var(--text) 2%);
-}
-
+/* Card Compact Variant */
 .card-compact {
   padding: 16px;
   border-radius: 8px;
@@ -152,12 +139,8 @@
   background: color-mix(in oklab, var(--primary) 10%, transparent 90%);
 }
 
-/* Responsive Design for Cards */
+/* Responsive Design for Cards - .card styles moved to global styles.scss */
 @media (max-width: 768px) {
-  .card {
-    padding: 16px;
-  }
-  
   .spec-card {
     padding: 12px;
   }

@@ -50,37 +50,56 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
           </p>
         </div>
 
-        <!-- Token Input (only shown when real mode) -->
-        @if (currentMode() === 'real') {
-          <div class="mb-6">
-            <label for="token" class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
-              Hetzner Cloud API Token
-            </label>
-            <div class="relative">
-              <input
-                id="token"
-                [type]="showToken() ? 'text' : 'password'"
-                [(ngModel)]="tokenInput"
-                placeholder="Enter your API token..."
-                class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-              <button
-                type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors w-6 h-6 flex items-center justify-center"
-                (click)="toggleTokenVisibility()"
-                [attr.aria-label]="showToken() ? 'Hide token' : 'Show token'">
-                @if (showToken()) {
-                  <span>🙈</span>
-                } @else {
-                  <span>👁️</span>
-                }
-              </button>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Your token is stored locally and never transmitted to our servers
-            </p>
+        <!-- Token Input (always visible, disabled in mock mode) -->
+        <div class="mb-6">
+          <label for="token" 
+                 class="block text-sm font-medium mb-2"
+                 [class]="currentMode() === 'mock' 
+                   ? 'text-slate-500 dark:text-slate-500' 
+                   : 'text-slate-900 dark:text-slate-100'">
+            Hetzner Cloud API Token
+          </label>
+          <div class="relative">
+            <input
+              id="token"
+              [type]="showToken() ? 'text' : 'password'"
+              [(ngModel)]="tokenInput"
+              [disabled]="currentMode() === 'mock'"
+              placeholder="Enter your API token..."
+              autocomplete="new-password"
+              spellcheck="false"
+              class="w-full px-3 py-2 pr-10 rounded-lg border transition-colors"
+              [class]="currentMode() === 'mock' 
+                ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-600 placeholder:text-slate-300 dark:placeholder:text-slate-700 cursor-not-allowed'
+                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'"
+            />
+            <button
+              type="button"
+              [disabled]="currentMode() === 'mock'"
+              class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors w-6 h-6 flex items-center justify-center"
+              [class]="currentMode() === 'mock' 
+                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+              (click)="toggleTokenVisibility()"
+              [attr.aria-label]="showToken() ? 'Hide token' : 'Show token'">
+              @if (showToken()) {
+                <span>🙈</span>
+              } @else {
+                <span>👁️</span>
+              }
+            </button>
           </div>
-        }
+          <p class="text-xs mt-1"
+             [class]="currentMode() === 'mock' 
+               ? 'text-slate-400 dark:text-slate-600' 
+               : 'text-slate-500 dark:text-slate-400'">
+            @if (currentMode() === 'mock') {
+              API token not required in mock mode
+            } @else {
+              Your token is stored locally and never transmitted to our servers
+            }
+          </p>
+        </div>
 
         <!-- Actions -->
         <div class="flex gap-3 justify-end">
@@ -118,7 +137,10 @@ export class SettingsDialogComponent {
   }
 
   toggleTokenVisibility(): void {
-    this.showToken.update(show => !show);
+    // Only allow toggling when not in mock mode
+    if (this.currentMode() !== 'mock') {
+      this.showToken.update(show => !show);
+    }
   }
 
   save(): void {

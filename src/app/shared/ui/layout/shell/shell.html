@@ -14,23 +14,25 @@
     
     <!-- Page Header - adapts to sidebar state -->
     @if (pageHeaderService.header()) {
-      <div class="page-header bg-card border-b border-ui transition-all duration-300"
+      <div class="page-header bg-card border-b border-ui transition-all duration-300 flex justify-center"
            [style.margin-left]="layoutService.sidebarWidth()">
-        @if (pageHeaderService.header()?.template) {
-          <ng-container 
-            [ngTemplateOutlet]="pageHeaderService.header()!.template!" 
-            [ngTemplateOutletContext]="pageHeaderService.header()!.context">
-          </ng-container>
-        } @else {
-          <div class="px-6 py-4">
-            @if (pageHeaderService.header()?.title) {
-              <h1 class="text-2xl font-bold text-ink">{{ pageHeaderService.header()!.title }}</h1>
-            }
-            @if (pageHeaderService.header()?.subtitle) {
-              <p class="text-soft mt-1">{{ pageHeaderService.header()!.subtitle }}</p>
-            }
-          </div>
-        }
+        <div class="w-full max-w-[1440px]">
+          @if (pageHeaderService.header()?.template) {
+            <ng-container 
+              [ngTemplateOutlet]="pageHeaderService.header()!.template!" 
+              [ngTemplateOutletContext]="pageHeaderService.header()!.context">
+            </ng-container>
+          } @else {
+            <div class="py-4">
+              @if (pageHeaderService.header()?.title) {
+                <h1 class="text-2xl font-bold text-ink">{{ pageHeaderService.header()!.title }}</h1>
+              }
+              @if (pageHeaderService.header()?.subtitle) {
+                <p class="text-soft mt-1">{{ pageHeaderService.header()!.subtitle }}</p>
+              }
+            </div>
+          }
+        </div>
       </div>
     }
     
