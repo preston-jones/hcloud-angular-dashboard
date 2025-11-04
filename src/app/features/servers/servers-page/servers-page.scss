@@ -12,6 +12,26 @@
    CHILD COMPONENT STYLES (shared via styleUrls)
    ============================================================================= */
 
+/* Page Header */
+.page-header {
+  margin-bottom: 2rem;
+  
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
 /* Labels Configuration */
 .labels-configuration {
   display: flex;
@@ -169,7 +189,8 @@
   }
 
   &.active {
-    background-color: #e7e7e7;
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
   }
 }
 
@@ -189,6 +210,7 @@
 }
 
 .summary-value {
+  display: none; /* Hidden by default */
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
@@ -197,6 +219,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  
+  &:not(:empty) {
+    display: block; /* Show when there's content */
+  }
 }
 
 .progress-step {

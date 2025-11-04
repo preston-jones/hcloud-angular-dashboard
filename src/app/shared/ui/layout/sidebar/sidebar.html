@@ -6,6 +6,7 @@
         <!-- Action button (like Settings) -->
         <button 
           class="nav-link"
+          [class.active]="item.action === 'settings' && showSettings()"
           (click)="onNavItemClick(item, $event)"
           [attr.aria-label]="item.label">
           <span class="icon">{{ item.icon }}</span>
