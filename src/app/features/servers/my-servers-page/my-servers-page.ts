@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { HetznerUtilsService } from '../../../core/hetzner-utils.service';
 import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 import { SelectionActionsComponent } from '../../../shared/ui/selection-actions/selection-actions';
 import { SelectionAction } from '../../../shared/models';
-import { ServerSelectionService, ServerDisplayService, ServerSortingService } from '../../../shared/services';
+import { ServerSelectionService, ServerSortingService } from '../../../shared/services';
 import { ServerStatusDotComponent } from '../../../shared/ui/server-status-dot';
 import { ServerSpecsDisplayComponent } from '../../../shared/ui/server-specs-display';
 import { ServerProtectionToggleComponent } from '../../../shared/ui/server-protection-toggle';
@@ -210,7 +211,7 @@ export class MyServersPage implements OnInit, OnDestroy {
   
   // Inject the new services (public for template access)
   selectionService = inject(ServerSelectionService);
-  displayService = inject(ServerDisplayService);
+  utilsService = inject(HetznerUtilsService);
   sortingService = inject(ServerSortingService);
 
   // Use selection service
@@ -399,44 +400,44 @@ export class MyServersPage implements OnInit, OnDestroy {
     this.router.navigate(['/my-servers', server.id]);
   }
 
-  // Display methods - delegate to display service
+  // Display methods - delegate to utils service
   getServerPrice(server: Server): string {
-    return this.displayService.getServerPrice(server);
+    return this.utilsService.getServerPriceFormatted(server);
   }
 
   getServerType(server: Server): string {
-    return this.displayService.getServerType(server);
+    return server.server_type?.name || 'Unknown';
   }
 
   getCpuCount(server: Server): string {
-    return this.displayService.getCpuCount(server);
+    return this.utilsService.getCpuCount(server);
   }
 
   getRamSize(server: Server): string {
-    return this.displayService.getRamSize(server);
+    return this.utilsService.getRamSize(server);
   }
 
   getDiskSize(server: Server): string {
-    return this.displayService.getDiskSize(server);
+    return this.utilsService.getDiskSize(server);
   }
 
   getArchitecture(server: Server): string {
-    return this.displayService.getArchitecture(server);
+    return this.utilsService.getArchitecture(server);
   }
 
   getNetworkZone(server: Server): string {
-    return this.displayService.getNetworkZone(server);
+    return this.utilsService.getNetworkZone(server);
   }
 
   getPublicIP(server: Server): string {
-    return this.displayService.getPublicIP(server);
+    return this.utilsService.getPublicIP(server);
   }
 
   getCreatedTimeAgo(server: Server): string {
-    return this.displayService.getCreatedTimeAgo(server);
+    return this.utilsService.getCreatedTimeAgo(server);
   }
 
   getLocationWithFlag(server: Server): string {
-    return this.displayService.getLocationWithFlag(server);
+    return this.utilsService.getLocationWithFlag(server);
   }
 }
