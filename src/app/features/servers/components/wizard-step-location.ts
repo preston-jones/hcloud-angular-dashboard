@@ -13,11 +13,9 @@ import { WizardStateService, DataMappingService } from '../services';
           <span class="step-icon-header" [class.completed]="isStepCompleted()">
             @if (isStepCompleted()) {
             ✓
-            } @else {
-            !
             }
           </span>
-          Location
+          Location*
         </h2>
         <p class="step-description">Select the location for your server</p>
       </div>

@@ -14,8 +14,6 @@ import { WizardStateService } from '../services';
           <span class="step-icon-header" [class.completed]="isStepCompleted()">
             @if (isStepCompleted()) {
             ✓
-            } @else {
-            !
             }
           </span>
           Firewalls

@@ -23,7 +23,7 @@ import { ServerProtectionToggleComponent } from '../../../shared/ui/server-prote
     <!-- Header Template -->
     <ng-template #headerTemplate>
       <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-6 py-4">
-        <h1 class="text-2xl font-bold text-ink">Servers</h1>
+        <h1 class="text-2xl font-bold text-ink">Server</h1>
         <div class="flex flex-wrap gap-2 items-center">
           <button 
             class="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary-700 transition-colors"

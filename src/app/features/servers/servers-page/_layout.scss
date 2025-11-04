@@ -39,7 +39,8 @@
 .wizard-sidebar {
   position: sticky;
   top: 0;
-  height: fit-content;
+  height: calc(100vh - 140px);
+  overflow: hidden;
 
   /* Custom scrollbar */
   &::-webkit-scrollbar { width: 6px; }

@@ -58,11 +58,11 @@ export class WizardStateService {
     this.enablePublicIPv4() || this.enablePublicIPv6()
   );
   
-  isSecurityComplete = computed(() => true); // Optional step
+  isSecurityComplete = computed(() => this.selectedFirewalls().length > 0);
   
-  isBackupsComplete = computed(() => true); // Optional step
+  isBackupsComplete = computed(() => this.enableBackups());
   
-  isLabelsComplete = computed(() => true); // Optional step
+  isLabelsComplete = computed(() => this.serverLabels().length > 0);
   
   isNameComplete = computed(() => this.nameError() === '');
 
