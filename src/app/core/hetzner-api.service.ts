@@ -80,17 +80,15 @@ export class HetznerApiService {
     this.loading.set(true);
     this.error.set(null);
 
-    // Choose endpoint based on mode
     const endpoint = this.mode() === 'mock' 
       ? this.getMockEndpoint('servers')
       : this.getEndpoint('servers');
-    
-    const httpOptions = this.mode() === 'mock' ? {} : this.getHttpOptions();
 
-    this.http.get(endpoint, httpOptions).pipe(
-      map((response: any) => response.servers || []),
+    this.http.get(endpoint, this.createHttpOptions()).pipe(
+      map((response: any) => this.extractResponseData(response, 'servers')),
       map(servers => servers.map((server: any) => ({ ...server, priceEur: this.calculatePrice(server) }))),
       catchError((err: HttpErrorResponse) => {
+        this.logApiCall('servers', err, true);
         this.error.set(err.message || 'Failed to load servers');
         return of([]);
       })
@@ -133,16 +131,14 @@ export class HetznerApiService {
 
   /** Load resources based on current mode */
   private loadResource(resource: string, signal: any, storageMethod: string): void {
-    // Choose endpoint based on mode
     const endpoint = this.mode() === 'mock' 
       ? this.getMockEndpoint(resource)
       : this.getEndpoint(resource);
-    
-    const httpOptions = this.mode() === 'mock' ? {} : this.getHttpOptions();
 
-    this.http.get(endpoint, httpOptions).pipe(
-      map((response: any) => response[resource] || []),
+    this.http.get(endpoint, this.createHttpOptions()).pipe(
+      map((response: any) => this.extractResponseData(response, resource)),
       catchError((err: HttpErrorResponse) => {
+        this.logApiCall(resource, err, true);
         console.warn(`Failed to load ${resource}:`, err.message);
         return of([]);
       })
@@ -224,20 +220,8 @@ export class HetznerApiService {
 
   /** Get HTTP options with auth headers */
   private getHttpOptions(): any {
-    const headers = this.getAuthHeaders();
-    // If no auth headers in real mode, switch to mock
-    if (!headers.Authorization && this.mode() === 'real') {
-      console.warn('No auth token found, switching to demo mode');
-      this.setMode('mock');
-      return {};
-    }
-    return headers.Authorization ? { headers } : {};
-  }
-
-  /** Get authentication headers */
-  private getAuthHeaders(): any {
-    const token = sessionStorage.getItem(CACHE_KEYS.TOKEN);
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    // In real mode with proxy, no auth headers needed - proxy handles authentication
+    return {};
   }
 
   /** Calculate server price */
@@ -245,6 +229,57 @@ export class HetznerApiService {
     const memory = server.server_type?.memory || 4;
     const cores = server.server_type?.cores || 2;
     return Math.round((memory * 0.75 + cores * 1.5) * 100) / 100;
+  }
+
+  // =============================================================================
+  // HTTP REQUEST HELPERS
+  // =============================================================================
+  
+  /** Create HTTP options based on current mode */
+  private createHttpOptions(): any {
+    if (this.mode() === 'mock') {
+      return {};
+    }
+    
+    return {
+      ...this.getHttpOptions(),
+      observe: 'response' as const
+    };
+  }
+
+  /** Extract data from HTTP response based on mode */
+  private extractResponseData(response: any, resourceKey: string): any[] {
+    if (this.mode() === 'mock') {
+      return response[resourceKey] || [];
+    }
+    
+    // Log headers in real mode for debugging
+    if (response.headers) {
+      this.logApiCall(resourceKey, response);
+    }
+    
+    return response.body?.[resourceKey] || [];
+  }
+
+  /** Log API call information (only in development/real mode) */
+  private logApiCall(endpoint: string, response: any, isError: boolean = false): void {
+    if (this.mode() !== 'real') return;
+    
+    const headers: Record<string, string> = {};
+    if (response.headers?.keys) {
+      response.headers.keys().forEach((key: string) => {
+        headers[key] = response.headers.get(key);
+      });
+    }
+
+    const logData = {
+      endpoint,
+      status: response.status,
+      url: response.url,
+      headers
+    };
+
+    console.log(isError ? `❌ ${endpoint}:` : `✅ ${endpoint}:`, logData);
   }
 
   /** Get persisted mode from localStorage */
@@ -285,14 +320,6 @@ export class HetznerApiService {
 
   closeDemoRestrictionDialog(): void {
     this.dismissDemoRestrictionDialog();
-  }
-
-  setToken(token: string): void {
-    sessionStorage.setItem(CACHE_KEYS.TOKEN, token);
-  }
-
-  getToken(): string {
-    return sessionStorage.getItem(CACHE_KEYS.TOKEN) || '';
   }
 
   isUsingMockData(): boolean {
