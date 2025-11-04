@@ -130,8 +130,8 @@ export class HetznerApiService {
       catchError(() => of([]))
     ).subscribe(data => {
       if (this.mode() === 'mock') {
-        (this.storage as any)[`save${storageMethod}`](data);
-        signal.set((this.storage as any)[`get${storageMethod}`]());
+        (this.storage as Record<string, any>)[`save${storageMethod}`](data);
+        signal.set((this.storage as Record<string, any>)[`get${storageMethod}`]());
       } else {
         signal.set(data);
       }
