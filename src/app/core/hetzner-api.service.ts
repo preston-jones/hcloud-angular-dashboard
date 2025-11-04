@@ -1,6 +1,6 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, of, map } from 'rxjs';
+import { Observable, catchError, of, map } from 'rxjs';
 import { Server, ApiMode, CACHE_KEYS } from './models';
 import { DataStorageService } from './data-storage.service';
 import { ServerGenerationService } from './server-generation.service';
@@ -69,8 +69,23 @@ export class HetznerApiService {
   // CONSTRUCTOR & INITIALIZATION
   // =============================================================================
   constructor() {
+    // Initial load
     this.loadAllData();
+
+    // Auto-reload when mode changes
+    effect(() => {
+      const currentMode = this.mode();
+      // Use Promise.resolve to avoid infinite loops and ensure clean execution
+      Promise.resolve().then(() => {
+        if (this.hasInitialized) {
+          this.loadAllData();
+        }
+      });
+      this.hasInitialized = true;
+    });
   }
+
+  private hasInitialized = false;
 
   // =============================================================================
   // DATA LOADING
@@ -107,7 +122,8 @@ export class HetznerApiService {
         return of([]);
       })
     ).subscribe(servers => {
-      if (servers.length > 0) {
+      // Only save if we got actual data (no empty writes to storage)
+      if (servers && servers.length > 0) {
         this.storage.saveServers(servers);
       }
       this.servers.set(this.storage.getServers());
@@ -210,6 +226,28 @@ export class HetznerApiService {
     this.servers.set(this.storage.getServers());
   }
 
+  /** Get server by ID with cache support in mock mode */
+  getServerById(id: number): Observable<Server | null> {
+    if (this.mode() === 'mock') {
+      // Fast cache lookup for mock mode
+      const server = this.storage.getServers().find(s => +s.id === +id) ?? null;
+      return of(server);
+    }
+    
+    // Real API call for detailed server info
+    return this.http.get<any>(this.getEndpoint(`servers/${id}`), this.createHttpOptions()).pipe(
+      map((response: any) => {
+        const serverData = this.mode() === 'mock' ? response?.server : response?.body?.server;
+        return serverData ? { ...serverData, priceEur: this.utils.getServerPrice(serverData) } : null;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this.logApiCall(`servers/${id}`, err, true);
+        console.warn(`Failed to load server ${id}:`, err.message);
+        return of(null);
+      })
+    );
+  }
+
   // =============================================================================
   // UTILITY METHODS
   // =============================================================================
@@ -245,44 +283,48 @@ export class HetznerApiService {
   /** Create HTTP options based on current mode */
   private createHttpOptions(): any {
     if (this.mode() === 'mock') {
-      return {};
+      return {}; // Plain JSON response for mock
     }
     
     return {
-      ...this.getHttpOptions(),
-      observe: 'response' as const
+      observe: 'response' as const // Typed HttpResponse for real API
     };
   }
 
   /** Extract data from HTTP response based on mode */
   private extractResponseData(response: any, resourceKey: string): any[] {
     if (this.mode() === 'mock') {
-      return response[resourceKey] || [];
+      return response?.[resourceKey] ?? [];
     }
     
-    // Log headers in real mode for debugging
-    if (response.headers) {
+    // Real mode (HttpResponse) - log headers
+    if (response && typeof response === 'object' && 'headers' in response) {
       this.logApiCall(resourceKey, response);
     }
     
-    return response.body?.[resourceKey] || [];
+    return response?.body?.[resourceKey] ?? [];
   }
 
-  /** Log API call information (only in development/real mode) */
+  /** Log API call information (only in real mode with HttpResponse) */
   private logApiCall(endpoint: string, response: any, isError: boolean = false): void {
-    if (this.mode() !== 'real') return;
-    
+    // Only log in real mode and if response is actually an HttpResponse
+    if (this.mode() !== 'real' || !response || typeof response !== 'object' || !('headers' in response)) {
+      return;
+    }
+
     const headers: Record<string, string> = {};
-    if (response.headers?.keys) {
-      response.headers.keys().forEach((key: string) => {
+    try {
+      response.headers?.keys?.().forEach((key: string) => {
         headers[key] = response.headers.get(key);
       });
+    } catch (e) {
+      // Silently handle header access errors
     }
 
     // Store endpoint status for dashboard
     const statusEntry = {
-      status: response.status || 0,
-      statusText: response.statusText || 'Unknown',
+      status: response.status ?? 0,
+      statusText: response.statusText ?? 'Unknown',
       endpoint: `/${endpoint}`,
       method: 'GET',
       date: new Date().toISOString()
