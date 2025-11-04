@@ -1,0 +1,172 @@
+/* Wizard Step Image - Component Specific Styles */
+
+/* Common step structure */
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scroll-margin-top: 140px;
+}
+
+.step-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.step-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.step-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.step-icon-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #10b981;
+  color: transparent;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+  transition: all 0.2s ease;
+  padding: 0;
+  
+  &.completed {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+  }
+}
+
+/* Image selection tabs */
+.image-tabs {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.image-tab {
+  padding: 1rem 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  
+  &:hover {
+    color: var(--text);
+    border-bottom-color: #10b981;
+  }
+  
+  &.active {
+    color: #ef4444;
+    border-bottom-color: #ef4444;
+    font-weight: 600;
+  }
+}
+
+/* Image grid layout */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.image-card {
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  
+  &:hover {
+    border-color: #10b981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+  }
+  
+  &.selected {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.15);
+  }
+}
+
+.image-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.image-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  h4 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+}
+
+/* Responsive design */
+@media(max-width:768px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-tabs {
+    gap: 1rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .image-tab {
+    white-space: nowrap;
+    text-align: center;
+    min-width: fit-content;
+  }
+}

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, HostBinding, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-
-type NavItem = { label: string; path: string; icon?: string };
+import { NavItem } from '../../../models/component.model';
 
 @Component({
   selector: 'app-sidebar',

@@ -1,6 +1,6 @@
-/* Server Creation Wizard - Ultra Minimal for Budget */
+/* Server Creation Wizard - Main Template + Shared Component Styles */
 
-/* Import modular components */
+/* Import layout and essential component styles shared by child components */
 @import 'layout';
 @import 'steps';
 @import 'architecture';
@@ -9,7 +9,7 @@
 @import 'forms';
 
 /* =============================================================================
-   LABELS & NAME CONFIGURATION
+   CHILD COMPONENT STYLES (shared via styleUrls)
    ============================================================================= */
 
 /* Labels Configuration */
@@ -40,7 +40,7 @@
   resize: vertical;
   transition: border-color 0.2s ease;
   margin-bottom: 0.75rem;
-  
+
   &:focus {
     outline: none;
     border-color: #ef4444;
@@ -83,7 +83,7 @@
   color: var(--text);
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: #ef4444;
@@ -101,7 +101,7 @@
 }
 
 /* =============================================================================
-   SUMMARY SIDEBAR
+   SUMMARY SIDEBAR (for main template only)
    ============================================================================= */
 
 .summary-card {
@@ -113,7 +113,7 @@
   flex-direction: column;
   gap: 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  
+
   h3 {
     font-size: 1.25rem;
     font-weight: 700;
@@ -136,9 +136,19 @@
   padding: 0.75rem 0;
   position: relative;
   cursor: pointer;
-  
+  border: 1px solid transparent;
+  transition: all 0.1s ease;
+
+  &:hover {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+    border-radius: 6px;
+    margin: 0 -0.5rem;
+    padding: 0.75rem 0.5rem;
+  }
+
   &.active {
-    background-color: var(--surface-muted, rgba(0, 0, 0, 0.05));
+    background-color: #e7e7e7;
     border-radius: 6px;
     margin: 0 -0.5rem;
     padding: 0.75rem 0.5rem;
@@ -150,12 +160,6 @@
   flex-direction: column;
   gap: 0.25rem;
   flex: 1;
-}
-
-.specs-section {
-  padding-top: 1rem;
-  flex-direction: column;
-  align-items: stretch;
 }
 
 .summary-label {
@@ -170,11 +174,6 @@
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
-  
-  .text-muted {
-    color: var(--text-muted);
-    font-style: italic;
-  }
 }
 
 .progress-step {
@@ -187,36 +186,33 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: transparent; /* Empty circle like unchecked checkbox */
+    background: transparent;
+    /* Empty circle like unchecked checkbox */
     border: 2px solid #10b981;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     font-size: 0.9rem;
-    color: transparent; /* Hide content by default */
+    color: transparent;
+    /* Hide content by default */
     transition: all 0.2s ease;
   }
-  
+
   &.active .step-icon {
-    background: transparent; /* Keep empty for active state */
+    background: transparent;
+    /* Keep empty for active state */
     border-color: #10b981;
-    color: transparent; /* Hide content for active state */
+    color: transparent;
+    /* Hide content for active state */
   }
-  
+
   &.completed .step-icon {
     background: #ef4444;
     border-color: #ef4444;
-    color: white; /* Show checkmark when completed */
+    color: white;
+    /* Show checkmark when completed */
   }
-}
-
-.summary-specs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  font-size: 0.875rem;
-  color: var(--text);
 }
 
 .summary-divider {
@@ -255,7 +251,7 @@
 .summary-actions {
   button {
     margin-bottom: 0.75rem;
-    
+
     &:disabled {
       cursor: not-allowed;
     }

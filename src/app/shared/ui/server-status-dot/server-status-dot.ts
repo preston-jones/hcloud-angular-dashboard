@@ -1,7 +1,6 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-
-export type ServerStatus = 'running' | 'stopped' | 'error' | 'available';
+import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
+import { ServerStatus } from '../../../core/models';
 
 @Component({
   selector: 'app-server-status-dot',

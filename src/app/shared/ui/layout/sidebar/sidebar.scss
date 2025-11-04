@@ -40,13 +40,16 @@
   gap: 10px;
   height: 40px;
   padding: 0 10px;
-  border-radius: 10px;
+  border-left: 3px solid transparent;
+  border-radius: 0 10px 10px 0;
   color: var(--sidebar-text);
   transition: background .15s ease, color .15s ease;
 }
 
 .nav-link:hover {
   background: var(--sidebar-active);
+  background: rgba(16, 185, 129, 0.05);
+  border-left: 3px solid #10b981;
 }
 
 /* aktiver roter Indikator links, wie in Hetzner */

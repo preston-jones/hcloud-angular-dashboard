@@ -1,0 +1,420 @@
+/* Wizard Step Architecture - Component Specific Styles */
+
+/* Architecture specific styles */
+.architecture-options {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.architecture-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    padding: 1.5rem;
+
+    /* Shared Resources gets 2/3 width, Dedicated Resources gets 1/3 width */
+    &:first-child {
+        flex: 2;
+    }
+
+    &:last-child {
+        flex: 1;
+    }
+}
+
+.section-header {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    margin: 0;
+}
+
+.architecture-cards-row {
+    display: grid;
+    gap: 1rem;
+    height: 100%;
+
+    /* Shared Resources section - 2 cards side by side */
+    .architecture-section:first-child & {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Dedicated Resources section - 1 card taking full width */
+    .architecture-section:last-child & {
+        grid-template-columns: 1fr;
+    }
+}
+
+.architecture-option {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--background);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 200px;
+    /* Ensure consistent height */
+
+    &:hover {
+        border-color: #10b981;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+    }
+
+    &.selected {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.05);
+        box-shadow: 0 2px 12px rgba(239, 68, 68, 0.15);
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+}
+
+.option-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+}
+
+.availability-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+
+    &.limited {
+        background: rgba(251, 191, 36, 0.1);
+        color: #f59e0b;
+    }
+}
+
+.arch-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.arch-selection-header {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.arch-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.arch-option {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    &.selected {
+        border-color: #ef4444;
+        background: #ef4444;
+        color: white;
+    }
+
+    input[type="radio"] {
+        margin: 0;
+    }
+
+    span {
+        margin: 0;
+    }
+}
+
+/* Common step structure */
+.wizard-step {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    scroll-margin-top: 140px;
+}
+
+.step-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.step-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+}
+
+.step-description {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.step-icon-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #10b981;
+    color: transparent;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-right: 0.75rem;
+    transition: all 0.2s ease;
+    padding: 0;
+
+    &.completed {
+        background: #ef4444;
+        border-color: #ef4444;
+        color: white;
+    }
+}
+
+/* Server types table */
+.server-types-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+
+    h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0;
+    }
+}
+
+.server-type-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--background);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 1.5fr;
+    background: var(--surface-secondary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text);
+    border-bottom: 2px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 1.5fr;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: rgba(16, 185, 129, 0.05);
+        border-left: 3px solid #10b981;
+    }
+
+    &.selected {
+        background: rgba(239, 68, 68, 0.05);
+        border-left: 3px solid #ef4444;
+        color: var(--text);
+
+        .col-name strong {
+            color: #ef4444;
+        }
+    }
+
+    &.unavailable {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: var(--surface-muted);
+
+        &:hover {
+            background: var(--surface-muted);
+            border-left: none;
+        }
+    }
+}
+
+.col-name,
+.col-vcpus,
+.col-memory,
+.col-disk,
+.col-transfer,
+.col-price {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    min-height: 60px;
+}
+
+.col-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    strong {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text);
+    }
+}
+
+.col-vcpus,
+.col-memory,
+.col-disk,
+.col-transfer {
+    justify-content: center;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.col-price {
+    justify-content: flex-end;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.unavailable-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 4px;
+    font-weight: 500;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Enhanced responsive design */
+@media(max-width: 1024px) {
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    }
+
+    .col-disk,
+    .col-transfer {
+        display: none;
+    }
+}
+
+@media(max-width: 768px) {
+    .architecture-options {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .architecture-section {
+        padding: 1rem;
+        border-radius: 6px;
+
+        /* Reset flex values for mobile - both sections take full width */
+        &:first-child,
+        &:last-child {
+            flex: 1;
+        }
+    }
+
+    .architecture-cards-row {
+        /* All cards stack vertically on mobile */
+        grid-template-columns: 1fr !important;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 2fr 1fr 1.5fr;
+    }
+
+    .col-vcpus,
+    .col-memory,
+    .col-disk,
+    .col-transfer {
+        display: none;
+    }
+
+    .col-name,
+    .col-price {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .server-type-table {
+        margin: 0 -0.5rem;
+    }
+}
+
+@media(max-width: 480px) {
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr;
+    }
+
+    .col-name,
+    .col-price {
+        padding: 0.75rem;
+        text-align: left;
+    }
+
+    .col-price {
+        justify-content: flex-start;
+        border-top: 1px solid var(--border);
+        background: var(--surface-muted);
+        font-weight: 700;
+    }
+}
