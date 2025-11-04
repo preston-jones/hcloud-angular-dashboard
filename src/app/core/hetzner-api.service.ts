@@ -5,6 +5,7 @@ import { Server, ApiMode, CACHE_KEYS } from './models';
 import { DataStorageService } from './data-storage.service';
 import { ServerGenerationService } from './server-generation.service';
 import { HetznerUtilsService } from './hetzner-utils.service';
+import { environment } from './../../environments/environment';
 
 /**
  * Simplified Hetzner Cloud API service
@@ -74,7 +75,7 @@ export class HetznerApiService {
     this.loadNetworks();
   }
 
-  /** Load servers with unified storage approach */
+  /** Load servers with automatic fallback */
   loadServers(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -82,59 +83,86 @@ export class HetznerApiService {
     const endpoint = this.getEndpoint('servers');
     const httpOptions = this.getHttpOptions();
 
+    // Always try proxy first
     this.http.get(endpoint, httpOptions).pipe(
       map((response: any) => response.servers || []),
       map(servers => servers.map((server: any) => ({ ...server, priceEur: this.calculatePrice(server) }))),
       catchError((err: HttpErrorResponse) => {
+        // On error, try mock data if fallback is enabled
+        if (environment.useMockFallback) {
+          const mockEndpoint = this.getMockEndpoint('servers');
+          return this.http.get(mockEndpoint).pipe(
+            map((response: any) => response.servers || []),
+            map(servers => servers.map((server: any) => ({ ...server, priceEur: this.calculatePrice(server) })))
+          );
+        }
         this.error.set(err.message || 'Failed to load servers');
         return of([]);
       })
     ).subscribe(servers => {
-      if (this.mode() === 'mock') {
-        // In mock mode: save to storage and load from storage
+      // Save valid data regardless of source
+      if (servers.length > 0) {
         this.storage.saveServers(servers);
-        this.servers.set(this.storage.getServers());
-      } else {
-        // In real mode: use servers directly
-        this.servers.set(servers);
       }
+      // Always get from storage to ensure consistent data format
+      this.servers.set(this.storage.getServers());
       this.loading.set(false);
     });
   }
 
-  /** Load server types */
+  /** Load server types with automatic fallback */
   loadServerTypes(): void {
     const endpoint = this.getEndpoint('server_types');
     const httpOptions = this.getHttpOptions();
 
+    // Always try proxy first
     this.http.get(endpoint, httpOptions).pipe(
       map((response: any) => this.serverGen.transformServerTypesToServers(response.server_types || [])),
-      catchError(() => of([]))
+      catchError(() => {
+        // On error, try mock data if fallback is enabled
+        if (environment.useMockFallback) {
+          const mockEndpoint = this.getMockEndpoint('server_types');
+          return this.http.get(mockEndpoint).pipe(
+            map((response: any) => this.serverGen.transformServerTypesToServers(response.server_types || []))
+          );
+        }
+        return of([]);
+      })
     ).subscribe(serverTypes => {
-      if (this.mode() === 'mock') {
+      // Save valid data regardless of source
+      if (serverTypes.length > 0) {
         this.storage.saveServerTypes(serverTypes);
-        this.serverTypes.set(this.storage.getServerTypes());
-      } else {
-        this.serverTypes.set(serverTypes);
       }
+      // Always get from storage to ensure consistent data format
+      this.serverTypes.set(this.storage.getServerTypes());
     });
   }
 
-  /** Load other resources (simplified pattern) */
+  /** Load resources with automatic fallback */
   private loadResource(resource: string, signal: any, storageMethod: string): void {
     const endpoint = this.getEndpoint(resource);
     const httpOptions = this.getHttpOptions();
 
+    // Always try proxy first
     this.http.get(endpoint, httpOptions).pipe(
       map((response: any) => response[resource] || []),
-      catchError(() => of([]))
+      catchError(() => {
+        // On error, try mock data if fallback is enabled
+        if (environment.useMockFallback) {
+          const mockEndpoint = this.getMockEndpoint(resource);
+          return this.http.get(mockEndpoint).pipe(
+            map((response: any) => response[resource] || [])
+          );
+        }
+        return of([]);
+      })
     ).subscribe(data => {
-      if (this.mode() === 'mock') {
+      // Save the data regardless of source
+      if (data.length > 0) {
         (this.storage as Record<string, any>)[`save${storageMethod}`](data);
-        signal.set((this.storage as Record<string, any>)[`get${storageMethod}`]());
-      } else {
-        signal.set(data);
       }
+      // Always get from storage to ensure consistent data format
+      signal.set((this.storage as Record<string, any>)[`get${storageMethod}`]());
     });
   }
 
@@ -196,11 +224,14 @@ export class HetznerApiService {
     return true;
   }
 
-  /** Get API endpoint based on mode */
+  /** Get API endpoint */
   private getEndpoint(path: string): string {
-    return this.mode() === 'mock' 
-      ? `/assets/mock/${path}.json`
-      : `https://api.hetzner.cloud/v1/${path}`;
+    return `${environment.apiBase}/${path}`;
+  }
+
+  /** Get mock data endpoint */
+  private getMockEndpoint(path: string): string {
+    return `/assets/mock/${path}.json`;
   }
 
   /** Get HTTP options with auth headers */
