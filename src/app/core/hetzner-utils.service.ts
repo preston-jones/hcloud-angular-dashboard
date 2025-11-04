@@ -168,13 +168,6 @@ export class HetznerUtilsService {
     return date.toLocaleDateString('de-DE');
   }
 
-  /** Get recent actions (mock implementation) */
-  getRecentActions(): Action[] {
-    // This would typically come from the API service
-    // For now, return empty array - to be implemented with proper action loading
-    return [];
-  }
-
   // =============================================================================
   // FORMAT HELPERS
   // =============================================================================
@@ -188,25 +181,5 @@ export class HetznerUtilsService {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  // =============================================================================
-  // RESOURCE AVAILABILITY (DEBUG HELPER)
-  // =============================================================================
-
-  /** Get resource availability for debugging */
-  getResourceAvailability(): Record<string, boolean> {
-    return {
-      servers: true,
-      serverTypes: true,
-      locations: true,
-      datacenters: true,
-      images: true,
-      firewalls: true,
-      actions: true,
-      floatingIps: true,
-      loadBalancers: true,
-      networks: true
-    };
   }
 }

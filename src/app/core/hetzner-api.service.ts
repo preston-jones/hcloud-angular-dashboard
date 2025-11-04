@@ -278,6 +278,10 @@ export class HetznerApiService {
     return this.mode();
   }
 
+  setSearchQuery(query: string): void {
+    this.searchQuery.set(query);
+  }
+
   // =============================================================================
   // DELEGATED UTILITY METHODS (for component compatibility)
   // =============================================================================
@@ -296,7 +300,29 @@ export class HetznerApiService {
   getLocationWithFlag = (server: Server) => this.utils.getLocationWithFlag(server);
   getActionDisplay = (command: string) => this.utils.getActionDisplay(command);
   formatActionDate = (dateString: string) => this.utils.formatActionDate(dateString);
-  getRecentActions = () => this.utils.getRecentActions();
   formatBytes = (bytes: number) => this.utils.formatBytes(bytes);
-  getResourceAvailability = () => this.utils.getResourceAvailability();
+
+  /** Get resource availability for debugging */
+  getResourceAvailability(): Record<string, boolean> {
+    return {
+      servers: this.servers().length > 0,
+      serverTypes: this.serverTypes().length > 0,
+      locations: this.locations().length > 0,
+      datacenters: this.datacenters().length > 0,
+      images: this.images().length > 0,
+      firewalls: this.firewalls().length > 0,
+      actions: this.actions().length > 0,
+      floatingIps: this.floatingIps().length > 0,
+      loadBalancers: this.loadBalancers().length > 0,
+      networks: this.networks().length > 0
+    };
+  }
+
+  /** Get recent actions */
+  getRecentActions(): any[] {
+    const actions = this.actions();
+    return actions
+      .sort((a, b) => new Date(b.started || b.finished || '').getTime() - new Date(a.started || a.finished || '').getTime())
+      .slice(0, 10); // Get latest 10 actions
+  }
 }

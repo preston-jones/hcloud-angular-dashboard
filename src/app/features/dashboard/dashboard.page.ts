@@ -227,7 +227,7 @@ export class DashboardPage implements OnInit {
   }
 
   hasCountryData(server: Server): boolean {
-    return !!server.datacenter?.location?.country && server.datacenter.location.country !== 'Unknown';
+    return !!server.datacenter?.location?.country && server.datacenter?.location?.country !== 'Unknown';
   }
 
   getLocationWithFlag(server: Server): string {
