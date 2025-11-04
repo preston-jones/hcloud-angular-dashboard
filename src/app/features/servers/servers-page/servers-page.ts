@@ -293,7 +293,8 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     const serverData = this.buildServerObject();
     this.saveToSessionStorage(serverData);
     this.wizardState.resetWizard();
-    this.router.navigate(['/servers']);
+    this.router.navigate(['/my-servers']);
+        console.log(serverData)
   }
 
   private buildServerObject(): ServerToCreate {
