@@ -86,7 +86,7 @@ export class HetznerApiService {
 
     this.http.get(endpoint, this.createHttpOptions()).pipe(
       map((response: any) => this.extractResponseData(response, 'servers')),
-      map(servers => servers.map((server: any) => ({ ...server, priceEur: this.calculatePrice(server) }))),
+      map(servers => servers.map((server: any) => ({ ...server, priceEur: this.utils.getServerPrice(server) }))),
       catchError((err: HttpErrorResponse) => {
         this.logApiCall('servers', err, true);
         this.error.set(err.message || 'Failed to load servers');
@@ -222,13 +222,6 @@ export class HetznerApiService {
   private getHttpOptions(): any {
     // In real mode with proxy, no auth headers needed - proxy handles authentication
     return {};
-  }
-
-  /** Calculate server price */
-  private calculatePrice(server: any): number {
-    const memory = server.server_type?.memory || 4;
-    const cores = server.server_type?.cores || 2;
-    return Math.round((memory * 0.75 + cores * 1.5) * 100) / 100;
   }
 
   // =============================================================================
