@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../../core/hetzner-api.service';
 
 @Component({
@@ -24,79 +25,28 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
 
         <!-- Mode Toggle -->
         <div class="mb-6">
-          <label class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">API Mode</label>
+          <label class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Data Source</label>
           <div class="flex items-center gap-3">
             <button
               type="button"
-              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border w-32 min-w-32"
+              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
               [class]="currentMode() === 'mock' ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'"
               (click)="setMode('mock')">
-              Mock Data
+              Demo Mode
             </button>
             <button
               type="button"
-              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border w-32 min-w-32"
+              class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
               [class]="currentMode() === 'real' ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'"
               (click)="setMode('real')">
-              Real API
+              Live Data
             </button>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-4">
             @if (currentMode() === 'mock') {
-              Using mock data for development and testing
+              Using sample data for testing and demo purposes
             } @else {
-              Using real Hetzner Cloud API
-            }
-          </p>
-        </div>
-
-        <!-- Token Input (always visible, disabled in mock mode) -->
-        <div class="mb-6">
-          <label for="token" 
-                 class="block text-sm font-medium mb-2"
-                 [class]="currentMode() === 'mock' 
-                   ? 'text-slate-500 dark:text-slate-500' 
-                   : 'text-slate-900 dark:text-slate-100'">
-            Hetzner Cloud API Token
-          </label>
-          <div class="relative">
-            <input
-              id="token"
-              [type]="showToken() ? 'text' : 'password'"
-              [(ngModel)]="tokenInput"
-              [disabled]="currentMode() === 'mock'"
-              placeholder="Enter your API token..."
-              autocomplete="new-password"
-              spellcheck="false"
-              class="w-full px-3 py-2 pr-10 rounded-lg border transition-colors"
-              [class]="currentMode() === 'mock' 
-                ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-600 placeholder:text-slate-300 dark:placeholder:text-slate-700 cursor-not-allowed'
-                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'"
-            />
-            <button
-              type="button"
-              [disabled]="currentMode() === 'mock'"
-              class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors w-6 h-6 flex items-center justify-center"
-              [class]="currentMode() === 'mock' 
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
-                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
-              (click)="toggleTokenVisibility()"
-              [attr.aria-label]="showToken() ? 'Hide token' : 'Show token'">
-              @if (showToken()) {
-                <span>🙈</span>
-              } @else {
-                <span>👁️</span>
-              }
-            </button>
-          </div>
-          <p class="text-xs mt-1"
-             [class]="currentMode() === 'mock' 
-               ? 'text-slate-400 dark:text-slate-600' 
-               : 'text-slate-500 dark:text-slate-400'">
-            @if (currentMode() === 'mock') {
-              API token not required in mock mode
-            } @else {
-              Your token is stored locally and never transmitted to our servers
+              Using real Hetzner Cloud data
             }
           </p>
         </div>
@@ -105,15 +55,15 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
         <div class="flex gap-3 justify-end">
           <button
             type="button"
-            class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors w-20 min-w-20"
+            class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
             (click)="close.emit()">
             Cancel
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 w-28 min-w-28"
+            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
             (click)="save()">
-            Save Settings
+            Save Changes
           </button>
         </div>
       </div>
@@ -126,36 +76,19 @@ export class SettingsDialogComponent {
   @Output() saveAndClose = new EventEmitter<void>();
   
   private apiService = inject(HetznerApiService);
-  
-  // Mode and token management
+  private router = inject(Router);
   currentMode = signal<'mock' | 'real'>(this.apiService.getCurrentMode());
-  tokenInput = signal(this.apiService.getToken());
-  showToken = signal(false);
 
   setMode(mode: 'mock' | 'real'): void {
     this.currentMode.set(mode);
   }
 
-  toggleTokenVisibility(): void {
-    // Only allow toggling when not in mock mode
-    if (this.currentMode() !== 'mock') {
-      this.showToken.update(show => !show);
-    }
-  }
-
   save(): void {
-    console.log('Saving settings - Mode:', this.currentMode(), 'Token:', this.tokenInput() ? 'Present' : 'None');
-    
-    // Save mode
     this.apiService.setMode(this.currentMode());
-    
-    // Save token if provided
-    if (this.tokenInput().trim()) {
-      this.apiService.setToken(this.tokenInput().trim());
-    }
-    
-    console.log('Settings saved successfully');
+    // Force immediate data reload before navigation
+    this.apiService.loadServers();
     this.saveAndClose.emit();
+    this.router.navigate(['/dashboard']);
   }
 
   onBackdropClick(event: Event): void {
