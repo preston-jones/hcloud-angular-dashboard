@@ -132,8 +132,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
     const diffMs = current.getTime() - startTime.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
     
-    if (diffHours > 0) {
+    if (diffDays > 0) {
+      const remainingHours = diffHours % 24;
+      if (remainingHours > 0) {
+        return `${diffDays}d ${remainingHours}h ago`;
+      } else {
+        return `${diffDays}d ago`;
+      }
+    } else if (diffHours > 0) {
       const remainingMinutes = diffMinutes % 60;
       if (remainingMinutes > 0) {
         return `${diffHours}h ${remainingMinutes}m ago`;
@@ -330,8 +338,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
     const diffMs = now.getTime() - createdDate.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-    if (diffHours > 0) {
+    if (diffDays > 0) {
+      const remainingHours = diffHours % 24;
+      if (remainingHours > 0) {
+        return `${diffDays}d ${remainingHours}h ago`;
+      } else {
+        return `${diffDays}d ago`;
+      }
+    } else if (diffHours > 0) {
       const remainingMinutes = diffMinutes % 60;
       if (remainingMinutes > 0) {
         return `${diffHours}h ${remainingMinutes}m ago`;
@@ -431,8 +447,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
     const diffMs = now.getTime() - activity.time.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
     
-    if (diffHours > 0) {
+    if (diffDays > 0) {
+      const remainingHours = diffHours % 24;
+      if (remainingHours > 0) {
+        return `${diffDays}d ${remainingHours}h ago`;
+      } else {
+        return `${diffDays}d ago`;
+      }
+    } else if (diffHours > 0) {
       const remainingMinutes = diffMinutes % 60;
       if (remainingMinutes > 0) {
         return `${diffHours}h ${remainingMinutes}m ago`;
