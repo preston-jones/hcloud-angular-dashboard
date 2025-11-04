@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@a
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../core/hetzner-api.service';
-import { Server } from '../../core/models';
+import { Server, Action } from '../../core/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +19,11 @@ export class DashboardPage implements OnInit {
   // API state
   get loading() { return this.api.loading; }
   get servers() { return this.api.servers; }
+  get actions() { return this.api.actions; }
+  get firewalls() { return this.api.firewalls; }
+  get floatingIps() { return this.api.floatingIps; }
+  get loadBalancers() { return this.api.loadBalancers; }
+  get networks() { return this.api.networks; }
   get error() { return this.api.error; }
   get isUsingMockData() { return this.api.isUsingMockData(); }
 
@@ -62,6 +67,137 @@ export class DashboardPage implements OnInit {
     return servers.reduce((total, server) => total + this.api.getServerOutgoingTraffic(server), 0);
   });
 
+  // Resource totals (works for both mock and real API modes)
+  totalLoadBalancers = computed(() => {
+    // Try dedicated API first, fall back to server-attached load balancers
+    const loadBalancers = this.loadBalancers();
+    if (loadBalancers && loadBalancers.length > 0) {
+      return loadBalancers.length;
+    }
+    
+    // Fallback: count unique load balancers attached to servers
+    const servers = this.myServers();
+    const loadBalancerIds = new Set<number>();
+    servers.forEach(server => {
+      server.load_balancers?.forEach((lb: any) => {
+        loadBalancerIds.add(lb.id || lb);
+      });
+    });
+    return loadBalancerIds.size;
+  });
+
+  totalPrimaryIPs = computed(() => {
+    // Count servers with primary IPv4 addresses
+    const servers = this.myServers();
+    return servers.filter(server => server.public_net?.ipv4?.id).length;
+  });
+
+  totalFloatingIPs = computed(() => {
+    // Try dedicated API first, fall back to server-attached floating IPs
+    const floatingIps = this.floatingIps();
+    if (floatingIps && floatingIps.length > 0) {
+      return floatingIps.length;
+    }
+    
+    // Fallback: count unique floating IPs attached to servers
+    const servers = this.myServers();
+    const floatingIpIds = new Set<number>();
+    servers.forEach(server => {
+      server.public_net?.floating_ips?.forEach((fip: any) => {
+        floatingIpIds.add(fip.id || fip);
+      });
+    });
+    return floatingIpIds.size;
+  });
+
+  totalVolumes = computed(() => {
+    // Count unique volumes attached to servers
+    const servers = this.myServers();
+    const volumeIds = new Set<number>();
+    servers.forEach(server => {
+      server.volumes?.forEach((volume: any) => {
+        volumeIds.add(volume.id || volume);
+      });
+    });
+    return volumeIds.size;
+  });
+
+  totalNetworks = computed(() => {
+    // Try dedicated API first, fall back to server-attached networks
+    const networks = this.networks();
+    if (networks && networks.length > 0) {
+      return networks.length;
+    }
+    
+    // Fallback: count unique networks attached to servers
+    const servers = this.myServers();
+    const networkIds = new Set<number>();
+    servers.forEach(server => {
+      server.private_net?.forEach((network: any) => {
+        networkIds.add(network.network || network.id || network);
+      });
+    });
+    return networkIds.size;
+  });
+
+  totalFirewalls = computed(() => {
+    // Try dedicated API first, fall back to server-attached firewalls
+    const firewalls = this.firewalls();
+    if (firewalls && firewalls.length > 0) {
+      return firewalls.length;
+    }
+    
+    // Fallback: count unique firewalls attached to servers
+    const servers = this.myServers();
+    const firewallIds = new Set<number>();
+    servers.forEach(server => {
+      server.public_net?.firewalls?.forEach((fw: any) => {
+        firewallIds.add(fw.id || fw);
+      });
+    });
+    return firewallIds.size;
+  });
+
+  totalBuckets = computed(() => {
+    // Buckets are not directly attached to servers in Hetzner Cloud
+    // This would require a separate API call in real implementation
+    return 0;
+  });
+
+  // IPv6 addresses count
+  totalIPv6Addresses = computed(() => {
+    const servers = this.myServers();
+    return servers.filter(server => server.public_net?.ipv6?.id).length;
+  });
+
+  // Protected servers count
+  totalProtectedServers = computed(() => {
+    const servers = this.myServers();
+    return servers.filter(server => server.protection?.delete === true).length;
+  });
+
+  // Servers by datacenter location
+  serversByLocation = computed(() => {
+    const servers = this.myServers();
+    const locationCounts: Record<string, number> = {};
+    servers.forEach(server => {
+      const location = server.datacenter?.location?.name || 'unknown';
+      locationCounts[location] = (locationCounts[location] || 0) + 1;
+    });
+    return locationCounts;
+  });
+
+  // Total disk space across all servers
+  totalDiskSpace = computed(() => {
+    const servers = this.myServers();
+    return servers.reduce((total, server) => total + (server.primary_disk_size || 0), 0);
+  });
+
+  // Recent actions
+  recentActions = computed(() => {
+    return this.api.getRecentActions();
+  });
+
   // Format bytes to human readable
   formatBytes(bytes: number): string {
     return this.api.formatBytes(bytes);
@@ -69,7 +205,7 @@ export class DashboardPage implements OnInit {
 
   // Navigation
   viewServerDetails(server: Server) {
-    this.router.navigate(['/servers', server.id]);
+    this.router.navigate(['/my-servers', server.id]);
   }
 
   goToMyServers() {
@@ -116,4 +252,53 @@ export class DashboardPage implements OnInit {
 
   // Skeleton rows
   skeletonRows = Array.from({ length: 3 });
+
+  // Action helpers
+  getActionDisplay(command: string) {
+    return this.api.getActionDisplay(command);
+  }
+
+  formatActionDate(dateString: string): string {
+    return this.api.formatActionDate(dateString);
+  }
+
+  trackAction = (_: number, action: Action) => action.id;
+
+  // Additional data helpers
+  getTotalDiskSpaceFormatted(): string {
+    return `${this.totalDiskSpace()} GB`;
+  }
+
+  getLocationBreakdown(): string {
+    const locations = this.serversByLocation();
+    const entries = Object.entries(locations);
+    if (entries.length === 0) return 'No servers';
+    if (entries.length === 1) return `${entries[0][1]} in ${entries[0][0]}`;
+    return `${entries.length} locations`;
+  }
+
+  getProtectionStatus(): string {
+    const total = this.myServers().length;
+    const protected_ = this.totalProtectedServers();
+    return `${protected_}/${total} protected`;
+  }
+
+  // Debug helper for development (can be removed in production)
+  getDataSources() {
+    if (!this.isUsingMockData) return null;
+    
+    return {
+      mode: this.api.getCurrentMode(),
+      resourceAvailability: this.api.getResourceAvailability(),
+      serverCount: this.myServers().length,
+      resourceCounts: {
+        loadBalancers: this.totalLoadBalancers(),
+        firewalls: this.totalFirewalls(),
+        floatingIps: this.totalFloatingIPs(),
+        networks: this.totalNetworks(),
+        primaryIps: this.totalPrimaryIPs(),
+        volumes: this.totalVolumes()
+      }
+    };
+  }
 }

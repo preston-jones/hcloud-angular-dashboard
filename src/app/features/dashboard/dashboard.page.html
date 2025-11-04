@@ -27,142 +27,258 @@
       </button>
     </div>
   } @else {
-    <!-- Overview Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Total Servers -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Total Servers</h3>
-        <p class="text-2xl font-bold text-ink">{{ myServers().length }}</p>
-      </div>
-
-      <!-- Total Costs -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Monthly Costs</h3>
-        <p class="text-2xl font-bold text-ink">€{{ totalCosts().toFixed(2) }}</p>
-      </div>
-
-      <!-- Total vCPUs -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Total vCPUs</h3>
-        <p class="text-2xl font-bold text-ink">{{ totalVCpus() }}</p>
-      </div>
-
-      <!-- Total Memory -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Total Memory</h3>
-        <p class="text-2xl font-bold text-ink">{{ totalMemory() }} GB</p>
-      </div>
-    </div>
-
-    <!-- Additional Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- CO2 Emissions (placeholder) -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">CO₂ Emissions</h3>
-        <p class="text-2xl font-bold text-ink">-</p>
-        <p class="text-xs text-soft mt-1">Coming soon</p>
-      </div>
-
-      <!-- Data Transfer In -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Data Transfer In</h3>
-        <p class="text-2xl font-bold text-ink">{{ formatBytes(totalIngoingTraffic()) }}</p>
-        <p class="text-xs text-soft mt-1">This month</p>
-      </div>
-
-      <!-- Data Transfer Out -->
-      <div class="card">
-        <h3 class="text-sm font-medium text-soft mb-2">Data Transfer Out</h3>
-        <p class="text-2xl font-bold text-ink">{{ formatBytes(totalOutgoingTraffic()) }}</p>
-        <p class="text-xs text-soft mt-1">This month</p>
-      </div>
-    </div>
-
-    <!-- My Servers and Server Locations Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- My Servers Table -->
-      <div class="card h-full">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-medium text-ink">My Servers</h2>
-          <button 
-            class="text-primary hover:text-primary-700 transition-colors flex items-center gap-1"
-            (click)="goToMyServers()">
-            View All
-            <span>></span>
-          </button>
-        </div>
-
-        @if (myServers().length === 0) {
-          <div class="text-center py-8">
-            <p class="text-soft">No servers found</p>
+    <!-- Main Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-start">
+      
+      <!-- Left Section: Resource Cards -->
+      <div class="lg:col-span-1">
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-ink">Alle Standorte</h2>
+            <button class="text-xs text-soft hover:text-ink transition-colors">⚙️</button>
           </div>
-        } @else {
-          <!-- Desktop Table -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b border-ui">
-                  <th class="text-left py-3 px-4 font-medium text-soft text-sm">Name</th>
-                  <th class="text-left py-3 px-4 font-medium text-soft text-sm">Type</th>
-                  <th class="text-left py-3 px-4 font-medium text-soft text-sm">Location</th>
-                  <th class="text-left py-3 px-4 font-medium text-soft text-sm">Status</th>
-                  <th class="text-left py-3 px-4 font-medium text-soft text-sm">Price</th>
-                </tr>
-              </thead>
-              <tbody>
+          
+          <!-- Resource Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Server -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🖥️</div>
+              <div>
+                <p class="text-sm text-ink">{{ myServers().length }}</p>
+                <p class="text-xs text-soft">Server</p>
+              </div>
+            </div>
+
+            <!-- Load Balancers -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">⚖️</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalLoadBalancers() }}</p>
+                <p class="text-xs text-soft">Load Balancers</p>
+              </div>
+            </div>
+
+            <!-- Primary IPs -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">📍</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalPrimaryIPs() }}</p>
+                <p class="text-xs text-soft">Primary IPs</p>
+              </div>
+            </div>
+
+            <!-- Floating IPs -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🌐</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalFloatingIPs() }}</p>
+                <p class="text-xs text-soft">Floating IPs</p>
+              </div>
+            </div>
+
+            <!-- Volumes -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">💾</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalVolumes() }}</p>
+                <p class="text-xs text-soft">Volumes</p>
+              </div>
+            </div>
+
+            <!-- Networks -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🌐</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalNetworks() }}</p>
+                <p class="text-xs text-soft">Netzwerke</p>
+              </div>
+            </div>
+
+            <!-- Firewalls -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🔥</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalFirewalls() }}</p>
+                <p class="text-xs text-soft">Firewalls</p>
+              </div>
+            </div>
+
+            <!-- Buckets -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🪣</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalBuckets() }}</p>
+                <p class="text-xs text-soft">Buckets</p>
+              </div>
+            </div>
+
+            <!-- Storage Boxes -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">📦</div>
+              <div>
+                <p class="text-sm text-ink">{{ getTotalDiskSpaceFormatted() }}</p>
+                <p class="text-xs text-soft">Total Disk</p>
+              </div>
+            </div>
+
+            <!-- DNS Zones -->
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface hover:bg-muted transition-colors">
+              <div class="text-primary">🌍</div>
+              <div>
+                <p class="text-sm text-ink">{{ totalIPv6Addresses() }}</p>
+                <p class="text-xs text-soft">IPv6 Addresses</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section: Server List + Activities -->
+            <!-- Right Section: Server List + Activities -->
+      <div class="lg:col-span-2 flex flex-col gap-6 lg:h-full">
+        
+        <!-- My Servers Card -->
+        <div class="card flex-1 min-h-0">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-lg font-medium text-ink">Server</h2>
+            <button 
+              class="text-primary hover:text-primary-700 transition-colors flex items-center gap-1"
+              (click)="goToMyServers()">
+              View All
+              <span>></span>
+            </button>
+          </div>
+
+          <div class="overflow-y-auto max-h-[300px]">
+            @if (myServers().length === 0) {
+              <div class="text-center py-8">
+                <p class="text-soft">No servers found</p>
+              </div>
+            } @else {
+              <!-- Desktop Table -->
+              <div class="hidden md:block">
+                <table class="w-full">
+                  <thead class="sticky top-0 bg-background">
+                    <tr class="border-b border-ui">
+                      <th class="text-left py-3 px-4 font-medium text-soft text-sm">Name</th>
+                      <th class="text-left py-3 px-4 font-medium text-soft text-sm">Type</th>
+                      <th class="text-left py-3 px-4 font-medium text-soft text-sm">Location</th>
+                      <th class="text-left py-3 px-4 font-medium text-soft text-sm">Status</th>
+                      <th class="text-left py-3 px-4 font-medium text-soft text-sm">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (server of myServers().slice(0, 5); track trackRow($index, server)) {
+                      <tr class="border-b border-ui hover:bg-muted cursor-pointer transition-colors"
+                          (click)="viewServerDetails(server)">
+                        <td class="py-3 px-4">
+                          <span class="font-medium text-ink">{{ server.name }}</span>
+                        </td>
+                        <td class="py-3 px-4 text-soft">{{ server.server_type?.name || 'Unknown' }}</td>
+                        <td class="py-3 px-4 text-soft">
+                          @if (hasCountryData(server)) {
+                            {{ getLocationWithFlag(server) }}
+                          } @else {
+                            {{ server.location }}
+                          }
+                        </td>
+                        <td class="py-3 px-4">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            {{ server.status }}
+                          </span>
+                        </td>
+                        <td class="py-3 px-4 text-soft">€{{ getServerPrice(server!) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Mobile Cards -->
+              <div class="md:hidden space-y-3 pr-2">
                 @for (server of myServers().slice(0, 5); track trackRow($index, server)) {
-                  <tr class="border-b border-ui hover:bg-muted cursor-pointer transition-colors"
-                      (click)="viewServerDetails(server)">
-                    <td class="py-3 px-4">
+                  <div class="border border-ui rounded-lg p-4 hover:bg-muted cursor-pointer transition-colors"
+                       (click)="viewServerDetails(server)">
+                    <div class="flex justify-between items-start mb-2">
                       <span class="font-medium text-ink">{{ server.name }}</span>
-                    </td>
-                    <td class="py-3 px-4 text-soft">{{ server.server_type?.name || 'Unknown' }}</td>
-                    <td class="py-3 px-4 text-soft">
-                      @if (hasCountryData(server)) {
-                        {{ getLocationWithFlag(server) }}
-                      } @else {
-                        {{ server.location }}
-                      }
-                    </td>
-                    <td class="py-3 px-4">
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         {{ server.status }}
                       </span>
-                    </td>
-                    <td class="py-3 px-4 text-soft">€{{ getServerPrice(server!) }}</td>
-                  </tr>
+                    </div>
+                    <p class="text-sm text-soft mb-1">{{ server.server_type?.name || 'Unknown' }}</p>
+                    <p class="text-sm text-soft mb-1">{{ getLocationWithFlag(server) }}</p>
+                    <p class="text-sm font-medium text-ink">€{{ getServerPrice(server!) }}/month</p>
+                  </div>
                 }
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Mobile Cards -->
-          <div class="md:hidden space-y-4">
-            @for (server of myServers().slice(0, 5); track trackRow($index, server)) {
-              <div class="border border-ui rounded-lg p-4 hover:bg-muted cursor-pointer transition-colors"
-                   (click)="viewServerDetails(server)">
-                <div class="flex justify-between items-start mb-2">
-                  <span class="font-medium text-ink">{{ server.name }}</span>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                    {{ server.status }}
-                  </span>
-                </div>
-                <p class="text-sm text-soft mb-1">{{ server.server_type?.name || 'Unknown' }}</p>
-                <p class="text-sm text-soft mb-1">{{ getLocationWithFlag(server) }}</p>
-                <p class="text-sm font-medium text-ink">€{{ getServerPrice(server!) }}/month</p>
               </div>
             }
           </div>
-        }
-      </div>
+        </div>
 
-      <!-- Server Locations Map -->
-      <div class="card h-full">
-        <h2 class="text-lg font-medium text-ink mb-6">Server Locations</h2>
-        <div class="h-64 bg-muted rounded-lg flex items-center justify-center">
-          <div class="text-center">
-            <div class="text-4xl mb-2">🗺️</div>
-            <p class="text-soft">Interactive map coming soon</p>
+        <!-- Activities Card -->
+        <div class="card flex-1 min-h-0">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-primary">🚨</span>
+              <h2 class="text-lg font-medium text-ink">AKTIVITÄTEN</h2>
+            </div>
+            <button class="text-primary hover:text-primary-700 transition-colors text-sm">
+              Alle anzeigen >
+            </button>
+          </div>
+          
+          <div class="overflow-y-auto max-h-[300px]">
+            @if (recentActions().length === 0) {
+              <div class="text-center py-8">
+                <div class="text-4xl mb-2">📋</div>
+                <p class="text-soft">Keine aktuellen Aktivitäten</p>
+              </div>
+            } @else {
+              <div class="space-y-3 pr-2">
+                @for (action of recentActions(); track trackAction($index, action)) {
+                  <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors border-l-4 border-primary">
+                    <!-- Action Icon -->
+                    <div class="flex-shrink-0">
+                      <div class="w-6 h-6 rounded-full bg-surface flex items-center justify-center">
+                        <span class="text-xs">{{ getActionDisplay(action.command).icon }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Action Details -->
+                    <div class="flex-1 min-w-0 flex items-center justify-between">
+                      <!-- Description and Server -->
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                          <p class="text-sm font-medium text-ink truncate">
+                            {{ getActionDisplay(action.command).label }}
+                          </p>
+                          @if (action.resources.length > 0) {
+                            <span class="text-xs text-soft">
+                              {{ action.resources[0].type }}-{{ action.resources[0].id }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      
+                      <!-- Date and Status -->
+                      <div class="flex items-center gap-2 flex-shrink-0">
+                        <p class="text-xs text-soft">
+                          {{ formatActionDate(action.started) }}
+                        </p>
+                        <!-- Status Badge -->
+                        @if (action.status === 'success') {
+                          <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        } @else if (action.status === 'error') {
+                          <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        } @else {
+                          <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
           </div>
         </div>
       </div>
