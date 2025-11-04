@@ -89,7 +89,10 @@ export class DashboardPage implements OnInit {
   totalPrimaryIPs = computed(() => {
     // Count servers with primary IPv4 addresses
     const servers = this.myServers();
-    return servers.filter(server => server.public_net?.ipv4?.id).length;
+    return servers.filter(server => {
+      const ipv4 = server.public_net?.ipv4;
+      return ipv4 && typeof ipv4 === 'object' && 'id' in ipv4;
+    }).length;
   });
 
   totalFloatingIPs = computed(() => {
@@ -167,7 +170,10 @@ export class DashboardPage implements OnInit {
   // IPv6 addresses count
   totalIPv6Addresses = computed(() => {
     const servers = this.myServers();
-    return servers.filter(server => server.public_net?.ipv6?.id).length;
+    return servers.filter(server => {
+      const ipv6 = server.public_net?.ipv6;
+      return ipv6 && typeof ipv6 === 'object' && 'id' in ipv6;
+    }).length;
   });
 
   // Protected servers count
