@@ -340,7 +340,7 @@ export class HetznerApiService {
       headers
     };
 
-    console.log(isError ? `❌ ${endpoint}:` : `✅ ${endpoint}:`, logData);
+    // Logging removed for production
   }
 
   /** Get persisted mode from localStorage */
