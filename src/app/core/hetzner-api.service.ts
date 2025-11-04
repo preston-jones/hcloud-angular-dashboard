@@ -39,6 +39,15 @@ export class HetznerApiService {
   floatingIps = signal<any[]>([]);
   loadBalancers = signal<any[]>([]);
   networks = signal<any[]>([]);
+  
+  // System status data for dashboard
+  endpointStatus = signal<Array<{
+    status: number;
+    statusText: string;
+    endpoint: string;
+    method: string;
+    date: string;
+  }>>([]);
 
   // =============================================================================
   // COMPUTED PROPERTIES
@@ -49,6 +58,11 @@ export class HetznerApiService {
 
   availableServerTypes = computed(() => {
     return this.serverTypes();
+  });
+
+  // Get recent endpoint status for dashboard
+  getRecentEndpointStatus = computed(() => {
+    return this.endpointStatus();
   });
 
   // =============================================================================
@@ -264,6 +278,18 @@ export class HetznerApiService {
         headers[key] = response.headers.get(key);
       });
     }
+
+    // Store endpoint status for dashboard
+    const statusEntry = {
+      status: response.status || 0,
+      statusText: response.statusText || 'Unknown',
+      endpoint: `/${endpoint}`,
+      method: 'GET',
+      date: new Date().toISOString()
+    };
+
+    const currentStatus = this.endpointStatus();
+    this.endpointStatus.set([statusEntry, ...currentStatus.slice(0, 9)]); // Keep last 10 entries
 
     const logData = {
       endpoint,

@@ -204,6 +204,47 @@ export class DashboardPage implements OnInit {
     return this.api.getRecentActions();
   });
 
+  // Get endpoint status for system status table
+  getEndpointStatus = computed(() => {
+    return this.api.getRecentEndpointStatus();
+  });
+
+  // Helper for status styling
+  getStatusClass(status: number): string {
+    if (status >= 200 && status < 300) {
+      return 'text-green-600';
+    } else if (status >= 400) {
+      return 'text-red-600';
+    }
+    return 'text-yellow-600';
+  }
+
+  getStatusDot(status: number): string {
+    if (status >= 200 && status < 300) {
+      return '🟢';
+    } else if (status >= 400) {
+      return '🔴';
+    }
+    return '🟡';
+  }
+
+  getStatusText(status: number): string {
+    if (status >= 200 && status < 300) {
+      return 'OK';
+    } else if (status >= 400 && status < 500) {
+      return 'Client Error';
+    } else if (status >= 500) {
+      return 'Server Error';
+    } else if (status >= 300 && status < 400) {
+      return 'Redirect';
+    }
+    return 'Unknown';
+  }
+
+  formatStatusDate(dateString: string): string {
+    return this.api.formatActionDate(dateString);
+  }
+
   // Format bytes to human readable
   formatBytes(bytes: number): string {
     return this.api.formatBytes(bytes);
