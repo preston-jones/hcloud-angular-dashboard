@@ -44,6 +44,14 @@
   border-radius: 0 10px 10px 0;
   color: var(--sidebar-text);
   transition: background .15s ease, color .15s ease;
+  background: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
 }
 
 .nav-link:hover {

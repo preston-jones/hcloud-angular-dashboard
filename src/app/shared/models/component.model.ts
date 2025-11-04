@@ -23,6 +23,7 @@ export interface NavItem {
   icon?: string;
   badge?: string | number;
   children?: NavItem[];
+  action?: string; // Optional action method name for special items
 }
 
 /**
