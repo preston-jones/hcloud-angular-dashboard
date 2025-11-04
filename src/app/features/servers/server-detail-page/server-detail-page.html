@@ -351,12 +351,12 @@
                   <div class="location-item">
                     <div class="location-details">
                       <div class="location-label">DATACENTER</div>
-                      <div class="location-value">{{ server()!.datacenter?.name || server()!.datacenter?.location?.name || server()!.location }}</div>
+                      <div class="location-value">{{ server()!.datacenter.name || server()!.datacenter.location.name || server()!.location }}</div>
                     </div>
                     <div class="location-details mt-4">
                       <div class="location-label">COUNTRY</div>
                       <div class="location-value">
-                        {{ getCountryFlag(server()!) }} {{ server()!.datacenter?.location?.country || server()!.country }}
+                        {{ getCountryFlag(server()!) }} {{ server()!.datacenter.location.country || server()!.country }}
                       </div>
                     </div>
                   </div>
