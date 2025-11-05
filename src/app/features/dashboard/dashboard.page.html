@@ -141,12 +141,32 @@
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-medium text-ink">Server</h2>
             <button 
-              class="text-primary hover:text-primary-700 transition-colors flex items-center gap-1"
+              class="group flex items-center gap-2 px-3 py-1.5 text-primary hover:text-primary-700 hover:bg-primary/5 rounded-lg transition-all duration-200"
               (click)="goToMyServers()">
-              View All
-              <span>></span>
+              <span class="text-sm font-medium">View All</span>
+              <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
             </button>
           </div>
+
+          <!-- Server Summary Stats -->
+          @if (myServers().length > 0) {
+            <div class="grid grid-cols-3 gap-4 mb-6 p-4 bg-muted rounded-lg">
+              <div class="text-center">
+                <div class="text-lg font-bold text-ink">{{ totalVCpus() }}</div>
+                <div class="text-xs text-soft">vCPUs</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-bold text-ink">{{ (totalMemory() / 1024).toFixed(1) }} GB</div>
+                <div class="text-xs text-soft">RAM</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-bold text-ink">{{ totalDiskSpace() }} GB</div>
+                <div class="text-xs text-soft">Disk</div>
+              </div>
+            </div>
+          }
 
           <div class="overflow-y-auto max-h-[300px]">
             @if (myServers().length === 0) {
@@ -167,7 +187,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (server of myServers().slice(0, 5); track trackRow($index, server)) {
+                    @for (server of myServers().slice(0, 2); track trackRow($index, server)) {
                       <tr class="border-b border-ui hover:bg-muted cursor-pointer transition-colors"
                           (click)="viewServerDetails(server)">
                         <td class="py-3 px-4">
@@ -195,7 +215,7 @@
 
               <!-- Mobile Cards -->
               <div class="md:hidden space-y-3 pr-2">
-                @for (server of myServers().slice(0, 5); track trackRow($index, server)) {
+                @for (server of myServers().slice(0, 2); track trackRow($index, server)) {
                   <div class="border border-ui rounded-lg p-4 hover:bg-muted cursor-pointer transition-colors"
                        (click)="viewServerDetails(server)">
                     <div class="flex justify-between items-start mb-2">

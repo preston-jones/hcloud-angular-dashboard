@@ -1,6 +1,10 @@
 /* Server Detail Page - Component Specific Styles */
 
 /* Server Detail Card (component-specific variant) */
+header h1 {
+  margin: 0;
+}
+
 .server-detail-card {
   background: var(--surface-elev);
   border: 1px solid var(--border);
@@ -16,7 +20,8 @@
 
 /* Activity Item Styling */
 .activity-category-dot {
-  margin-top: 2px; /* Align with first line of text */
+  margin-top: 2px;
+  /* Align with first line of text */
 }
 
 .activity-description {
@@ -29,7 +34,7 @@
     font-weight: 500;
     line-height: 1.2;
   }
-  
+
   .activity-time {
     font-size: 0.75rem;
     white-space: nowrap;
@@ -41,7 +46,7 @@
   .server-detail-card {
     padding: 16px;
   }
-  
+
   .activity-description {
     max-width: 220px;
   }
