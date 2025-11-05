@@ -1,5 +1,7 @@
 # Hetzner Cloud Angular Dashboard
 
+![Deploy Angular](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/deploy.yml/badge.svg)
+
 Ein modernes Angular-Dashboard für die Verwaltung von Hetzner Cloud-Ressourcen mit vollständigem Demo-Modus und Live-API-Integration.
 
 ![Dashboard Light Mode](src/assets/screenshots/dashboard_dark.png)
