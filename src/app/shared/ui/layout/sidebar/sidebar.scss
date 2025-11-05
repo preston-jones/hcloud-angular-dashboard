@@ -95,15 +95,15 @@
   font-size: 12px;
   padding: 12px;
   min-height: 44px;
+
+  >a:hover {
+    cursor: pointer;
+  }
 }
 
 .footer-top {
   display: flex;
   gap: 8px;
-
-  > a:hover {
-    cursor: pointer;
-  }
 }
 
 
