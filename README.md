@@ -1,5 +1,9 @@
 # Hetzner Cloud Angular Dashboard
 
+[![Hetzner Dashboard CI](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
+[![Angular](https://img.shields.io/badge/Angular-20+-red.svg)](https://angular.io/)
+
 A modern Angular 20 dashboard for managing Hetzner Cloud servers with dual-mode operation (Mock/Production).
 
 ## 🚀 Technology Stack

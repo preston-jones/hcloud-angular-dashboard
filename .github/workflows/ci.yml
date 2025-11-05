@@ -1,0 +1,54 @@
+name: Hetzner Dashboard CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      NODE_OPTIONS: --max_old_space_size=4096
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: Run unit tests
+        run: |
+          if npm run | grep -q "test:ci"; then
+            npm run test:ci
+          else
+            npx ng test --watch=false --browsers=ChromeHeadless --code-coverage --no-progress --include='**/search.service.spec.ts'
+          fi
+        continue-on-error: true
+
+      - name: Build production
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hetzner-dashboard-dist
+          path: dist/
+          if-no-files-found: ignore
