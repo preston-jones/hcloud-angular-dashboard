@@ -108,3 +108,19 @@
 .server-card .meta { color: var(--text-soft); font-size: 0.875rem; }
 
 /* Skeleton - removed duplicate definition since it's in global styles */
+
+/* Slide-up animation for success message */
+@keyframes slide-up {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}

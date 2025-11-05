@@ -317,9 +317,11 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     // Force reload servers to include the new user-created server
     this.api.forceReloadServers();
     
+    // Store the new server ID for loading state
+    sessionStorage.setItem('newServerLoading', serverData.id.toString());
+    
     this.wizardState.resetWizard();
     this.router.navigate(['/my-servers']);
-    console.log(serverData)
   }
 
   private buildServerObject(): ServerToCreate {

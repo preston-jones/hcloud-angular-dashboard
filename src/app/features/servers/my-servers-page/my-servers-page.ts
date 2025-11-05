@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, TemplateRef, ViewChild, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { HetznerUtilsService } from '../../../core/hetzner-utils.service';
@@ -170,8 +170,12 @@ import { ServerProtectionToggleComponent } from '../../../shared/ui/server-prote
                       [attr.aria-label]="'Select ' + s.name">
                   </div>
                   <div class="flex items-center gap-2">
-                    <!-- Status dot -->
-                    <app-server-status-dot [status]="s.status"></app-server-status-dot>
+                    <!-- Status dot or loading spinner -->
+                    @if (isServerLoading()(s.id)) {
+                      <div class="w-3 h-3 rounded-full border-2 border-green-500 border-t-transparent animate-spin"></div>
+                    } @else {
+                      <app-server-status-dot [status]="s.status"></app-server-status-dot>
+                    }
                     <app-server-specs-display [server]="s"></app-server-specs-display>
                   </div>
                   <div class="text-soft">{{ getPublicIP(s) }}</div>
@@ -198,6 +202,16 @@ import { ServerProtectionToggleComponent } from '../../../shared/ui/server-prote
       [actions]="selectionActions()">
     </app-selection-actions>
 
+    <!-- Success Message -->
+    @if (showSuccessMessage()) {
+      <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-slide-up z-50">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">✅</span>
+          <span class="font-medium">Server created successfully!</span>
+        </div>
+      </div>
+    }
+
   `,
   styleUrls: ['./my-servers-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -216,6 +230,15 @@ export class MyServersPage implements OnInit, OnDestroy {
 
   // Use selection service
   selectedCount = this.selectionService.selectedCount;
+  
+  // Loading state for newly created servers
+  private newlyCreatedServers = signal<Set<number>>(new Set());
+  showSuccessMessage = signal(false);
+
+  // Helper method to check if server is loading
+  isServerLoading = computed(() => (serverId: number) => 
+    this.newlyCreatedServers().has(serverId)
+  );
   
   // Selection actions for the shared component
   selectionActions = computed<SelectionAction[]>(() => [
@@ -288,6 +311,13 @@ export class MyServersPage implements OnInit, OnDestroy {
 
     // Servers are automatically loaded by the service
     // No need to call loadServers() here since service manages loading
+    
+    // Check if there's a new server that should be in loading state
+    const newServerLoadingId = sessionStorage.getItem('newServerLoading');
+    if (newServerLoadingId) {
+      sessionStorage.removeItem('newServerLoading');
+      this.handleNewServerCreated(parseInt(newServerLoadingId));
+    }
   }
 
   ngOnDestroy() {
@@ -439,5 +469,29 @@ export class MyServersPage implements OnInit, OnDestroy {
 
   getLocationWithFlag(server: Server): string {
     return this.utilsService.getLocationWithFlag(server);
+  }
+
+  // Handle new server creation with loading state
+  handleNewServerCreated(serverId: number): void {
+    // Add server to loading set
+    this.newlyCreatedServers.update(servers => new Set([...servers, serverId]));
+    
+    // Start 3-second timer
+    setTimeout(() => {
+      // Remove from loading set
+      this.newlyCreatedServers.update(servers => {
+        const newSet = new Set(servers);
+        newSet.delete(serverId);
+        return newSet;
+      });
+      
+      // Show success message
+      this.showSuccessMessage.set(true);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        this.showSuccessMessage.set(false);
+      }, 3000);
+    }, 3000);
   }
 }

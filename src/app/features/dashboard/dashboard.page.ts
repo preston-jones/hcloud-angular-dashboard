@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@a
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { HetznerApiService } from '../../core/hetzner-api.service';
+import { ServerSortingService } from '../../shared/services';
 import { Server, Action } from '../../core/models';
 
 @Component({
@@ -15,6 +16,7 @@ import { Server, Action } from '../../core/models';
 export class DashboardPage implements OnInit {
   private api = inject(HetznerApiService);
   private router = inject(Router);
+  private sortingService = inject(ServerSortingService);
 
   // API state
   get loading() { return this.api.loading; }
@@ -29,15 +31,19 @@ export class DashboardPage implements OnInit {
 
   ngOnInit() {
     // Servers are automatically loaded by the service
+    // Set sorting to show newest servers first
+    this.sortingService.sortColumn.set('created');
+    this.sortingService.sortDirection.set('desc');
   }
 
   retry(): void {
     this.api.forceReloadServers();
   }
 
-  // Use the service's myServers computed property (non-available servers)
+  // Use the service's myServers computed property (non-available servers) with sorting
   myServers = computed(() => {
-    return this.api.myServers();
+    const servers = this.api.myServers();
+    return this.sortingService.sortServers(servers);
   });
 
   // Calculate totals
