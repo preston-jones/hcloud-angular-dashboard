@@ -2,49 +2,41 @@
   <!-- Navigation -->
   <nav class="nav">
     @for (item of nav; track item.path || item.label) {
-      @if (item.action) {
-        <!-- Action button (like Settings) -->
-        <button 
-          class="nav-link"
-          [class.active]="item.action === 'settings' && showSettings()"
-          (click)="onNavItemClick(item, $event)"
-          [attr.aria-label]="item.label">
-          <span class="icon">{{ item.icon }}</span>
-          <span class="label">{{ item.label }}</span>
-        </button>
-      } @else {
-        <!-- Regular navigation link -->
-        <a [routerLink]="item.path"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="nav-link"
-           [attr.aria-label]="item.label"
-           (click)="onNavItemClick(item, $event)">
-          <span class="icon">{{ item.icon }}</span>
-          <span class="label">{{ item.label }}</span>
-        </a>
-      }
+    @if (item.action) {
+    <!-- Action button (like Settings) -->
+    <button class="nav-link" [class.active]="item.action === 'settings' && showSettings()"
+      (click)="onNavItemClick(item, $event)" [attr.aria-label]="item.label">
+      <span class="icon">{{ item.icon }}</span>
+      <span class="label">{{ item.label }}</span>
+    </button>
+    } @else {
+    <!-- Regular navigation link -->
+    <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link"
+      [attr.aria-label]="item.label" (click)="onNavItemClick(item, $event)">
+      <span class="icon">{{ item.icon }}</span>
+      <span class="label">{{ item.label }}</span>
+    </a>
+    }
     }
   </nav>
 
   <!-- Footer / Version -->
   <div class="footer">
-    <button 
-      class="pin-button"
-      (click)="onPinClick()"
-      [class.pinned]="isPinned"
-      [attr.aria-label]="isPinned ? 'Unpin sidebar' : 'Pin sidebar'"
-      title="{{ isPinned ? 'Unpin sidebar' : 'Pin sidebar' }}">
-      {{ isPinned ? '📌' : '📍' }}
-    </button>
-    <span class="muted">v0.1.0</span>
+    <div class="footer-top">
+      <button class="pin-button" (click)="onPinClick()" [class.pinned]="isPinned"
+        [attr.aria-label]="isPinned ? 'Unpin sidebar' : 'Pin sidebar'"
+        title="{{ isPinned ? 'Unpin sidebar' : 'Pin sidebar' }}">
+        {{ isPinned ? '📌' : '📍' }}
+      </button>
+      <span class="muted">v0.1.0</span>
+    </div>
+    <div class="footer-btm"></div>
+    <a><span>INFO</span></a>
   </div>
 </aside>
 
 <!-- Settings Dialog -->
 @if (showSettings()) {
-  <app-settings-dialog 
-    (close)="closeSettings()" 
-    (saveAndClose)="saveSettings()">
-  </app-settings-dialog>
+<app-settings-dialog (close)="closeSettings()" (saveAndClose)="saveSettings()">
+</app-settings-dialog>
 }

@@ -33,7 +33,6 @@ export class SidebarComponent {
     { label: 'Dashboard', path: '/dashboard', icon: '📊' },
     { label: 'Server', path: '/my-servers', icon: '🖥️' },
     { label: 'Settings', path: '#', icon: '⚙️', action: 'settings' },
-    { label: 'About this App', path: '/app-info', icon: '🌿' },
   ];
 
   onPinClick() {
