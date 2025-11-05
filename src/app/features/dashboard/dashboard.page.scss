@@ -55,6 +55,14 @@
   background: var(--surface-muted);
 }
 
+.btm-spc {
+  height: 1rem;
+}
+
+.system-status-footer {
+  height: 90px;
+}
+
 /* Ensure proper spacing for mobile cards */
 @media (max-width: 768px) {
   .card {

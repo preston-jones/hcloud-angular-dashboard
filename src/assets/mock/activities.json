@@ -50,16 +50,6 @@
         "status": "completed",
         "icon": "⚙️",
         "category": "configuration"
-      },
-      {
-        "id": "act_006",
-        "type": "monitoring_alert",
-        "title": "High CPU usage detected",
-        "description": "CPU usage exceeded 85% for 5 minutes",
-        "timestamp": "2024-11-04T16:30:00Z",
-        "status": "warning",
-        "icon": "⚠️",
-        "category": "monitoring"
       }
     ],
     "111897045": [
@@ -112,26 +102,6 @@
         "status": "completed",
         "icon": "🔒",
         "category": "security"
-      },
-      {
-        "id": "act_106",
-        "type": "disk_usage_warning",
-        "title": "Disk space warning",
-        "description": "Disk usage is at 82% capacity",
-        "timestamp": "2024-11-04T10:15:00Z",
-        "status": "warning",
-        "icon": "💽",
-        "category": "monitoring"
-      },
-      {
-        "id": "act_107",
-        "type": "load_balancer_connected",
-        "title": "Load balancer attached",
-        "description": "Server added to production load balancer pool",
-        "timestamp": "2024-10-29T11:30:00Z",
-        "status": "completed",
-        "icon": "⚖️",
-        "category": "networking"
       }
     ],
     "111897046": [
