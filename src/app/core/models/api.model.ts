@@ -23,6 +23,16 @@ export interface HetznerApiState {
 export const CACHE_KEYS = {
   MOCK_SERVERS: 'hetzner_mock_servers',
   USER_SERVERS: 'hetzner_user_servers',
+  SERVERS: 'hetzner_servers',
+  SERVER_TYPES: 'hetzner_server_types',
+  LOCATIONS: 'hetzner_locations',
+  DATACENTERS: 'hetzner_datacenters',
+  IMAGES: 'hetzner_images',
+  FIREWALLS: 'hetzner_firewalls',
+  ACTIONS: 'hetzner_actions',
+  FLOATING_IPS: 'hetzner_floating_ips',
+  LOAD_BALANCERS: 'hetzner_load_balancers',
+  NETWORKS: 'hetzner_networks',
   MODE: 'hetzner_api_mode',
   TOKEN: 'hz.token'
 } as const;

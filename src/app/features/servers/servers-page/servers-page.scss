@@ -12,6 +12,26 @@
    CHILD COMPONENT STYLES (shared via styleUrls)
    ============================================================================= */
 
+/* Page Header */
+.page-header {
+  margin-bottom: 2rem;
+  
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
 /* Labels Configuration */
 .labels-configuration {
   display: flex;
@@ -109,23 +129,44 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
+  height: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
   h3 {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text);
-    margin: 0;
+    margin: 0 0 1.5rem 0;
+    flex-shrink: 0;
   }
 }
 
 .summary-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* Important for flex shrinking */
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem; /* Add padding to prevent edge clipping */
+  margin: 0 -0.5rem 1.5rem -0.5rem; /* Compensate for padding */
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 .summary-section {
@@ -133,25 +174,23 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem 0;
+  padding: 0.75rem 0.5rem;
+  min-height: 60px; /* Fixed minimum height */
   position: relative;
   cursor: pointer;
   border: 1px solid transparent;
+  border-radius: 6px;
   transition: all 0.1s ease;
+  width: 100%;
 
   &:hover {
     border-color: #10b981;
     background: rgba(16, 185, 129, 0.05);
-    border-radius: 6px;
-    margin: 0 -0.5rem;
-    padding: 0.75rem 0.5rem;
   }
 
   &.active {
-    background-color: #e7e7e7;
-    border-radius: 6px;
-    margin: 0 -0.5rem;
-    padding: 0.75rem 0.5rem;
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
   }
 }
 
@@ -171,9 +210,19 @@
 }
 
 .summary-value {
+  display: none; /* Hidden by default */
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.2;
+  min-height: 1.35rem; /* Consistent height even when empty */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  &:not(:empty) {
+    display: block; /* Show when there's content */
+  }
 }
 
 .progress-step {
@@ -187,43 +236,43 @@
     height: 24px;
     border-radius: 50%;
     background: transparent;
-    /* Empty circle like unchecked checkbox */
     border: 2px solid #10b981;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: transparent;
-    /* Hide content by default */
-    transition: all 0.2s ease;
-  }
-
-  &.active .step-icon {
-    background: transparent;
-    /* Keep empty for active state */
-    border-color: #10b981;
-    color: transparent;
-    /* Hide content for active state */
+    position: relative;
   }
 
   &.completed .step-icon {
     background: #ef4444;
     border-color: #ef4444;
-    color: white;
-    /* Show checkmark when completed */
+    
+    &::before {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
   }
 }
 
 .summary-divider {
   height: 1px;
   background: var(--border);
+  flex-shrink: 0;
+}
+
+.summary-bottom {
+  flex-shrink: 0;
+  padding-top: 1rem;
 }
 
 .summary-pricing {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .pricing-row {
@@ -254,17 +303,28 @@
 
     &:disabled {
       cursor: not-allowed;
+      background-color: #6b7280 !important; /* Gray background */
+      color: #9ca3af !important; /* Lighter text */
+      opacity: 0.6;
+      
+      &:hover {
+        background-color: #6b7280 !important; /* Prevent hover state */
+      }
     }
   }
 }
 
 .creation-hint {
+  padding: 0.5rem 0.25rem 0 0.25rem; /* Add top padding and small horizontal padding */
+  
   p {
     font-size: 0.875rem;
     color: var(--text-muted);
     text-align: center;
     margin: 0;
     line-height: 1.4;
+    word-wrap: break-word; /* Ensure long words break */
+    overflow-wrap: break-word; /* Better text wrapping */
   }
 }
 

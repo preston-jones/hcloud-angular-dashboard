@@ -16,3 +16,6 @@ export * from './wizard.model';
 
 // Re-export firewall and security models
 export * from './firewall.model';
+
+// Re-export action and activity models
+export * from './action.model';

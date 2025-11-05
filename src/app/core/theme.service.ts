@@ -7,6 +7,11 @@ const STORAGE_KEY = 'theme';
 export class ThemeService {
   theme = signal<Theme>(this.getInitialTheme());
 
+  constructor() {
+    // Apply initial theme to DOM
+    this.applyThemeToDom(this.theme());
+  }
+
   private getInitialTheme(): Theme {
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -21,9 +26,13 @@ export class ThemeService {
     }
   }
 
+  private applyThemeToDom(theme: Theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }
+
   set(theme: Theme) {
     this.theme.set(theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    this.applyThemeToDom(theme);
     sessionStorage.setItem(STORAGE_KEY, theme);
   }
 

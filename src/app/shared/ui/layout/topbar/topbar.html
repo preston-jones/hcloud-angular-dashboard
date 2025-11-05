@@ -1,4 +1,4 @@
-<header class="topbar h-16">
+<header class="topbar">
   <div class="container flex items-center justify-between py-3">
     <!-- Left: Brand -->
     <div class="flex items-center gap-4">
@@ -20,8 +20,17 @@
       />
     </div>
 
-    <!-- Right: Theme Toggle -->
+    <!-- Right: Status + Theme Toggle -->
     <div class="flex items-center gap-4">
+      <!-- API Status Indicator -->
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-ui">
+        <span class="text-sm">{{ getStatusDot() }}</span>
+        <span [class]="getStatusColor()" class="text-sm font-medium">
+          {{ getStatusText() }}
+        </span>
+      </div>
+      
+      <!-- Theme Toggle -->
       <button
         class="rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
         (click)="toggleTheme()"

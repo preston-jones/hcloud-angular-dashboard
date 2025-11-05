@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { Server } from '../../../core/models';
-import { ServerDisplayService } from '../../services';
+import { HetznerUtilsService } from '../../../core/hetzner-utils.service';
 
 @Component({
   selector: 'app-server-specs-display',
@@ -14,10 +14,10 @@ import { ServerDisplayService } from '../../services';
       </div>
       <!-- Server specs line -->
       <div class="text-soft text-xs server-specs">
-        {{ displayService.getServerType(server()) }} | 
-        {{ displayService.getArchitecture(server()) }} | 
-        {{ displayService.getDiskSize(server()) }} | 
-        {{ displayService.getNetworkZone(server()) }}
+        {{ getServerType() }} | 
+        {{ utilsService.getArchitecture(server()) }} | 
+        {{ utilsService.getDiskSize(server()) }} | 
+        {{ utilsService.getNetworkZone(server()) }}
       </div>
     </div>
   `,
@@ -39,5 +39,9 @@ import { ServerDisplayService } from '../../services';
 })
 export class ServerSpecsDisplayComponent {
   server = input.required<Server>();
-  displayService = inject(ServerDisplayService);
+  utilsService = inject(HetznerUtilsService);
+  
+  getServerType(): string {
+    return this.server().server_type?.name || 'Unknown';
+  }
 }

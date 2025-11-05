@@ -11,11 +11,6 @@ import { WizardStateService } from '../services';
       <div class="step-header">
         <h2 class="step-title">
           <span class="step-icon-header" [class.completed]="isStepCompleted()">
-            @if (isStepCompleted()) {
-            ✓
-            } @else {
-            !
-            }
           </span>
           Networking
         </h2>

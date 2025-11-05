@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBase: '/api/v1', // Production: Backend-Proxy (später 'https://api.hetzner.cloud/v1')
-  useMockFallback: false // Production: kein Mock-Fallback
+  apiBase: 'https://hcloud-proxy.small-mode-0508.workers.dev',
+  useMockFallback: false
 };

@@ -12,13 +12,8 @@ import { ImageTab } from '../../../core/models';
       <div class="step-header">
         <h2 class="step-title">
           <span class="step-icon-header" [class.completed]="isStepCompleted()">
-            @if (isStepCompleted()) {
-            ✓
-            } @else {
-            !
-            }
           </span>
-          Image
+          Image*
         </h2>
         <p class="step-description">Select an operating system or application</p>
       </div>

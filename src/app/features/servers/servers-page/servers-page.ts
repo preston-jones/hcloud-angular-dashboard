@@ -214,6 +214,8 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   updateServerName(event: Event): void {
     const target = event.target as HTMLInputElement;
+    // Mark name step as touched when user interacts with the field
+    this.wizardState.markNameStepTouched();
     this.wizardState.serverName.set(target.value);
     const error = this.nameValidator.validateServerName(target.value);
     this.wizardState.nameError.set(error);
@@ -293,7 +295,8 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     const serverData = this.buildServerObject();
     this.saveToSessionStorage(serverData);
     this.wizardState.resetWizard();
-    this.router.navigate(['/servers']);
+    this.router.navigate(['/my-servers']);
+        console.log(serverData)
   }
 
   private buildServerObject(): ServerToCreate {

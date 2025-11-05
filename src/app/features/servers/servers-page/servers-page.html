@@ -3,6 +3,12 @@
   <div class="wizard-layout">
     <!-- Left Side: Scrollable Wizard Steps -->
     <div class="wizard-main">
+      
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Create New Server</h1>
+        <p class="page-subtitle">Configure your server settings and deploy it to your preferred location.</p>
+      </div>
 
       <!-- Scrollable Steps Container -->
       <div class="wizard-steps-container">
@@ -10,259 +16,200 @@
         <!-- Step Components -->
         <wizard-step-architecture />
 
-        <wizard-step-location 
-          [isStepCompleted]="isStepCompleted('location')"
+        <wizard-step-location [isStepCompleted]="isStepCompleted('location')"
           (onLocationSelect)="selectLocation($event)" />
 
-        <wizard-step-image 
-          [isStepCompleted]="isStepCompleted('image')"
-          (onImageSelect)="selectImage($event)"
+        <wizard-step-image [isStepCompleted]="isStepCompleted('image')" (onImageSelect)="selectImage($event)"
           (onImageTabSelect)="setImageTab($event)" />
 
-        <wizard-step-networking 
-          [isStepCompleted]="isStepCompleted('networking')"
-          (onToggleIPv4)="togglePublicIPv4()"
+        <wizard-step-networking [isStepCompleted]="isStepCompleted('networking')" (onToggleIPv4)="togglePublicIPv4()"
           (onToggleIPv6)="togglePublicIPv6()" />
 
-        <wizard-step-security 
-          [isStepCompleted]="isStepCompleted('security')"
+        <wizard-step-security [isStepCompleted]="isStepCompleted('security')"
           (onFirewallToggle)="toggleFirewall($event)" />
 
-        <wizard-step-extras 
-          [isStepCompleted]="isStepCompleted('extras')"
-          (onToggleBackups)="toggleBackups()"
+        <wizard-step-extras [isStepCompleted]="isStepCompleted('extras')" (onToggleBackups)="toggleBackups()"
           (onBackupWindowSelect)="selectBackupWindow($event)" />
 
-        <wizard-step-labels 
-          [isStepCompleted]="isStepCompleted('labels')"
+        <wizard-step-labels [isStepCompleted]="isStepCompleted('labels')"
           (onLabelsUpdate)="updateLabelsTextarea($event)" />
 
-        <wizard-step-name 
-          [isStepCompleted]="isStepCompleted('name')"
-          (onNameUpdate)="updateServerName($event)" />
+        <wizard-step-name [isStepCompleted]="isStepCompleted('name')" (onNameUpdate)="updateServerName($event)" />
 
         <!-- Additional bottom spacing -->
         <div class="wizard-bottom-spacing"></div>
 
       </div>
-  </div>
+    </div>
 
-  <!-- Right Side: Summary Card -->
-  <div class="wizard-sidebar">
-    <div class="summary-card">
-      <h3>Server Configuration</h3>
+    <!-- Right Side: Summary Card -->
+    <div class="wizard-sidebar">
+      <div class="summary-card">
+        <h3>Server Configuration</h3>
 
-      <div class="summary-sections">
-        <div class="summary-section" [class.completed]="isStepCompleted('architecture')"
-          [class.active]="isSectionActive('step-architecture')" (click)="scrollToStep('step-architecture')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-architecture'"
-            [class.completed]="isStepCompleted('architecture')">
-            <div class="step-icon">
-              @if (isStepCompleted('architecture')) {
-              ✓
-              } @else {
-              !
-              }
+        <div class="summary-sections">
+          <div class="summary-section" [class.completed]="isStepCompleted('architecture')"
+            [class.active]="isSectionActive('step-architecture')" (click)="scrollToStep('step-architecture')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-architecture'"
+              [class.completed]="isStepCompleted('architecture')">
+              <div class="step-icon"></div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (selectedArchitecture() && selectedServerType()) {
+                {{ selectedServerType() }}
+                }
+              </div>
+              <div class="summary-label">Type</div>
             </div>
           </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (selectedArchitecture() && selectedServerType()) {
-              {{ selectedServerType() }}
-              }
+
+          <div class="summary-section" [class.completed]="isStepCompleted('location')"
+            [class.active]="isSectionActive('step-location')" (click)="scrollToStep('step-location')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-location'"
+              [class.completed]="isStepCompleted('location')">
+              <div class="step-icon"></div>
             </div>
-            <div class="summary-label">Type</div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (selectedLocation()) {
+                {{ getLocationDisplayName(selectedLocation()) }}
+                }
+              </div>
+              <div class="summary-label">Location</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('image')"
+            [class.active]="isSectionActive('step-image')" (click)="scrollToStep('step-image')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-image'"
+              [class.completed]="isStepCompleted('image')">
+              <div class="step-icon"></div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (selectedImage()) {
+                {{ getImageDisplayName(selectedImage()) }}
+                }
+              </div>
+              <div class="summary-label">Image</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('networking')"
+            [class.active]="isSectionActive('step-networking')" (click)="scrollToStep('step-networking')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-networking'"
+              [class.completed]="isStepCompleted('networking')">
+              <div class="step-icon"></div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (enablePublicIPv4() || enablePublicIPv6()) {
+                {{ enablePublicIPv4() ? 'IPv4' : '' }}{{ enablePublicIPv4() && enablePublicIPv6() ? ' + ' : '' }}{{
+                enablePublicIPv6() ? 'IPv6' : '' }}
+                }
+              </div>
+              <div class="summary-label">Networking</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('security')"
+            [class.active]="isSectionActive('step-security')" (click)="scrollToStep('step-security')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-security'"
+              [class.completed]="isStepCompleted('security')">
+              <div class="step-icon">
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (selectedFirewalls().length > 0) {
+                {{ selectedFirewalls().length }} firewall{{ selectedFirewalls().length === 1 ? '' : 's' }}
+                }
+              </div>
+              <div class="summary-label">Firewalls</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('extras')"
+            [class.active]="isSectionActive('step-extras')" (click)="scrollToStep('step-extras')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-extras'"
+              [class.completed]="isStepCompleted('extras')">
+              <div class="step-icon">
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (enableBackups()) {
+                Backups {{ selectedBackupWindow() }}
+                }
+              </div>
+              <div class="summary-label">Backups</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('labels')"
+            [class.active]="isSectionActive('step-labels')" (click)="scrollToStep('step-labels')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-labels'"
+              [class.completed]="isStepCompleted('labels')">
+              <div class="step-icon">
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (serverLabels().length > 0) {
+                {{ serverLabels().length }} {{ serverLabels().length === 1 ? 'label' : 'labels' }}
+                }
+              </div>
+              <div class="summary-label">Labels</div>
+            </div>
+          </div>
+
+          <div class="summary-section" [class.completed]="isStepCompleted('name')"
+            [class.active]="isSectionActive('step-name')" (click)="scrollToStep('step-name')">
+            <div class="progress-step" [class.active]="activeSection() === 'step-name'"
+              [class.completed]="isStepCompleted('name')">
+              <div class="step-icon">
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">
+                @if (serverName()) {
+                {{ serverName() }}
+                }
+              </div>
+              <div class="summary-label">Name</div>
+            </div>
           </div>
         </div>
 
-        <div class="summary-section" [class.completed]="isStepCompleted('location')"
-          [class.active]="isSectionActive('step-location')" (click)="scrollToStep('step-location')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-location'"
-            [class.completed]="isStepCompleted('location')">
-            <div class="step-icon">
-              @if (isStepCompleted('location')) {
-              ✓
-              } @else {
-              !
-              }
+        <div class="summary-divider"></div>
+
+        <div class="summary-bottom">
+          <div class="summary-pricing">
+            <div class="pricing-row">
+              <span>Server</span>
+              <span>€{{ formatPrice(serverPrice()) }}/Month</span>
+            </div>
+
+            <div class="pricing-row backup-row" [style.visibility]="enableBackups() ? 'visible' : 'hidden'">
+              <span>Backups</span>
+              <span>€{{ formatPrice(backupPrice()) }}/Month</span>
+            </div>
+
+            <div class="pricing-total">
+              <span>Total</span>
+              <span class="total-price">€{{ formatPrice(totalPrice()) }}/Month</span>
             </div>
           </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (selectedLocation()) {
-              {{ getLocationDisplayName(selectedLocation()) }}
-              }
-            </div>
-            <div class="summary-label">Location</div>
+
+          <div class="summary-actions">
+            <button class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
+              [disabled]="!canCreateServer()" (click)="createServer()">
+              Create Server
+            </button>
           </div>
         </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('image')"
-          [class.active]="isSectionActive('step-image')" (click)="scrollToStep('step-image')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-image'"
-            [class.completed]="isStepCompleted('image')">
-            <div class="step-icon">
-              @if (isStepCompleted('image')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (selectedImage()) {
-              {{ getImageDisplayName(selectedImage()) }}
-              }
-            </div>
-            <div class="summary-label">Image</div>
-          </div>
-        </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('networking')"
-          [class.active]="isSectionActive('step-networking')" (click)="scrollToStep('step-networking')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-networking'"
-            [class.completed]="isStepCompleted('networking')">
-            <div class="step-icon">
-              @if (isStepCompleted('networking')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (enablePublicIPv4() || enablePublicIPv6()) {
-              {{ enablePublicIPv4() ? 'IPv4' : '' }}{{ enablePublicIPv4() && enablePublicIPv6() ? ' + ' : '' }}{{
-              enablePublicIPv6() ? 'IPv6' : '' }}
-              }
-            </div>
-            <div class="summary-label">Networking</div>
-          </div>
-        </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('security')"
-          [class.active]="isSectionActive('step-security')" (click)="scrollToStep('step-security')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-security'"
-            [class.completed]="isStepCompleted('security')">
-            <div class="step-icon">
-              @if (isStepCompleted('security')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (selectedFirewalls().length > 0) {
-              {{ selectedFirewalls().length }} firewall{{ selectedFirewalls().length === 1 ? '' : 's' }}
-              }
-            </div>
-            <div class="summary-label">Firewalls</div>
-          </div>
-        </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('extras')"
-          [class.active]="isSectionActive('step-extras')" (click)="scrollToStep('step-extras')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-extras'"
-            [class.completed]="isStepCompleted('extras')">
-            <div class="step-icon">
-              @if (isStepCompleted('extras')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (enableBackups()) {
-              Backups {{ selectedBackupWindow() }}
-              }
-            </div>
-            <div class="summary-label">Backups</div>
-          </div>
-        </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('labels')"
-          [class.active]="isSectionActive('step-labels')" (click)="scrollToStep('step-labels')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-labels'"
-            [class.completed]="isStepCompleted('labels')">
-            <div class="step-icon">
-              @if (isStepCompleted('labels')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-                        <div class="summary-value">
-              @if (serverLabels().length > 0) {
-              {{ serverLabels().length }} {{ serverLabels().length === 1 ? 'label' : 'labels' }}
-              }
-            </div>
-            <div class="summary-label">Labels</div>
-          </div>
-        </div>
-
-        <div class="summary-section" [class.completed]="isStepCompleted('name')"
-          [class.active]="isSectionActive('step-name')" (click)="scrollToStep('step-name')">
-          <div class="progress-step" [class.active]="activeSection() === 'step-name'"
-            [class.completed]="isStepCompleted('name')">
-            <div class="step-icon">
-              @if (isStepCompleted('name')) {
-              ✓
-              } @else {
-              !
-              }
-            </div>
-          </div>
-          <div class="summary-content">
-            <div class="summary-value">
-              @if (serverName()) {
-              {{ serverName() }}
-              }
-            </div>
-            <div class="summary-label">Name</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-divider"></div>
-
-      <div class="summary-pricing">
-        <div class="pricing-row">
-          <span>Server</span>
-          <span>€{{ formatPrice(serverPrice()) }}/Month</span>
-        </div>
-
-        <div class="pricing-row backup-row" [style.visibility]="enableBackups() ? 'visible' : 'hidden'">
-          <span>Backups</span>
-          <span>€{{ formatPrice(backupPrice()) }}/Month</span>
-        </div>
-
-        <div class="pricing-total">
-          <span>Total</span>
-          <span class="total-price">€{{ formatPrice(totalPrice()) }}/Month</span>
-        </div>
-      </div>
-
-      <div class="summary-actions">
-        <button class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
-          [disabled]="!canCreateServer()" (click)="createServer()">
-          Create Server
-        </button>
-
-        @if (!canCreateServer()) {
-        <div class="creation-hint">
-          <p>Select architecture, location, and image to continue.</p>
-        </div>
-        }
       </div>
     </div>
-  </div>
   </div>
 </section>

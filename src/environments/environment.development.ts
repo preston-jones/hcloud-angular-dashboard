@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiBase: 'assets/mock', // Development: Mock-Daten (relativer Pfad)
+  apiBase: 'https://hcloud-proxy.small-mode-0508.workers.dev',
   useMockFallback: true
 };

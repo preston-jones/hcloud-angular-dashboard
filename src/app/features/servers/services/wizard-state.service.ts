@@ -37,6 +37,7 @@ export class WizardStateService {
   labelsTextarea = signal<string>('');
   serverName = signal<string>('');
   nameError = signal<string>('');
+  nameStepTouched = signal<boolean>(false);
 
   // ============================================================================
   // UI STATE
@@ -58,13 +59,16 @@ export class WizardStateService {
     this.enablePublicIPv4() || this.enablePublicIPv6()
   );
   
-  isSecurityComplete = computed(() => true); // Optional step
+  isSecurityComplete = computed(() => this.selectedFirewalls().length > 0);
   
-  isBackupsComplete = computed(() => true); // Optional step
+  isBackupsComplete = computed(() => this.enableBackups());
   
-  isLabelsComplete = computed(() => true); // Optional step
+  isLabelsComplete = computed(() => this.serverLabels().length > 0);
   
-  isNameComplete = computed(() => this.nameError() === '');
+  isNameComplete = computed(() => {
+    // Step is complete only after user interaction (touched the field)
+    return this.nameStepTouched() && this.nameError() === '';
+  });
 
   // Can create server check
   canCreateServer = computed(() => 
@@ -137,6 +141,7 @@ export class WizardStateService {
     this.labelsTextarea.set('');
     this.serverName.set('');
     this.nameError.set('');
+    this.nameStepTouched.set(false);
   }
 
   // ============================================================================
@@ -163,5 +168,12 @@ export class WizardStateService {
   persistFirewallSelection(): void {
     const selectedIds = this.selectedFirewalls();
     sessionStorage.setItem('selectedFirewalls', JSON.stringify(selectedIds));
+  }
+
+  // ============================================================================
+  // NAME STEP METHODS
+  // ============================================================================
+  markNameStepTouched(): void {
+    this.nameStepTouched.set(true);
   }
 }
