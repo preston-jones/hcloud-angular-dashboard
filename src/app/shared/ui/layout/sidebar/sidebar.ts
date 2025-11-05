@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, HostBinding, Input, Output, EventEm
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NavItem } from '../../../models/component.model';
 import { SettingsDialogComponent } from '../settings-dialog/settings-dialog';
+import { InfoDialogComponent } from '../info-dialog/info-dialog';
 import { LayoutService } from '../../../services/layout.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, SettingsDialogComponent],
+  imports: [RouterLink, RouterLinkActive, SettingsDialogComponent, InfoDialogComponent],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +24,18 @@ export class SidebarComponent {
 
   // Settings dialog state
   showSettings = signal(false);
+  
+  // Info dialog state
+  showInfo = signal(false);
 
   // Expose settings state for parent components
   get isSettingsOpen() {
     return this.showSettings();
+  }
+  
+  // Expose info state for parent components
+  get isInfoOpen() {
+    return this.showInfo();
   }
 
   nav: NavItem[] = [
@@ -60,5 +69,13 @@ export class SidebarComponent {
     this.showSettings.set(false);
     this.togglePin.emit(); // Unpin the sidebar
     this.router.navigate(['/my-servers']);
+  }
+  
+  openInfo() {
+    this.showInfo.set(true);
+  }
+
+  closeInfo() {
+    this.showInfo.set(false);
   }
 }

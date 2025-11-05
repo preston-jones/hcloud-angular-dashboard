@@ -31,7 +31,9 @@
       <span class="muted">v0.1.0</span>
     </div>
     <div class="footer-btm"></div>
-    <a><span>INFO</span></a>
+    <button class="info-button" (click)="openInfo()" title="About">
+      <span>INFO</span>
+    </button>
   </div>
 </aside>
 
@@ -39,4 +41,10 @@
 @if (showSettings()) {
 <app-settings-dialog (close)="closeSettings()" (saveAndClose)="saveSettings()">
 </app-settings-dialog>
+}
+
+<!-- Info Dialog -->
+@if (showInfo()) {
+<app-info-dialog (close)="closeInfo()">
+</app-info-dialog>
 }

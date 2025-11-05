@@ -1,0 +1,36 @@
+<div class="dialog-backdrop" (click)="onBackdropClick($event)">
+  <div class="dialog">
+    <div class="dialog-header">
+      <h2 class="dialog-title">About</h2>
+      <button class="close-button" (click)="onCloseClick()" aria-label="Close dialog">
+        ✕
+      </button>
+    </div>
+    
+    <div class="dialog-content">
+      <div class="info-section">
+        <h3>Impressum</h3>
+        <p class="contact-info">
+          <strong>Preston Jones</strong><br>
+          Unterlauterbach 4<br>
+          82393 Iffeldorf<br>
+          <a href="https://prestonjones.dev" target="_blank" class="link">prestonjones.dev</a>
+        </p>
+      </div>
+      
+      <div class="info-section">
+        <h3>Technical Information</h3>
+        <p class="tech-info">
+          Built with <strong>Angular 20</strong><br>
+          © {{ currentYear }} Preston Jones
+        </p>
+      </div>
+    </div>
+    
+    <div class="dialog-footer">
+      <button class="primary-button" (click)="onCloseClick()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
