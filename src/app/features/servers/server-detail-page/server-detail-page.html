@@ -379,11 +379,12 @@
                 
                 <!-- Right: Location Map (Full Height) -->
                 <div class="location-map flex flex-col justify-center">
-                  <div class="map-placeholder h-full min-h-[120px] flex items-center justify-center">
-                    <div class="text-center">
-                      <div class="map-point"></div>
-                      🗺️ Map View
-                    </div>
+                  <div class="h-full min-h-[180px]">
+                    <app-location-map 
+                      [countryCode]="server()!.datacenter.location.country || server()!.country || ''"
+                      [locationName]="getCleanCityName(server()!)"
+                      class="block w-full h-full">
+                    </app-location-map>
                   </div>
                 </div>
               </div>

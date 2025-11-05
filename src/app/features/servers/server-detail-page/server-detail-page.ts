@@ -7,11 +7,12 @@ import { ActivityService } from '../../../core/activity.service';
 import { Server, Activity } from '../../../core/models';
 import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 import { NetworkDetailsDialogComponent } from '../../../shared/ui/network-details-dialog/network-details-dialog';
+import { LocationMapComponent } from '../../../shared/ui/location-map/location-map.component';
 
 @Component({
   selector: 'app-server-detail-page',
   standalone: true,
-  imports: [NgClass, DeleteConfirmationDialogComponent, NetworkDetailsDialogComponent],
+  imports: [NgClass, DeleteConfirmationDialogComponent, NetworkDetailsDialogComponent, LocationMapComponent],
   templateUrl: './server-detail-page.html',
   styleUrls: ['./server-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

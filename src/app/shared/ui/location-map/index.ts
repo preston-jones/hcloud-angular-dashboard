@@ -1,0 +1,1 @@
+export { LocationMapComponent } from './location-map.component';
