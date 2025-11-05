@@ -22,7 +22,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
         <!-- Message -->
         <div class="mb-6">
           <p class="text-slate-700 dark:text-slate-300 text-center">
-            Function not available in Demo Mode
+            Function not available in Demo
           </p>
         </div>
 
