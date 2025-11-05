@@ -305,11 +305,11 @@
                 <div class="option-icon">💾</div>
                 <div class="option-button-content">
                   <button 
-                    class="px-4 py-2 rounded-lg transition-colors"
-                    [class]="!backupEnabled() ? 'text-white bg-primary hover:bg-primary-700' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                    class="px-4 py-2 rounded-lg transition-colors font-medium"
+                    [class]="backupEnabled() ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
                     (click)="toggleBackup()">
-                    <span class="font-medium">
-                      {{ backupEnabled() ? 'Disable' : 'Enable' }}
+                    <span>
+                      {{ backupEnabled() ? 'Enabled' : 'Disabled' }}
                     </span>
                   </button>
                   <div class="option-label">BACKUP</div>

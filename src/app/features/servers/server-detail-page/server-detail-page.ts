@@ -30,8 +30,15 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   showDeleteDialog = signal(false);
   
   // Feature states
-  backupEnabled = signal(false);
   backupActivity = signal<{ message: string; time: Date } | null>(null);
+  
+  // Computed backup state based on actual server data
+  backupEnabled = computed(() => {
+    const currentServer = this.server();
+    if (!currentServer) return false;
+    // Check if backup_window exists and is not null
+    return currentServer.backup_window !== null && currentServer.backup_window !== undefined;
+  });
   
   // Timer state
   serverStartTime = signal<Date | null>(null);
@@ -425,8 +432,17 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
 
   // Backup management
   toggleBackup(): void {
+    const currentServer = this.server();
+    if (!currentServer) return;
+    
     const currentState = this.backupEnabled();
-    this.backupEnabled.set(!currentState);
+    
+    // Update the server's backup_window field
+    // If enabling backup, set a default backup window; if disabling, set to null
+    const newBackupWindow = !currentState ? '22-02' : null;
+    
+    // Update server data through API service
+    this.api.updateServer(currentServer.id, { backup_window: newBackupWindow });
     
     const message = !currentState 
       ? 'Backup enabled'

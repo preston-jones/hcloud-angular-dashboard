@@ -218,6 +218,14 @@ export class HetznerApiService {
     this.servers.set(this.storage.getServers());
   }
 
+  /** Update server with partial data */
+  updateServer(serverId: number, updates: Partial<any>): void {
+    if (!this.checkWritePermission()) return;
+    
+    this.storage.updateServer(serverId, updates);
+    this.servers.set(this.storage.getServers());
+  }
+
   /** Delete server */
   deleteServer(serverId: number): void {
     if (!this.checkWritePermission()) return;
