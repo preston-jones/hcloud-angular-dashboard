@@ -219,11 +219,8 @@
         <div class="card flex-1 min-h-0 overflow-hidden">
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-2">
-              <h2 class="text-lg font-medium text-ink">System Status</h2>
+              <h2 class="text-lg font-medium text-ink">{{ getSystemStatusTitle() }}</h2>
             </div>
-            <button class="text-primary hover:text-primary-700 transition-colors text-sm">
-              View All >
-            </button>
           </div>
           
           @if (getEndpointStatus().length === 0) {

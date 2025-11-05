@@ -245,6 +245,10 @@ export class DashboardPage implements OnInit {
     return this.api.formatActionDate(dateString);
   }
 
+  getSystemStatusTitle(): string {
+    return this.api.mode() === 'mock' ? 'System Status (Demo)' : 'System Status';
+  }
+
   // Format bytes to human readable
   formatBytes(bytes: number): string {
     return this.api.formatBytes(bytes);
