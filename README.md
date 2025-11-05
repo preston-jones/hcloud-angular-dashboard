@@ -2,7 +2,7 @@
 
 Ein modernes Angular-Dashboard für die Verwaltung von Hetzner Cloud-Ressourcen mit vollständigem Demo-Modus und Live-API-Integration.
 
-![Dashboard Light Mode](src/assets/screenshots/dashboard_light.png)
+![Dashboard Light Mode](src/assets/screenshots/dashboard_dark.png)
 
 ## 🚀 Funktionen
 
