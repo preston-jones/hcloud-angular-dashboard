@@ -65,15 +65,7 @@
   background: var(--sidebar-active);
   color: var(--primary);
   font-weight: 600;
-}
-
-.nav-link.active::before {
-  content: '';
-  position: absolute;
-  inset: 6px auto 6px 0;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--primary);
+  border-left: 3px solid #10b981;
 }
 
 /* Icon/Label */

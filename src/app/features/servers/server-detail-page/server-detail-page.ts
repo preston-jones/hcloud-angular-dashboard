@@ -3,7 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../core/page-header.service';
-import { Server } from '../../../core/models';
+import { ActivityService } from '../../../core/activity.service';
+import { Server, Activity } from '../../../core/models';
 import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
 import { NetworkDetailsDialogComponent } from '../../../shared/ui/network-details-dialog/network-details-dialog';
 
@@ -20,6 +21,7 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   private router = inject(Router);
   public api = inject(HetznerApiService);
   private pageHeaderService = inject(PageHeaderService);
+  private activityService = inject(ActivityService);
 
   @ViewChild('serverHeaderTemplate', { static: true }) serverHeaderTemplate!: TemplateRef<any>;
 
@@ -31,8 +33,12 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   showDeleteDialog = signal(false);
   showNetworkDialog = signal(false);
   
-  // Feature states
-  backupActivity = signal<{ message: string; time: Date } | null>(null);
+  // Activity state
+  activities = computed(() => {
+    const currentServerId = this.serverId();
+    if (!currentServerId) return [];
+    return this.activityService.getRecentServerActivities(currentServerId, 8);
+  });
   
   // Computed backup state based on actual server data
   backupEnabled = computed(() => {
@@ -291,6 +297,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
       this.api.updateServerStatus(server.id, 'running');
       this.resetTimer();
       this.startTimer();
+      
+      // Add activity for server start
+      this.activityService.addActivity(server.id, {
+        type: 'server_started',
+        title: 'Server started',
+        description: 'Server boot process completed successfully',
+        status: 'completed',
+        icon: '▶️',
+        category: 'power'
+      });
     }
   }
 
@@ -300,6 +316,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
       this.api.updateServerStatus(server.id, 'stopped');
       this.clearTimer();
       this.serverStartTime.set(null);
+      
+      // Add activity for server stop
+      this.activityService.addActivity(server.id, {
+        type: 'server_stopped',
+        title: 'Server stopped',
+        description: 'Server was gracefully shut down',
+        status: 'completed',
+        icon: '⏹️',
+        category: 'power'
+      });
     }
   }
 
@@ -314,6 +340,16 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   confirmDelete(): void {
     const server = this.server();
     if (server) {
+      // Add activity for server deletion (before actual deletion)
+      this.activityService.addActivity(server.id, {
+        type: 'configuration_changed',
+        title: 'Server deleted',
+        description: `Server ${server.name} has been permanently deleted`,
+        status: 'completed',
+        icon: '🗑️',
+        category: 'lifecycle'
+      });
+      
       this.api.deleteServer(server.id);
       this.showDeleteDialog.set(false);
       this.goBack(); // Navigate back after deletion
@@ -446,46 +482,33 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
     // Update server data through API service
     this.api.updateServer(currentServer.id, { backup_window: newBackupWindow });
     
-    const message = !currentState 
-      ? 'Backup enabled'
-      : 'Backup disabled';
+    // Add activity to track backup changes
+    const activityTitle = !currentState ? 'Backup enabled' : 'Backup disabled';
+    const activityDescription = !currentState 
+      ? `Automatic backups enabled with window ${newBackupWindow}`
+      : 'Automatic backups have been disabled';
     
-    this.backupActivity.set({
-      message: message,
-      time: new Date()
+    this.activityService.addActivity(currentServer.id, {
+      type: !currentState ? 'backup_created' : 'configuration_changed',
+      title: activityTitle,
+      description: activityDescription,
+      status: 'completed',
+      icon: !currentState ? '💾' : '⚙️',
+      category: 'backup'
     });
   }
 
-  // Get backup activity time display
-  getBackupActivityTime(): string {
-    const activity = this.backupActivity();
-    if (!activity) return '';
-    
-    const now = new Date();
-    const diffMs = now.getTime() - activity.time.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffDays > 0) {
-      const remainingHours = diffHours % 24;
-      if (remainingHours > 0) {
-        return `${diffDays}d ${remainingHours}h ago`;
-      } else {
-        return `${diffDays}d ago`;
-      }
-    } else if (diffHours > 0) {
-      const remainingMinutes = diffMinutes % 60;
-      if (remainingMinutes > 0) {
-        return `${diffHours}h ${remainingMinutes}m ago`;
-      } else {
-        return `${diffHours}h ago`;
-      }
-    } else if (diffMinutes > 0) {
-      return `${diffMinutes}m ago`;
-    } else {
-      return 'Just now';
-    }
+  // Activity helpers
+  getActivityStatusClasses(status: string): string {
+    return this.activityService.getStatusClasses(status as any);
+  }
+
+  getActivityCategoryClasses(category: string): string {
+    return this.activityService.getCategoryClasses(category as any);
+  }
+
+  getActivityRelativeTime(timestamp: string): string {
+    return this.activityService.getRelativeTime(timestamp);
   }
 
   // Network dialog methods

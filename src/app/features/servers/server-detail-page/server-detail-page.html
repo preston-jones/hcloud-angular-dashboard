@@ -258,129 +258,133 @@
               🔔 Server Activities
             </h3>
             <div class="space-y-3">
-              <div class="activity-item">
-                <div class="activity-left">
-                  <div class="activity-title">Server created</div>
-                </div>
-                <div class="activity-time">{{ server()!.created ? getRelativeTime(server()!.created!) : 'Unknown' }}</div>
-              </div>
-              @if (server()!.status === 'running') {
+              @for (activity of activities(); track activity.id) {
                 <div class="activity-item">
                   <div class="activity-left">
-                    <div class="activity-title">Server started</div>
+                    <div class="flex items-center gap-3">
+                      <span class="activity-category-dot" [ngClass]="getActivityCategoryClasses(activity.category)"></span>
+                      <div>
+                        <div class="activity-title flex items-center gap-2">
+                          <span>{{ activity.icon }}</span>
+                          <span>{{ activity.title }}</span>
+                          <span [ngClass]="getActivityStatusClasses(activity.status)">{{ activity.status }}</span>
+                        </div>
+                        @if (activity.description) {
+                          <div class="activity-description text-xs text-soft mt-1">{{ activity.description }}</div>
+                        }
+                      </div>
+                    </div>
                   </div>
-                  <div class="activity-time">{{ getElapsedTime() }}</div>
-                </div>
-              }
-              @if (server()!.status === 'stopped') {
-                <div class="activity-item">
-                  <div class="activity-left">
-                    <div class="activity-title">Server stopped</div>
-                  </div>
-                  <div class="activity-time">Recently</div>
+                  <div class="activity-time">{{ getActivityRelativeTime(activity.timestamp) }}</div>
                 </div>
               }
-              @if (backupActivity()) {
-                <div class="activity-item">
-                  <div class="activity-left">
-                    <div class="activity-title">{{ backupActivity()!.message }}</div>
-                  </div>
-                  <div class="activity-time">{{ getBackupActivityTime() }}</div>
+              
+              @if (activities().length === 0) {
+                <div class="text-center py-6 text-soft">
+                  <div class="text-lg mb-2">📭</div>
+                  <div>No recent activities</div>
+                  <div class="text-xs mt-1">Server activities will appear here</div>
                 </div>
               }
             </div>
           </div>
         </div>
 
-        <!-- Right Column: Server Options + Location (Stacked) -->
-        <div class="lg:col-span-1 space-y-6">
+        <!-- Right Column: Server Options + Location (Full Height Split) -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
           
-          <!-- Server Options -->
-          <div class="server-detail-card">
+          <!-- Server Options (Half Height) -->
+          <div class="server-detail-card flex-1 flex flex-col">
             <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
               ⚙️ Server Options
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="option-button-wrapper">
-                <div class="option-icon">💾</div>
-                <div class="option-button-content">
-                  <button 
-                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                    (click)="openNetworkDialog()">
-                    <span>Info</span>
-                  </button>
-                  <div class="option-label">BACKUP</div>
+            <div class="flex-1 flex items-center">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                <div class="option-button-wrapper">
+                  <div class="option-icon">💾</div>
+                  <div class="option-button-content">
+                    <button 
+                      class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                      (click)="openNetworkDialog()">
+                      <span>Info</span>
+                    </button>
+                    <div class="option-label">BACKUP</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div class="option-button-wrapper">
-                <div class="option-icon">📦</div>
-                <div class="option-button-content">
-                  <button 
-                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                    (click)="openNetworkDialog()">
-                    <span>Info</span>
-                  </button>
-                  <div class="option-label">PLACEMENT GROUP</div>
+                
+                <div class="option-button-wrapper">
+                  <div class="option-icon">📦</div>
+                  <div class="option-button-content">
+                    <button 
+                      class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                      (click)="openNetworkDialog()">
+                      <span>Info</span>
+                    </button>
+                    <div class="option-label">PLACEMENT GROUP</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div class="option-button-wrapper">
-                <div class="option-icon">🌐</div>
-                <div class="option-button-content">
-                  <button 
-                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                    (click)="openNetworkDialog()">
-                    <span>Info</span>
-                  </button>
-                  <div class="option-label">PUBLIC NETWORK</div>
+                
+                <div class="option-button-wrapper">
+                  <div class="option-icon">🌐</div>
+                  <div class="option-button-content">
+                    <button 
+                      class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                      (click)="openNetworkDialog()">
+                      <span>Info</span>
+                    </button>
+                    <div class="option-label">PUBLIC NETWORK</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Server Location -->
-          <div class="server-detail-card">
+          <!-- Server Location (Half Height) -->
+          <div class="server-detail-card flex-1 flex flex-col">
             <h3 class="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
               📍 Server Location
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Left: Location Details -->
-              <div class="location-details">
-                <div class="grid grid-cols-2 gap-4">
-                  <!-- Column 1: DATACENTER & COUNTRY -->
-                  <div class="location-item">
-                    <div class="location-details">
-                      <div class="location-label">DATACENTER</div>
-                      <div class="location-value">{{ server()!.datacenter.name || server()!.datacenter.location.name || server()!.location }}</div>
+            <div class="flex-1 flex flex-col">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                <!-- Left: Location Details -->
+                <div class="location-details flex flex-col justify-center">
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Column 1: DATACENTER & COUNTRY -->
+                    <div class="location-item">
+                      <div class="location-details">
+                        <div class="location-label">DATACENTER</div>
+                        <div class="location-value">{{ server()!.datacenter.name || server()!.datacenter.location.name || server()!.location }}</div>
+                      </div>
+                      <div class="location-details mt-4">
+                        <div class="location-label">COUNTRY</div>
+                        <div class="location-value">
+                          {{ getCountryFlag(server()!) }} {{ server()!.datacenter.location.country || server()!.country }}
+                        </div>
+                      </div>
                     </div>
-                    <div class="location-details mt-4">
-                      <div class="location-label">COUNTRY</div>
-                      <div class="location-value">
-                        {{ getCountryFlag(server()!) }} {{ server()!.datacenter.location.country || server()!.country }}
+                    
+                    <!-- Column 2: CITY & NETWORK ZONE -->
+                    <div class="space-y-4">
+                      <div class="location-item">
+                        <div class="location-label">CITY</div>
+                        <div class="location-value">{{ getCleanCityName(server()!) }}</div>
+                      </div>
+                      <div class="location-item">
+                        <div class="location-label">NETWORK ZONE</div>
+                        <div class="location-value">{{ getNetworkZone() }}</div>
                       </div>
                     </div>
                   </div>
-                  
-                  <!-- Column 2: CITY & NETWORK ZONE -->
-                  <div class="space-y-4">
-                    <div class="location-item">
-                      <div class="location-label">CITY</div>
-                      <div class="location-value">{{ getCleanCityName(server()!) }}</div>
-                    </div>
-                    <div class="location-item">
-                      <div class="location-label">NETWORK ZONE</div>
-                      <div class="location-value">{{ getNetworkZone() }}</div>
+                </div>
+                
+                <!-- Right: Location Map (Full Height) -->
+                <div class="location-map flex flex-col justify-center">
+                  <div class="map-placeholder h-full min-h-[120px] flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="map-point"></div>
+                      🗺️ Map View
                     </div>
                   </div>
-                </div>
-              </div>
-              
-              <!-- Right: Location Map (Full Height) -->
-              <div class="location-map h-full">
-                <div class="map-placeholder h-full">
-                  <div class="map-point"></div>
-                  🗺️ Map View
                 </div>
               </div>
             </div>

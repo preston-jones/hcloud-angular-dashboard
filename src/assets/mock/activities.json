@@ -1,0 +1,257 @@
+{
+  "serverActivities": {
+    "111897044": [
+      {
+        "id": "act_001",
+        "type": "server_created",
+        "title": "Server created",
+        "description": "Server was successfully created and initialized",
+        "timestamp": "2024-11-01T10:30:00Z",
+        "status": "completed",
+        "icon": "🖥️",
+        "category": "lifecycle"
+      },
+      {
+        "id": "act_002", 
+        "type": "server_started",
+        "title": "Server started",
+        "description": "Server boot process completed successfully",
+        "timestamp": "2024-11-01T10:35:00Z",
+        "status": "completed",
+        "icon": "▶️",
+        "category": "power"
+      },
+      {
+        "id": "act_003",
+        "type": "backup_created",
+        "title": "Backup completed",
+        "description": "Automatic backup created successfully (15.2 GB)",
+        "timestamp": "2024-11-04T22:15:00Z",
+        "status": "completed",
+        "icon": "💾",
+        "category": "backup"
+      },
+      {
+        "id": "act_004",
+        "type": "firewall_updated",
+        "title": "Firewall rules updated",
+        "description": "Added SSH access rule for port 22",
+        "timestamp": "2024-11-03T14:20:00Z",
+        "status": "completed",
+        "icon": "🛡️",
+        "category": "security"
+      },
+      {
+        "id": "act_005",
+        "type": "configuration_changed",
+        "title": "Configuration updated",
+        "description": "Server hostname changed to test-server-01",
+        "timestamp": "2024-11-02T09:45:00Z",
+        "status": "completed",
+        "icon": "⚙️",
+        "category": "configuration"
+      },
+      {
+        "id": "act_006",
+        "type": "monitoring_alert",
+        "title": "High CPU usage detected",
+        "description": "CPU usage exceeded 85% for 5 minutes",
+        "timestamp": "2024-11-04T16:30:00Z",
+        "status": "warning",
+        "icon": "⚠️",
+        "category": "monitoring"
+      }
+    ],
+    "111897045": [
+      {
+        "id": "act_101",
+        "type": "server_created",
+        "title": "Server created",
+        "description": "Server was successfully created and initialized",
+        "timestamp": "2024-10-28T15:20:00Z",
+        "status": "completed",
+        "icon": "🖥️",
+        "category": "lifecycle"
+      },
+      {
+        "id": "act_102",
+        "type": "server_started",
+        "title": "Server started",
+        "description": "Server boot process completed successfully",
+        "timestamp": "2024-10-28T15:25:00Z",
+        "status": "completed",
+        "icon": "▶️",
+        "category": "power"
+      },
+      {
+        "id": "act_103",
+        "type": "backup_created",
+        "title": "Backup completed",
+        "description": "Automatic backup created successfully (28.4 GB)",
+        "timestamp": "2024-11-05T02:15:00Z",
+        "status": "completed",
+        "icon": "💾",
+        "category": "backup"
+      },
+      {
+        "id": "act_104",
+        "type": "update_installed",
+        "title": "System updates installed",
+        "description": "Security updates applied and server rebooted",
+        "timestamp": "2024-11-01T03:00:00Z",
+        "status": "completed",
+        "icon": "🔄",
+        "category": "maintenance"
+      },
+      {
+        "id": "act_105",
+        "type": "ssl_certificate_renewed",
+        "title": "SSL certificate renewed",
+        "description": "Let's Encrypt certificate auto-renewed for 90 days",
+        "timestamp": "2024-10-30T12:00:00Z",
+        "status": "completed",
+        "icon": "🔒",
+        "category": "security"
+      },
+      {
+        "id": "act_106",
+        "type": "disk_usage_warning",
+        "title": "Disk space warning",
+        "description": "Disk usage is at 82% capacity",
+        "timestamp": "2024-11-04T10:15:00Z",
+        "status": "warning",
+        "icon": "💽",
+        "category": "monitoring"
+      },
+      {
+        "id": "act_107",
+        "type": "load_balancer_connected",
+        "title": "Load balancer attached",
+        "description": "Server added to production load balancer pool",
+        "timestamp": "2024-10-29T11:30:00Z",
+        "status": "completed",
+        "icon": "⚖️",
+        "category": "networking"
+      }
+    ],
+    "111897046": [
+      {
+        "id": "act_201",
+        "type": "server_created",
+        "title": "Server created",
+        "description": "Server was successfully created and initialized",
+        "timestamp": "2024-11-03T08:15:00Z",
+        "status": "completed",
+        "icon": "🖥️",
+        "category": "lifecycle"
+      },
+      {
+        "id": "act_202",
+        "type": "server_stopped",
+        "title": "Server stopped",
+        "description": "Server was gracefully shut down",
+        "timestamp": "2024-11-04T18:45:00Z",
+        "status": "completed",
+        "icon": "⏹️",
+        "category": "power"
+      },
+      {
+        "id": "act_203",
+        "type": "server_started",
+        "title": "Server started",
+        "description": "Server boot process completed successfully",
+        "timestamp": "2024-11-03T08:20:00Z",
+        "status": "completed",
+        "icon": "▶️",
+        "category": "power"
+      },
+      {
+        "id": "act_204",
+        "type": "image_created",
+        "title": "Server image created",
+        "description": "Custom image backup_prod_v1.2 created from server",
+        "timestamp": "2024-11-04T14:30:00Z",
+        "status": "completed",
+        "icon": "📦",
+        "category": "backup"
+      },
+      {
+        "id": "act_205",
+        "type": "maintenance_scheduled",
+        "title": "Maintenance scheduled",
+        "description": "System maintenance planned for Nov 10, 2024 02:00 UTC",
+        "timestamp": "2024-11-04T09:00:00Z",
+        "status": "pending",
+        "icon": "🔧",
+        "category": "maintenance"
+      }
+    ]
+  },
+  "activityTypes": {
+    "server_created": {
+      "label": "Server Created",
+      "color": "blue",
+      "priority": "high"
+    },
+    "server_started": {
+      "label": "Server Started",
+      "color": "green",
+      "priority": "medium"
+    },
+    "server_stopped": {
+      "label": "Server Stopped",
+      "color": "orange",
+      "priority": "medium"
+    },
+    "backup_created": {
+      "label": "Backup Created",
+      "color": "purple",
+      "priority": "medium"
+    },
+    "firewall_updated": {
+      "label": "Firewall Updated",
+      "color": "red",
+      "priority": "high"
+    },
+    "configuration_changed": {
+      "label": "Configuration Changed",
+      "color": "yellow",
+      "priority": "low"
+    },
+    "monitoring_alert": {
+      "label": "Monitoring Alert",
+      "color": "red",
+      "priority": "high"
+    },
+    "update_installed": {
+      "label": "Updates Installed",
+      "color": "green",
+      "priority": "medium"
+    },
+    "ssl_certificate_renewed": {
+      "label": "SSL Certificate Renewed",
+      "color": "green",
+      "priority": "low"
+    },
+    "disk_usage_warning": {
+      "label": "Disk Usage Warning",
+      "color": "orange",
+      "priority": "medium"
+    },
+    "load_balancer_connected": {
+      "label": "Load Balancer Connected",
+      "color": "blue",
+      "priority": "medium"
+    },
+    "image_created": {
+      "label": "Image Created",
+      "color": "purple",
+      "priority": "low"
+    },
+    "maintenance_scheduled": {
+      "label": "Maintenance Scheduled",
+      "color": "blue",
+      "priority": "medium"
+    }
+  }
+}
