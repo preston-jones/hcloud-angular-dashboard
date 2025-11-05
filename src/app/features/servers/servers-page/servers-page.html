@@ -212,4 +212,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Demo Restriction Dialog -->
+  @if (showDemoRestriction()) {
+    <app-demo-restriction-dialog (close)="showDemoRestriction.set(false)"></app-demo-restriction-dialog>
+  }
 </section>

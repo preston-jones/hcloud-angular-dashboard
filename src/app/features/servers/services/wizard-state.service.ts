@@ -70,12 +70,11 @@ export class WizardStateService {
     return this.nameStepTouched() && this.nameError() === '';
   });
 
-  // Can create server check
+  // Can create server check - only requires first three steps
   canCreateServer = computed(() => 
     this.isArchitectureComplete() && 
     this.isLocationComplete() && 
-    this.isImageComplete() &&
-    this.isNameComplete()
+    this.isImageComplete()
   );
 
   // ============================================================================

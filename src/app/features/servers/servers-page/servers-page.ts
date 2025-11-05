@@ -29,7 +29,8 @@ import {
   WizardStepExtras,
   WizardStepLabels,
   WizardStepName
-} from '../components'; @Component({
+} from '../components';
+import { DemoRestrictionDialogComponent } from '../../../shared/ui/demo-restriction-dialog/demo-restriction-dialog'; @Component({
   selector: 'app-servers-page',
   imports: [
     FormsModule,
@@ -40,7 +41,8 @@ import {
     WizardStepSecurity,
     WizardStepExtras,
     WizardStepLabels,
-    WizardStepName
+    WizardStepName,
+    DemoRestrictionDialogComponent
   ],
   templateUrl: './servers-page.html',
   styleUrls: ['./servers-page.scss'],
@@ -60,6 +62,7 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   // UI STATE (Component-specific)
   // ============================================================================
   private scrollEventListener?: () => void;
+  showDemoRestriction = signal(false);
 
   // ============================================================================
   // DATA ACCESS FROM SERVICE
@@ -291,6 +294,18 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
 
   createServer(): void {
     if (!this.wizardState.canCreateServer()) return;
+
+    // Check if in live mode and show demo restriction dialog
+    if (this.api.mode() === 'real') {
+      this.showDemoRestriction.set(true);
+      return;
+    }
+
+    // Auto-generate name if none provided
+    if (!this.wizardState.serverName()) {
+      const generatedName = this.generateServerName();
+      this.wizardState.serverName.set(generatedName);
+    }
 
     const serverData = this.buildServerObject();
     this.saveToSessionStorage(serverData);
