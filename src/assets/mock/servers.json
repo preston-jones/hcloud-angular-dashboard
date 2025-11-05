@@ -235,7 +235,7 @@
         "delete": false,
         "rebuild": false
       },
-      "backup_window": null,
+      "backup_window": "22-02",
       "rescue_enabled": false,
       "locked": false,
       "placement_group": null,
@@ -360,10 +360,10 @@
         "role": "web-server"
       },
       "protection": {
-        "delete": true,
+        "delete": false,
         "rebuild": false
       },
-      "backup_window": null,
+      "backup_window": "02-06",
       "rescue_enabled": false,
       "locked": false,
       "placement_group": null,
