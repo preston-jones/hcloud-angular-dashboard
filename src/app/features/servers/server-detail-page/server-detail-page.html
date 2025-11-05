@@ -305,12 +305,9 @@
                 <div class="option-icon">💾</div>
                 <div class="option-button-content">
                   <button 
-                    class="px-4 py-2 rounded-lg transition-colors font-medium"
-                    [class]="backupEnabled() ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                    (click)="toggleBackup()">
-                    <span>
-                      {{ backupEnabled() ? 'Enabled' : 'Disabled' }}
-                    </span>
+                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                    (click)="openNetworkDialog()">
+                    <span>Info</span>
                   </button>
                   <div class="option-label">BACKUP</div>
                 </div>
@@ -319,8 +316,10 @@
               <div class="option-button-wrapper">
                 <div class="option-icon">📦</div>
                 <div class="option-button-content">
-                  <button class="option-button-card" disabled>
-                    <span class="option-action">Select group</span>
+                  <button 
+                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                    (click)="openNetworkDialog()">
+                    <span>Info</span>
                   </button>
                   <div class="option-label">PLACEMENT GROUP</div>
                 </div>
@@ -329,8 +328,10 @@
               <div class="option-button-wrapper">
                 <div class="option-icon">🌐</div>
                 <div class="option-button-content">
-                  <button class="option-button-card" disabled>
-                    <span class="option-action">Disable</span>
+                  <button 
+                    class="px-4 py-2 rounded-lg transition-colors font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                    (click)="openNetworkDialog()">
+                    <span>Info</span>
                   </button>
                   <div class="option-label">PUBLIC NETWORK</div>
                 </div>
@@ -369,7 +370,7 @@
                     </div>
                     <div class="location-item">
                       <div class="location-label">NETWORK ZONE</div>
-                      <div class="location-value">eu-central</div>
+                      <div class="location-value">{{ getNetworkZone() }}</div>
                     </div>
                   </div>
                 </div>
@@ -397,4 +398,12 @@
     (confirm)="confirmDelete()"
     (cancel)="cancelDelete()">
   </app-delete-confirmation-dialog>
+}
+
+<!-- Network Details Dialog -->
+@if (showNetworkDialog()) {
+  <app-network-details-dialog
+    [server]="server()!"
+    (cancel)="closeNetworkDialog()">
+  </app-network-details-dialog>
 }

@@ -5,11 +5,12 @@ import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../core/page-header.service';
 import { Server } from '../../../core/models';
 import { DeleteConfirmationDialogComponent } from '../../../shared/ui/delete-confirmation-dialog/delete-confirmation-dialog';
+import { NetworkDetailsDialogComponent } from '../../../shared/ui/network-details-dialog/network-details-dialog';
 
 @Component({
   selector: 'app-server-detail-page',
   standalone: true,
-  imports: [NgClass, DeleteConfirmationDialogComponent],
+  imports: [NgClass, DeleteConfirmationDialogComponent, NetworkDetailsDialogComponent],
   templateUrl: './server-detail-page.html',
   styleUrls: ['./server-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +29,7 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   error = signal<string | null>(null);
   showActionsDropdown = signal(false);
   showDeleteDialog = signal(false);
+  showNetworkDialog = signal(false);
   
   // Feature states
   backupActivity = signal<{ message: string; time: Date } | null>(null);
@@ -484,5 +486,51 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
     } else {
       return 'Just now';
     }
+  }
+
+  // Network dialog methods
+  openNetworkDialog(): void {
+    this.showNetworkDialog.set(true);
+  }
+
+  closeNetworkDialog(): void {
+    this.showNetworkDialog.set(false);
+  }
+
+  // Network status helpers for button display
+  getNetworkStatusText(): string {
+    const server = this.server();
+    if (!server) return 'Unknown';
+    const hasPublic = !!(this.getIPv4(server) || this.getIPv6(server));
+    return hasPublic ? 'Active' : 'Disabled';
+  }
+
+  getNetworkStatusClass(): string {
+    const server = this.server();
+    if (!server) return 'status-unknown';
+    const hasPublic = !!(this.getIPv4(server) || this.getIPv6(server));
+    return hasPublic ? 'status-active' : 'status-disabled';
+  }
+
+  getFirewallCount(): number {
+    const server = this.server();
+    if (!server) return 0;
+    if (server.public_net?.firewalls) {
+      return server.public_net.firewalls.length;
+    }
+    // Mock some firewall rules based on server status for demo
+    return server.status === 'running' ? 3 : 0;
+  }
+
+  getPlacementGroupStatus(): string {
+    const server = this.server();
+    if (!server) return 'Not assigned';
+    return server.placement_group?.id ? 'Assigned' : 'Not assigned';
+  }
+
+  getNetworkZone(): string {
+    const server = this.server();
+    if (!server) return 'Unknown';
+    return server.datacenter?.location?.network_zone || 'eu-central';
   }
 }
