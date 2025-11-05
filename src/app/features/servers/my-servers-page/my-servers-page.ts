@@ -285,21 +285,12 @@ export class MyServersPage implements OnInit, OnDestroy {
   get loading() { return this.api.loading; }
   get error() { return this.api.error; }
 
-  // Use combined servers (real + user-created) with filtering and sorting
+  // Use combined servers (real + user-created) with sorting only (no search filtering)
   myServers = computed(() => {
     const allServers = this.api.myServers();
-    const searchTerm = this.api.searchQuery().toLowerCase();
     
-    // Apply search filtering by server name only (like create server page)
-    let filteredServers = allServers;
-    if (searchTerm) {
-      filteredServers = allServers.filter(server => 
-        server.name?.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    // Apply sorting using the sorting service
-    return this.sortingService.sortServers(filteredServers);
+    // Apply sorting using the sorting service (no search filtering)
+    return this.sortingService.sortServers(allServers);
   });
 
   ngOnInit() {

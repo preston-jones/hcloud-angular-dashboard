@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, signal, TemplateRef, ViewChild, AfterViewInit, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { PageHeaderService } from '../../../core/page-header.service';
 import { ActivityService } from '../../../core/activity.service';
@@ -53,6 +54,7 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   serverStartTime = signal<Date | null>(null);
   currentTime = signal<Date>(new Date());
   private timerInterval: any = null;
+  private routeSubscription?: Subscription;
 
   // Computed server based on ID from route - only show actual user servers
   server = computed(() => {
@@ -72,31 +74,36 @@ export class ServerDetailPage implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
-    // Get server ID from route params
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (!idParam) {
-      this.error.set('No server ID provided');
-      this.loading.set(false);
-      return;
-    }
+    // Listen to route parameter changes
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (!idParam) {
+        this.error.set('No server ID provided');
+        this.loading.set(false);
+        return;
+      }
 
-    const id = parseInt(idParam, 10);
-    if (isNaN(id)) {
-      this.error.set('Invalid server ID');
-      this.loading.set(false);
-      return;
-    }
+      const id = parseInt(idParam, 10);
+      if (isNaN(id)) {
+        this.error.set('Invalid server ID');
+        this.loading.set(false);
+        return;
+      }
 
-    this.serverId.set(id);
-    this.loading.set(false);
-    
-    // Initialize timer if server is running
-    this.initializeTimer();
+      this.serverId.set(id);
+      this.loading.set(false);
+      this.error.set(null); // Clear any previous errors
+      
+      // Clear and reinitialize timer for new server
+      this.clearTimer();
+      this.initializeTimer();
+    });
   }
 
   ngOnDestroy() {
     this.clearTimer();
     this.pageHeaderService.clearHeader();
+    this.routeSubscription?.unsubscribe();
   }
 
   ngAfterViewInit() {

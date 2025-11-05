@@ -48,4 +48,10 @@
   @if (api.showDemoRestrictionDialog()) {
   <app-demo-restriction-dialog (close)="api.closeDemoRestrictionDialog()"></app-demo-restriction-dialog>
   }
+
+  <!-- Global Search Dropdown - at root level for proper z-index -->
+  <app-server-search-dropdown 
+    [query]="searchService.searchQuery()"
+    (serverSelected)="onSearchDropdownClosed()">
+  </app-server-search-dropdown>
 </div>

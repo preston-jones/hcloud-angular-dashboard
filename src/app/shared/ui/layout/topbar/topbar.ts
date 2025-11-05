@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
 import { ThemeService } from '../../../../core/theme.service';
 import { HetznerApiService } from '../../../../core/hetzner-api.service';
+import { SearchService } from '../../../../core/search.service';
 
 @Component({
   selector: 'app-topbar',
@@ -14,6 +15,7 @@ export class TopbarComponent {
   @Output() search = new EventEmitter<string>();
   private theme = inject(ThemeService);
   private api = inject(HetznerApiService);
+  public searchService = inject(SearchService);
 
   isDark() { return this.theme.theme() === 'dark'; }
   toggleTheme() { this.theme.toggle(); }
@@ -37,6 +39,27 @@ export class TopbarComponent {
 
   onSearchInput(event: Event) {
     const input = event.target as HTMLInputElement;
+    this.searchService.setQuery(input.value);
     this.search.emit(input.value);
+  }
+
+  onSearchClear(event: Event) {
+    // Handle the native search clear event (when X button is clicked)
+    const input = event.target as HTMLInputElement;
+    this.searchService.clearQuery();
+    this.search.emit('');
+  }
+
+  clearSearch() {
+    this.searchService.clearQuery();
+    const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = '';
+    }
+  }
+
+  onSearchDropdownClosed() {
+    // Clear search when a server is selected
+    this.clearSearch();
   }
 }
