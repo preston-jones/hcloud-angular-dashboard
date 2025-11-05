@@ -1,6 +1,10 @@
 # Hetzner Cloud Angular Dashboard
 
-![Deploy Angular](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/deploy.yml/badge.svg)
+[![Deploy Angular](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/deploy.yml/badge.svg)](https://github.com/preston-jones/hcloud-angular-dashboard/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Live Demo](https://img.shields.io/badge/Demo-online-brightgreen.svg)](https://preston-jones.github.io/hcloud-angular-dashboard/)
+[![Made with Angular](https://img.shields.io/badge/Made%20with-Angular-red?logo=angular)](https://angular.dev)
+[![Hosted on GitHub Pages](https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-blue?logo=github)](https://pages.github.com/)
 
 Ein modernes Angular-Dashboard für die Verwaltung von Hetzner Cloud-Ressourcen mit vollständigem Demo-Modus und Live-API-Integration.
 
@@ -347,12 +351,18 @@ Das gebaute Projekt kann auf jedem Static Hosting Service deployt werden:
 - CORS-Schutz implementiert
 - Keine direkten API-Aufrufe vom Client
 
-## 📝 Lizenz
+## 🪪 Lizenz
 
-Copyright © 2025 Preston Jones
+Dieses Projekt steht unter der **MIT License**.
 
-**Kontakt:**
-- Website: [prestonjones.dev](https://prestonjones.dev)
+Das bedeutet:
+- Du darfst den Code **verwenden, kopieren, verändern und weiterveröffentlichen**,  
+  auch **kommerziell**, solange der ursprüngliche **Copyright-Hinweis** erhalten bleibt.  
+- Es wird **keine Garantie oder Haftung** für eventuelle Fehler übernommen.  
+
+📄 Vollständiger Lizenztext: [MIT License](./LICENSE)
+
+Copyright © 2025 **Preston Jones**
 
 ## 🤝 Beitragen
 
