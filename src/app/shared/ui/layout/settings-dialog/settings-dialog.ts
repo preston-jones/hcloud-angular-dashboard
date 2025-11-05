@@ -61,9 +61,15 @@ import { HetznerApiService } from '../../../../core/hetzner-api.service';
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            [disabled]="isSaving()"
             (click)="save()">
-            Save Changes
+            @if (isSaving()) {
+              <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span>Saving...</span>
+            } @else {
+              <span>Save Changes</span>
+            }
           </button>
         </div>
       </div>
@@ -78,17 +84,24 @@ export class SettingsDialogComponent {
   private apiService = inject(HetznerApiService);
   private router = inject(Router);
   currentMode = signal<'mock' | 'real'>(this.apiService.getCurrentMode());
+  isSaving = signal(false);
 
   setMode(mode: 'mock' | 'real'): void {
     this.currentMode.set(mode);
   }
 
   save(): void {
+    this.isSaving.set(true);
     this.apiService.setMode(this.currentMode());
     // Force immediate data reload before navigation
     this.apiService.loadServers();
-    this.saveAndClose.emit();
-    this.router.navigate(['/dashboard']);
+    
+    // Small delay to show loading state, then complete
+    setTimeout(() => {
+      this.isSaving.set(false);
+      this.saveAndClose.emit();
+      this.router.navigate(['/dashboard']);
+    }, 500);
   }
 
   onBackdropClick(event: Event): void {

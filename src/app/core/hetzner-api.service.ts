@@ -5,6 +5,7 @@ import { Server, ApiMode, CACHE_KEYS } from './models';
 import { DataStorageService } from './data-storage.service';
 import { ServerGenerationService } from './server-generation.service';
 import { HetznerUtilsService } from './hetzner-utils.service';
+import { MockStatusService } from './mock-status.service';
 import { environment } from './../../environments/environment';
 
 /**
@@ -18,6 +19,7 @@ export class HetznerApiService {
   private storage = inject(DataStorageService);
   private serverGen = inject(ServerGenerationService);
   private utils = inject(HetznerUtilsService);
+  private mockStatus = inject(MockStatusService);
 
   // =============================================================================
   // STATE SIGNALS
@@ -72,6 +74,11 @@ export class HetznerApiService {
     // Initial load
     this.loadAllData();
 
+    // Generate mock status data in mock mode
+    if (this.mode() === 'mock') {
+      this.refreshMockStatus();
+    }
+
     // Auto-reload when mode changes
     effect(() => {
       const currentMode = this.mode();
@@ -79,6 +86,10 @@ export class HetznerApiService {
       Promise.resolve().then(() => {
         if (this.hasInitialized) {
           this.loadAllData();
+          // Refresh mock status when switching to mock mode
+          if (currentMode === 'mock') {
+            this.refreshMockStatus();
+          }
         }
       });
       this.hasInitialized = true;
@@ -119,6 +130,7 @@ export class HetznerApiService {
       catchError((err: HttpErrorResponse) => {
         this.logApiCall('servers', err, true);
         this.error.set(err.message || 'Failed to load servers');
+        this.loading.set(false);
         return of([]);
       })
     ).subscribe(servers => {
@@ -127,7 +139,10 @@ export class HetznerApiService {
         this.storage.saveServers(servers);
       }
       this.servers.set(this.storage.getServers(this.mode()));
-      this.loading.set(false);
+      // Only set loading to false if there's no error
+      if (!this.error()) {
+        this.loading.set(false);
+      }
     });
   }
 
@@ -351,6 +366,16 @@ export class HetznerApiService {
     // Logging removed for production
   }
 
+  /** Generate mock endpoint status data */
+  private async refreshMockStatus(): Promise<void> {
+    try {
+      const mockStatuses = await this.mockStatus.generateBatch();
+      this.endpointStatus.set(mockStatuses);
+    } catch (error) {
+      console.warn('Failed to generate mock status data:', error);
+    }
+  }
+
   /** Get persisted mode from localStorage */
   private getPersistedMode(): ApiMode {
     try {
@@ -365,9 +390,21 @@ export class HetznerApiService {
   // PUBLIC API METHODS (for component compatibility)
   // =============================================================================
   setMode(mode: ApiMode): void {
+    // Show loading indicator during mode switch
+    this.loading.set(true);
+    this.error.set(null);
+    
+    // Update mode and persist to localStorage
     this.mode.set(mode);
     localStorage.setItem(CACHE_KEYS.MODE, mode);
+    
+    // Reload all data for the new mode
     this.loadAllData();
+    
+    // Generate mock status if switching to mock mode
+    if (mode === 'mock') {
+      this.refreshMockStatus();
+    }
   }
 
   forceReloadServers(): void {

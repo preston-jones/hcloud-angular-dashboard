@@ -217,9 +217,22 @@
         <!-- Activities Card -->
         <div class="card flex-1 min-h-0 overflow-hidden">
           <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
               <h2 class="text-lg font-medium text-ink">{{ getSystemStatusTitle() }}</h2>
             </div>
+            @if (getEndpointStatus().length > 0) {
+              <div class="flex items-center gap-2 text-sm bg-muted px-3 py-1.5 rounded-full">
+                <!-- Health Status Dot -->
+                <span class="w-2 h-2 rounded-full" 
+                      [class]="systemHealth().percentage >= 80 ? 'bg-green-500' : systemHealth().percentage >= 60 ? 'bg-yellow-500' : 'bg-red-500'">
+                </span>
+                <!-- Health Text -->
+                <span [class]="systemHealth().percentage >= 80 ? 'text-green-700 dark:text-green-400' : systemHealth().percentage >= 60 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400'" 
+                      class="font-medium">
+                  {{ systemHealth().healthy }}/{{ systemHealth().total }} OK ({{ systemHealth().percentage }}%)
+                </span>
+              </div>
+            }
           </div>
           
           @if (getEndpointStatus().length === 0) {
@@ -243,7 +256,7 @@
               <!-- Scrollable Table Body -->
               <div class="overflow-y-auto max-h-[240px] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 @for (status of getEndpointStatus(); track status.date) {
-                  <div class="border-b border-ui hover:bg-muted transition-colors px-6 py-3">
+                  <div class="border-b border-ui transition-colors px-6 py-3 text-gray-500">
                     <div class="grid grid-cols-[1fr_2fr_1fr_1.5fr] gap-3 items-center text-sm">
                       <!-- Status Column -->
                       <div class="flex items-center gap-1.5">
@@ -273,6 +286,13 @@
                 <!-- Bottom spacing to ensure all rows are visible -->
                 <div class="h-20"></div>
               </div>
+              
+              @if (isUsingMockData) {
+                <!-- Demo Mode Indicator -->
+                <div class="px-6 py-3 border-t border-ui bg-muted">
+                  <p class="text-xs text-soft text-center">Live endpoints unavailable in demo mode.</p>
+                </div>
+              }
             </div>
           }
         </div>

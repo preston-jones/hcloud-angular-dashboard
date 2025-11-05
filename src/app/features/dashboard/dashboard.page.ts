@@ -215,6 +215,20 @@ export class DashboardPage implements OnInit {
     return this.api.getRecentEndpointStatus();
   });
 
+  // Calculate system health statistics
+  systemHealth = computed(() => {
+    const statuses = this.getEndpointStatus();
+    if (statuses.length === 0) {
+      return { healthy: 0, total: 0, percentage: 0 };
+    }
+    
+    const healthy = statuses.filter(status => status.status >= 200 && status.status < 300).length;
+    const total = statuses.length;
+    const percentage = Math.round((healthy / total) * 100);
+    
+    return { healthy, total, percentage };
+  });
+
   // Helper for status styling
   getStatusClass(status: number): string {
     if (status >= 200 && status < 300) {

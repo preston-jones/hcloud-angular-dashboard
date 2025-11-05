@@ -1,0 +1,12 @@
+{
+  "endpoints": [
+    { "path": "/servers", "method": "GET", "weight": 1.0 },
+    { "path": "/locations", "method": "GET", "weight": 1.0 },
+    { "path": "/images", "method": "GET", "weight": 0.8 },
+    { "path": "/networks", "method": "GET", "weight": 0.6 },
+    { "path": "/load_balancers", "method": "GET", "weight": 0.4 },
+    { "path": "/firewalls", "method": "GET", "weight": 0.7 },
+    { "path": "/floating_ips", "method": "GET", "weight": 0.5 },
+    { "path": "/volumes", "method": "GET", "weight": 0.3 }
+  ]
+}
