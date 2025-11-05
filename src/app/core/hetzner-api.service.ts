@@ -126,7 +126,7 @@ export class HetznerApiService {
       if (servers && servers.length > 0) {
         this.storage.saveServers(servers);
       }
-      this.servers.set(this.storage.getServers());
+      this.servers.set(this.storage.getServers(this.mode()));
       this.loading.set(false);
     });
   }
@@ -199,7 +199,7 @@ export class HetznerApiService {
     const newServer = this.serverGen.createServer(serverType, customName, config);
     
     // Refresh servers from storage
-    this.servers.set(this.storage.getServers());
+    this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Update server status */
@@ -207,7 +207,7 @@ export class HetznerApiService {
     if (!this.checkWritePermission()) return;
     
     this.storage.updateServer(serverId, { status: newStatus });
-    this.servers.set(this.storage.getServers());
+    this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Update server protection */
@@ -215,7 +215,7 @@ export class HetznerApiService {
     if (!this.checkWritePermission()) return;
     
     this.storage.updateServer(serverId, { protection: { delete: enabled, rebuild: false } });
-    this.servers.set(this.storage.getServers());
+    this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Update server with partial data */
@@ -223,7 +223,7 @@ export class HetznerApiService {
     if (!this.checkWritePermission()) return;
     
     this.storage.updateServer(serverId, updates);
-    this.servers.set(this.storage.getServers());
+    this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Delete server */
@@ -231,14 +231,14 @@ export class HetznerApiService {
     if (!this.checkWritePermission()) return;
     
     this.storage.deleteServer(serverId);
-    this.servers.set(this.storage.getServers());
+    this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Get server by ID with cache support in mock mode */
   getServerById(id: number): Observable<Server | null> {
     if (this.mode() === 'mock') {
       // Fast cache lookup for mock mode
-      const server = this.storage.getServers().find(s => +s.id === +id) ?? null;
+      const server = this.storage.getServers(this.mode()).find(s => +s.id === +id) ?? null;
       return of(server);
     }
     

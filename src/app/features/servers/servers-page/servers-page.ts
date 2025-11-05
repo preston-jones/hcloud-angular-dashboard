@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit, O
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
+import { DataStorageService } from '../../../core/data-storage.service';
 import {
   Server,
   ServerArchitecture,
@@ -50,6 +51,7 @@ import { DemoRestrictionDialogComponent } from '../../../shared/ui/demo-restrict
 })
 export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
   private api = inject(HetznerApiService);
+  private storage = inject(DataStorageService);
   private router = inject(Router);
   private wizardState = inject(WizardStateService);
   private dataMapping = inject(DataMappingService);
@@ -308,10 +310,16 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const serverData = this.buildServerObject();
-    this.saveToSessionStorage(serverData);
+    
+    // Use data storage service instead of direct session storage manipulation
+    this.storage.addServer(serverData as Server);
+    
+    // Force reload servers to include the new user-created server
+    this.api.forceReloadServers();
+    
     this.wizardState.resetWizard();
     this.router.navigate(['/my-servers']);
-        console.log(serverData)
+    console.log(serverData)
   }
 
   private buildServerObject(): ServerToCreate {
@@ -371,17 +379,6 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
       id: id,
       status: 'applied'
     }));
-  }
-
-  private saveToSessionStorage(serverData: any): void {
-    try {
-      const existingServers = sessionStorage.getItem('user-servers');
-      const servers = existingServers ? JSON.parse(existingServers) : [];
-      servers.push(serverData);
-      sessionStorage.setItem('user-servers', JSON.stringify(servers));
-    } catch (error) {
-      console.error('Failed to save server to session storage:', error);
-    }
   }
 
   protected formatPrice(price: string | number | undefined): string {

@@ -13,10 +13,23 @@ export class DataStorageService {
   // =============================================================================
 
   /** Get all servers from storage */
-  getServers(): Server[] {
+  getServers(mode?: 'mock' | 'real'): Server[] {
     try {
-      const cached = sessionStorage.getItem(CACHE_KEYS.SERVERS);
-      return cached ? JSON.parse(cached) : [];
+      // Get API servers (mock or real)
+      const apiServers = sessionStorage.getItem(CACHE_KEYS.SERVERS);
+      const servers = apiServers ? JSON.parse(apiServers) : [];
+      
+      // In live/real mode, only return API servers
+      if (mode === 'real') {
+        return servers;
+      }
+      
+      // In mock mode or when mode is not specified, combine with user-created servers
+      const userServers = sessionStorage.getItem('user-servers');
+      const userCreatedServers = userServers ? JSON.parse(userServers) : [];
+      
+      // Combine both arrays, with user-created servers first (most recent)
+      return [...userCreatedServers, ...servers];
     } catch {
       return [];
     }
@@ -31,28 +44,73 @@ export class DataStorageService {
     }
   }
 
-  /** Add a new server to storage */
+  /** Add a new server to storage (user-created servers only) */
   addServer(server: Server): void {
-    const servers = this.getServers();
-    servers.push(server);
-    this.saveServers(servers);
-  }
-
-  /** Update a server in storage */
-  updateServer(serverId: number, updates: Partial<Server>): void {
-    const servers = this.getServers();
-    const index = servers.findIndex(s => s.id === serverId);
-    if (index !== -1) {
-      servers[index] = { ...servers[index], ...updates };
-      this.saveServers(servers);
+    try {
+      const userServers = sessionStorage.getItem('user-servers');
+      const userCreatedServers = userServers ? JSON.parse(userServers) : [];
+      userCreatedServers.push(server);
+      sessionStorage.setItem('user-servers', JSON.stringify(userCreatedServers));
+    } catch (error) {
+      console.warn('Failed to add server to storage:', error);
     }
   }
 
-  /** Delete a server from storage */
+  /** Update a server in storage (searches both API and user-created servers) */
+  updateServer(serverId: number, updates: Partial<Server>): void {
+    try {
+      // Try to update in API servers first
+      const apiServers = sessionStorage.getItem(CACHE_KEYS.SERVERS);
+      if (apiServers) {
+        const servers = JSON.parse(apiServers);
+        const index = servers.findIndex((s: Server) => s.id === serverId);
+        if (index !== -1) {
+          servers[index] = { ...servers[index], ...updates };
+          sessionStorage.setItem(CACHE_KEYS.SERVERS, JSON.stringify(servers));
+          return;
+        }
+      }
+
+      // If not found in API servers, try user-created servers
+      const userServers = sessionStorage.getItem('user-servers');
+      if (userServers) {
+        const userCreatedServers = JSON.parse(userServers);
+        const index = userCreatedServers.findIndex((s: Server) => s.id === serverId);
+        if (index !== -1) {
+          userCreatedServers[index] = { ...userCreatedServers[index], ...updates };
+          sessionStorage.setItem('user-servers', JSON.stringify(userCreatedServers));
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to update server in storage:', error);
+    }
+  }
+
+  /** Delete a server from storage (searches both API and user-created servers) */
   deleteServer(serverId: number): void {
-    const servers = this.getServers();
-    const filtered = servers.filter(s => s.id !== serverId);
-    this.saveServers(filtered);
+    try {
+      // Try to delete from API servers first
+      const apiServers = sessionStorage.getItem(CACHE_KEYS.SERVERS);
+      if (apiServers) {
+        const servers = JSON.parse(apiServers);
+        const originalLength = servers.length;
+        const filtered = servers.filter((s: Server) => s.id !== serverId);
+        if (filtered.length !== originalLength) {
+          sessionStorage.setItem(CACHE_KEYS.SERVERS, JSON.stringify(filtered));
+          return;
+        }
+      }
+
+      // If not found in API servers, try user-created servers
+      const userServers = sessionStorage.getItem('user-servers');
+      if (userServers) {
+        const userCreatedServers = JSON.parse(userServers);
+        const filtered = userCreatedServers.filter((s: Server) => s.id !== serverId);
+        sessionStorage.setItem('user-servers', JSON.stringify(filtered));
+      }
+    } catch (error) {
+      console.warn('Failed to delete server from storage:', error);
+    }
   }
 
   // =============================================================================
