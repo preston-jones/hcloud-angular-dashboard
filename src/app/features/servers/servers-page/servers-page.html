@@ -36,8 +36,16 @@
 
         <wizard-step-name [isStepCompleted]="isStepCompleted('name')" (onNameUpdate)="updateServerName($event)" />
 
-        <!-- Additional bottom spacing -->
-        <div class="wizard-bottom-spacing"></div>
+        <!-- Additional bottom spacing (hidden on responsive) -->
+        <div class="wizard-bottom-spacing hidden lg:block"></div>
+
+        <!-- Responsive Create Server Button (only visible on mobile/tablet) -->
+        <div class="responsive-create-button lg:hidden">
+          <button class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
+            [disabled]="!canCreateServer()" (click)="createServer()">
+            Create Server
+          </button>
+        </div>
 
       </div>
     </div>

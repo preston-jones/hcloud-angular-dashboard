@@ -60,7 +60,6 @@
   }
   
   .wizard-sidebar {
-    position: static;
-    order: -1;
+    display: none; /* Hide the entire summary card on responsive */
   }
 }

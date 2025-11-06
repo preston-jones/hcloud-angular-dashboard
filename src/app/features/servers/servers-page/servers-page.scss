@@ -332,6 +332,29 @@
    RESPONSIVE DESIGN
    ============================================================================= */
 
+/* Responsive Create Server Button */
+.responsive-create-button {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  
+  button {
+    &:disabled {
+      cursor: not-allowed;
+      background-color: #6b7280 !important; /* Gray background */
+      color: #9ca3af !important; /* Lighter text */
+      opacity: 0.6;
+      
+      &:hover {
+        background-color: #6b7280 !important; /* Prevent hover state */
+      }
+    }
+  }
+}
+
 @media(max-width:768px) {
   .wizard-layout {
     gap: 1rem;
@@ -343,6 +366,7 @@
 
   .wizard-steps-container {
     gap: 2rem;
+    margin-bottom: 6rem;
   }
 
   .step-title {
