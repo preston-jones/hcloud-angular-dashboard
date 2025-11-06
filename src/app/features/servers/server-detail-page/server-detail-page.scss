@@ -50,4 +50,40 @@ header h1 {
   .activity-description {
     max-width: 220px;
   }
+
+  /* Make header responsive - remove fixed height on mobile */
+  header {
+    height: auto !important;
+    
+    /* Reduce headline font sizes on mobile */
+    .text-3xl {
+      font-size: 1.5rem !important; /* Reduce from text-3xl to text-2xl equivalent */
+    }
+    
+    h1.text-2xl {
+      font-size: 1.25rem !important; /* Reduce from text-2xl to text-xl equivalent */
+    }
+
+    /* Hide on/off switch on mobile */
+    .power-switch {
+      display: none !important;
+    }
+
+    /* Make actions button full width and center content */
+    .relative {
+      width: 100% !important;
+      
+      button {
+        width: 100% !important;
+        justify-content: center !important;
+      }
+    }
+
+    /* IP addresses container - stack vertically on mobile */
+    .flex.items-center.gap-4.mt-2 {
+      flex-direction: column !important;
+      gap: 0 !important;
+      align-items: flex-start !important;
+    }
+  }
 }
