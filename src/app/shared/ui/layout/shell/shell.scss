@@ -12,6 +12,15 @@
 .main-content {
   /* Match the exact sidebar transition timing and easing */
   transition: margin-left 0.3s ease-in-out;
+  
+  /* Hide scrollbar while maintaining scroll functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+.main-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* Mobile responsiveness for page header and main content */
