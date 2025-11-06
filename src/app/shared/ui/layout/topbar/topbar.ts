@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { ThemeService } from '../../../../core/theme.service';
 import { HetznerApiService } from '../../../../core/hetzner-api.service';
 import { SearchService } from '../../../../core/search.service';
@@ -16,6 +16,9 @@ export class TopbarComponent {
   private theme = inject(ThemeService);
   private api = inject(HetznerApiService);
   public searchService = inject(SearchService);
+
+  // Mobile search state
+  public showMobileSearch = signal(false);
 
   isDark() { return this.theme.theme() === 'dark'; }
   toggleTheme() { this.theme.toggle(); }
@@ -61,5 +64,18 @@ export class TopbarComponent {
   onSearchDropdownClosed() {
     // Clear search when a server is selected
     this.clearSearch();
+  }
+
+  onMobileSearchClick() {
+    this.showMobileSearch.set(!this.showMobileSearch());
+    // Focus the search input when opened
+    if (this.showMobileSearch()) {
+      setTimeout(() => {
+        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 300);
+    }
   }
 }

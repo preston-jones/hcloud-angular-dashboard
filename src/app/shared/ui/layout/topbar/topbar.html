@@ -9,7 +9,7 @@
     </div>
 
     <!-- Center: Search Bar -->
-    <div class="flex-1 flex justify-center max-w-lg mx-6">
+    <div class="flex-1 flex justify-center max-w-lg mx-6" [class.mobile-search-active]="showMobileSearch()">
       <input
         type="search"
         placeholder="Search Server by Name"
@@ -32,19 +32,30 @@
         </span>
       </div>
       
-      <!-- Theme Toggle -->
-      <button
-        class="rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
-        (click)="toggleTheme()"
-        [attr.aria-pressed]="isDark()"
-        aria-label="Toggle dark mode">
-        @if (!isDark()) {
-        <span>🌙</span>
-        }
-        @if (isDark()) {
-        <span>☀️</span>
-        }
-      </button>
+      <!-- Mobile Icons Group -->
+      <div class="mobile-icons-group">
+        <!-- Search Icon (Mobile Only) -->
+        <button
+          class="search-icon-mobile rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
+          (click)="onMobileSearchClick()"
+          aria-label="Search servers">
+          <span>{{ showMobileSearch() ? '✕' : '🔍' }}</span>
+        </button>
+        
+        <!-- Theme Toggle -->
+        <button
+          class="rounded-lg px-4 py-2.5 text-soft hover:bg-[color-mix(in_oklab,_var(--text)_8%,_transparent)] transition-colors w-12 flex items-center justify-center"
+          (click)="toggleTheme()"
+          [attr.aria-pressed]="isDark()"
+          aria-label="Toggle dark mode">
+          @if (!isDark()) {
+          <span>🌙</span>
+          }
+          @if (isDark()) {
+          <span>☀️</span>
+          }
+        </button>
+      </div>
     </div>
   </div>
 </header>

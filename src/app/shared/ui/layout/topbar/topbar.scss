@@ -10,10 +10,20 @@
   display: flex;
   align-items: center;
   height: 80px;
+  transition: height 0.3s ease-in-out;
 
   .container {
     max-width: none;
   }
+}
+
+/* Hide search icon by default */
+.search-icon-mobile {
+  display: none;
+}
+
+.mobile-icons-group {
+  display: contents;
 }
 
 // Style the native search input clear button
@@ -40,5 +50,52 @@ input[type="search"] {
   // Firefox
   &::-moz-search-cancel-button {
     cursor: pointer;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .topbar {
+    height: auto;
+    min-height: 80px;
+    align-items: stretch;
+  }
+
+  .container {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+
+    /* Target the right container with status badge and theme toggle */
+    > div:last-child {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .mobile-icons-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Desktop search bar - hidden by default on mobile */
+  .container > div:nth-child(2) {
+    display: none;
+    
+    &.mobile-search-active {
+      display: flex;
+      order: 3;
+      max-width: none;
+      margin: 0;
+      
+      input[type="search"] {
+        max-width: none;
+      }
+    }
+  }
+
+  /* Show search icon on mobile */
+  .search-icon-mobile {
+    display: flex;
   }
 }
