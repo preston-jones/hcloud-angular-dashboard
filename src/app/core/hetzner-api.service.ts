@@ -1,7 +1,24 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, WritableSignal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, of, map } from 'rxjs';
-import { Server, ApiMode, CACHE_KEYS } from './models';
+import { 
+  Server, 
+  ApiMode, 
+  CACHE_KEYS, 
+  ServerTemplate,
+  Location, 
+  Datacenter, 
+  ServerImage, 
+  Firewall, 
+  Action, 
+  FloatingIP, 
+  LoadBalancer, 
+  Network,
+  HetznerApiResponse,
+  HttpOptions,
+  ServerUpdate,
+  ServerCreationConfig
+} from './models';
 import { DataStorageService } from './data-storage.service';
 import { ServerGenerationService } from './server-generation.service';
 import { HetznerUtilsService } from './hetzner-utils.service';
@@ -30,18 +47,18 @@ export class HetznerApiService {
   showDemoRestrictionDialog = signal(false);
   mode = signal<ApiMode>(this.getPersistedMode());
 
-  // Data signals - always read from storage for consistency
+  // Data signals - now with proper typing instead of any[]
   servers = signal<Server[]>([]);
-  serverTypes = signal<any[]>([]);
-  locations = signal<any[]>([]);
-  datacenters = signal<any[]>([]);
-  images = signal<any[]>([]);
-  firewalls = signal<any[]>([]);
-  actions = signal<any[]>([]);
-  floatingIps = signal<any[]>([]);
-  loadBalancers = signal<any[]>([]);
-  networks = signal<any[]>([]);
-  
+  serverTypes = signal<ServerTemplate[]>([]);
+  locations = signal<Location[]>([]);
+  datacenters = signal<Datacenter[]>([]);
+  images = signal<ServerImage[]>([]);
+  firewalls = signal<Firewall[]>([]);
+  actions = signal<Action[]>([]);
+  floatingIps = signal<FloatingIP[]>([]);
+  loadBalancers = signal<LoadBalancer[]>([]);
+  networks = signal<Network[]>([]);
+
   // System status data for dashboard
   endpointStatus = signal<Array<{
     status: number;
@@ -120,13 +137,13 @@ export class HetznerApiService {
     this.loading.set(true);
     this.error.set(null);
 
-    const endpoint = this.mode() === 'mock' 
+    const endpoint = this.mode() === 'mock'
       ? this.getMockEndpoint('servers')
       : this.getEndpoint('servers');
 
     this.http.get(endpoint, this.createHttpOptions()).pipe(
-      map((response: any) => this.extractResponseData(response, 'servers')),
-      map(servers => servers.map((server: any) => ({ ...server, priceEur: this.utils.getServerPrice(server) }))),
+      map((response: HetznerApiResponse<Server> | any) => this.extractResponseData(response, 'servers')),
+      map(servers => servers.map((server: Server) => ({ ...server, priceEur: this.utils.getServerPrice(server) }))),
       catchError((err: HttpErrorResponse) => {
         this.logApiCall('servers', err, true);
         this.error.set(err.message || 'Failed to load servers');
@@ -153,13 +170,13 @@ export class HetznerApiService {
 
     // Always try proxy first
     this.http.get(endpoint, httpOptions).pipe(
-      map((response: any) => this.serverGen.transformServerTypesToServers(response.server_types || [])),
+      map((response: HetznerApiResponse<any> | any) => this.serverGen.transformServerTypesToServers(response.server_types || [])),
       catchError(() => {
         // On error, try mock data if fallback is enabled
         if (environment.useMockFallback) {
           const mockEndpoint = this.getMockEndpoint('server_types');
           return this.http.get(mockEndpoint).pipe(
-            map((response: any) => this.serverGen.transformServerTypesToServers(response.server_types || []))
+            map((response: HetznerApiResponse<any> | any) => this.serverGen.transformServerTypesToServers(response.server_types || []))
           );
         }
         return of([]);
@@ -174,14 +191,18 @@ export class HetznerApiService {
     });
   }
 
-  /** Load resources based on current mode */
-  private loadResource(resource: string, signal: any, storageMethod: string): void {
+  /** Load resources based on current mode with proper typing */
+  private loadResource<T>(
+    resource: string, 
+    signal: WritableSignal<T[]>, 
+    storageMethod: string
+  ): void {
     const endpoint = this.mode() === 'mock' 
       ? this.getMockEndpoint(resource)
       : this.getEndpoint(resource);
 
     this.http.get(endpoint, this.createHttpOptions()).pipe(
-      map((response: any) => this.extractResponseData(response, resource)),
+      map((response: HetznerApiResponse<T> | any) => this.extractResponseData(response, resource)),
       catchError((err: HttpErrorResponse) => {
         this.logApiCall(resource, err, true);
         console.warn(`Failed to load ${resource}:`, err.message);
@@ -189,30 +210,28 @@ export class HetznerApiService {
       })
     ).subscribe(data => {
       if (data.length > 0) {
-        (this.storage as Record<string, any>)[`save${storageMethod}`](data);
+        (this.storage as any)[`save${storageMethod}`](data);
       }
-      signal.set((this.storage as Record<string, any>)[`get${storageMethod}`]());
+      signal.set((this.storage as any)[`get${storageMethod}`]());
     });
-  }
-
-  loadLocations(): void { this.loadResource('locations', this.locations, 'Locations'); }
-  loadDatacenters(): void { this.loadResource('datacenters', this.datacenters, 'Datacenters'); }
-  loadImages(): void { this.loadResource('images', this.images, 'Images'); }
-  loadFirewalls(): void { this.loadResource('firewalls', this.firewalls, 'Firewalls'); }
-  loadActions(): void { this.loadResource('actions', this.actions, 'Actions'); }
-  loadFloatingIps(): void { this.loadResource('floating_ips', this.floatingIps, 'FloatingIps'); }
-  loadLoadBalancers(): void { this.loadResource('load_balancers', this.loadBalancers, 'LoadBalancers'); }
-  loadNetworks(): void { this.loadResource('networks', this.networks, 'Networks'); }
+  }  loadLocations(): void { this.loadResource<Location>('locations', this.locations, 'Locations'); }
+  loadDatacenters(): void { this.loadResource<Datacenter>('datacenters', this.datacenters, 'Datacenters'); }
+  loadImages(): void { this.loadResource<ServerImage>('images', this.images, 'Images'); }
+  loadFirewalls(): void { this.loadResource<Firewall>('firewalls', this.firewalls, 'Firewalls'); }
+  loadActions(): void { this.loadResource<Action>('actions', this.actions, 'Actions'); }
+  loadFloatingIps(): void { this.loadResource<FloatingIP>('floating_ips', this.floatingIps, 'FloatingIps'); }
+  loadLoadBalancers(): void { this.loadResource<LoadBalancer>('load_balancers', this.loadBalancers, 'LoadBalancers'); }
+  loadNetworks(): void { this.loadResource<Network>('networks', this.networks, 'Networks'); }
 
   // =============================================================================
   // SERVER OPERATIONS
   // =============================================================================
   /** Create server from type */
-  createServerFromType(serverType: Server, customName?: string, config?: any): void {
+  createServerFromType(serverType: Server, customName?: string, config?: ServerCreationConfig): void {
     if (!this.checkWritePermission()) return;
 
     const newServer = this.serverGen.createServer(serverType, customName, config);
-    
+
     // Refresh servers from storage
     this.servers.set(this.storage.getServers(this.mode()));
   }
@@ -220,7 +239,7 @@ export class HetznerApiService {
   /** Update server status */
   updateServerStatus(serverId: number, newStatus: 'running' | 'stopped' | 'error'): void {
     if (!this.checkWritePermission()) return;
-    
+
     this.storage.updateServer(serverId, { status: newStatus });
     this.servers.set(this.storage.getServers(this.mode()));
   }
@@ -228,15 +247,15 @@ export class HetznerApiService {
   /** Update server protection */
   updateServerProtection(serverId: number, enabled: boolean): void {
     if (!this.checkWritePermission()) return;
-    
+
     this.storage.updateServer(serverId, { protection: { delete: enabled, rebuild: false } });
     this.servers.set(this.storage.getServers(this.mode()));
   }
 
   /** Update server with partial data */
-  updateServer(serverId: number, updates: Partial<any>): void {
+  updateServer(serverId: number, updates: ServerUpdate): void {
     if (!this.checkWritePermission()) return;
-    
+
     this.storage.updateServer(serverId, updates);
     this.servers.set(this.storage.getServers(this.mode()));
   }
@@ -244,7 +263,7 @@ export class HetznerApiService {
   /** Delete server */
   deleteServer(serverId: number): void {
     if (!this.checkWritePermission()) return;
-    
+
     this.storage.deleteServer(serverId);
     this.servers.set(this.storage.getServers(this.mode()));
   }
@@ -256,10 +275,10 @@ export class HetznerApiService {
       const server = this.storage.getServers(this.mode()).find(s => +s.id === +id) ?? null;
       return of(server);
     }
-    
+
     // Real API call for detailed server info
-    return this.http.get<any>(this.getEndpoint(`servers/${id}`), this.createHttpOptions()).pipe(
-      map((response: any) => {
+    return this.http.get<HetznerApiResponse<Server>>(this.getEndpoint(`servers/${id}`), this.createHttpOptions()).pipe(
+      map((response: HetznerApiResponse<Server> | any) => {
         const serverData = this.mode() === 'mock' ? response?.server : response?.body?.server;
         return serverData ? { ...serverData, priceEur: this.utils.getServerPrice(serverData) } : null;
       }),
@@ -294,7 +313,7 @@ export class HetznerApiService {
   }
 
   /** Get HTTP options with auth headers */
-  private getHttpOptions(): any {
+  private getHttpOptions(): Record<string, any> {
     // In real mode with proxy, no auth headers needed - proxy handles authentication
     return {};
   }
@@ -302,34 +321,34 @@ export class HetznerApiService {
   // =============================================================================
   // HTTP REQUEST HELPERS
   // =============================================================================
-  
+
   /** Create HTTP options based on current mode */
-  private createHttpOptions(): any {
+  private createHttpOptions(): Record<string, any> {
     if (this.mode() === 'mock') {
       return {}; // Plain JSON response for mock
     }
-    
+
     return {
       observe: 'response' as const // Typed HttpResponse for real API
     };
   }
 
   /** Extract data from HTTP response based on mode */
-  private extractResponseData(response: any, resourceKey: string): any[] {
+  private extractResponseData(response: HetznerApiResponse<any> | any, resourceKey: string): any[] {
     if (this.mode() === 'mock') {
       return response?.[resourceKey] ?? [];
     }
-    
+
     // Real mode (HttpResponse) - log headers
     if (response && typeof response === 'object' && 'headers' in response) {
       this.logApiCall(resourceKey, response);
     }
-    
+
     return response?.body?.[resourceKey] ?? [];
   }
 
   /** Log API call information (only in real mode with HttpResponse) */
-  private logApiCall(endpoint: string, response: any, isError: boolean = false): void {
+  private logApiCall(endpoint: string, response: HetznerApiResponse<any> | any, isError: boolean = false): void {
     // Only log in real mode and if response is actually an HttpResponse
     if (this.mode() !== 'real' || !response || typeof response !== 'object' || !('headers' in response)) {
       return;
@@ -393,14 +412,14 @@ export class HetznerApiService {
     // Show loading indicator during mode switch
     this.loading.set(true);
     this.error.set(null);
-    
+
     // Update mode and persist to localStorage
     this.mode.set(mode);
     localStorage.setItem(CACHE_KEYS.MODE, mode);
-    
+
     // Reload all data for the new mode
     this.loadAllData();
-    
+
     // Generate mock status if switching to mock mode
     if (mode === 'mock') {
       this.refreshMockStatus();
@@ -415,7 +434,7 @@ export class HetznerApiService {
     this.loadAllData();
   }
 
-  isServerTypeAvailable(server: any): boolean {
+  isServerTypeAvailable(server: ServerTemplate): boolean {
     // Simple availability check - in real implementation this would check datacenter availability
     return server && server.server_type && !server.server_type.deprecated;
   }
@@ -477,7 +496,7 @@ export class HetznerApiService {
   }
 
   /** Get recent actions */
-  getRecentActions(): any[] {
+  getRecentActions(): Action[] {
     const actions = this.actions();
     return actions
       .sort((a, b) => new Date(b.started || b.finished || '').getTime() - new Date(a.started || a.finished || '').getTime())
