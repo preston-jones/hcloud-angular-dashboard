@@ -1,3 +1,5 @@
+import { Server, ServerType, Location } from './server.model';
+
 /**
  * API mode types
  */
@@ -7,9 +9,9 @@ export type ApiMode = 'mock' | 'real';
  * Service state interface
  */
 export interface HetznerApiState {
-  servers: any[] | null;
-  serverTypes: any[] | null;
-  locations: any[] | null;
+  servers: Server[] | null;
+  serverTypes: ServerType[] | null;
+  locations: Location[] | null;
   loading: boolean;
   error: string | null;
   searchQuery: string;

@@ -376,7 +376,7 @@ export class ServersPage implements OnInit, OnDestroy, AfterViewInit {
     return this.dataMapping.getImageObjectForType(selectedImage);
   }
 
-  private getSelectedFirewallObjects(): any[] {
+  private getSelectedFirewallObjects(): { id: number; status: string }[] {
     return this.wizardState.selectedFirewalls().map(id => ({
       id: id,
       status: 'applied'

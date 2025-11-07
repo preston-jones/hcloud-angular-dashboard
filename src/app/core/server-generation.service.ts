@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Server } from './models';
+import { Server, ServerType, Datacenter, ServerImage, ServerTemplate } from './models';
 import { DataStorageService } from './data-storage.service';
 
 /**
@@ -15,7 +15,13 @@ export class ServerGenerationService {
   // =============================================================================
 
   /** Create a new server from server type configuration */
-  createServer(serverType: any, customName?: string, config?: any): Server {
+  createServer(serverType: ServerTemplate, customName?: string, config?: {
+    enableBackups?: boolean;
+    backupWindow?: string;
+    selectedFirewalls?: number[];
+    enableIPv4?: boolean;
+    enableIPv6?: boolean;
+  }): Server {
     const serverId = this.generateServerId();
     
     const server: Server = {
@@ -60,14 +66,14 @@ export class ServerGenerationService {
   }
 
   /** Generate server name */
-  private generateServerName(serverType: any): string {
+  private generateServerName(serverType: ServerTemplate): string {
     const memory = serverType.server_type?.memory || 8;
     const instanceNumber = Math.floor(Math.random() * 999) + 1;
     return `server-${memory}gb-${instanceNumber}`;
   }
 
   /** Get default server type configuration */
-  private getDefaultServerType(): any {
+  private getDefaultServerType(): ServerType {
     return {
       id: 114,
       name: 'cx23',
@@ -86,7 +92,7 @@ export class ServerGenerationService {
   }
 
   /** Select appropriate datacenter */
-  private selectDatacenter(serverType: any): any {
+  private selectDatacenter(serverType: ServerTemplate): Datacenter {
     if (serverType.datacenter) {
       return serverType.datacenter;
     }
@@ -115,7 +121,7 @@ export class ServerGenerationService {
   }
 
   /** Select appropriate image */
-  private selectImage(): any {
+  private selectImage(): ServerImage {
     return {
       id: 161547269,
       type: 'system',
@@ -139,7 +145,11 @@ export class ServerGenerationService {
   }
 
   /** Generate public networking configuration */
-  private generatePublicNet(serverId: number, config?: any): any {
+  private generatePublicNet(serverId: number, config?: {
+    selectedFirewalls?: number[];
+    enableIPv4?: boolean;
+    enableIPv6?: boolean;
+  }): Server['public_net'] {
     return {
       firewalls: config?.selectedFirewalls?.map((id: number) => ({
         id: id,
@@ -151,13 +161,13 @@ export class ServerGenerationService {
         ip: this.generateRandomIP(),
         blocked: false,
         dns_ptr: `static.${this.generateRandomIP().split('.').reverse().join('.')}.clients.your-server.de`
-      } : null,
+      } : [],
       ipv6: config?.enableIPv6 !== false ? {
         id: serverId + 2000,
         ip: this.generateRandomIPv6(),
         blocked: false,
         dns_ptr: []
-      } : null
+      } : []
     };
   }
 
@@ -181,9 +191,16 @@ export class ServerGenerationService {
   }
 
   /** Calculate server price */
-  private calculateServerPrice(serverType: any): number {
+  private calculateServerPrice(serverType: ServerTemplate): number {
     const memory = serverType.server_type?.memory || 4;
     const cores = serverType.server_type?.cores || 2;
+    return Math.round((memory * 0.75 + cores * 1.5) * 100) / 100;
+  }
+
+  /** Calculate price from server type directly */
+  private calculatePriceFromServerType(serverType: ServerType): number {
+    const memory = serverType.memory || 4;
+    const cores = serverType.cores || 2;
     return Math.round((memory * 0.75 + cores * 1.5) * 100) / 100;
   }
 
@@ -192,7 +209,7 @@ export class ServerGenerationService {
   // =============================================================================
 
   /** Transform server types from API response to server format */
-  transformServerTypesToServers(serverTypes: any[]): any[] {
+  transformServerTypesToServers(serverTypes: ServerType[]): ServerTemplate[] {
     return serverTypes.map((st, index) => {
       const baseServer = {
         id: 10000 + index,
@@ -209,7 +226,12 @@ export class ServerGenerationService {
         rescue_enabled: false,
         locked: false,
         placement_group: null,
-        public_net: { firewalls: [], floating_ips: [], ipv4: null, ipv6: null },
+        public_net: { 
+          firewalls: [], 
+          floating_ips: [] as [], 
+          ipv4: [] as [], 
+          ipv6: [] as [] 
+        },
         private_net: [],
         load_balancers: [],
         volumes: [],
@@ -217,7 +239,7 @@ export class ServerGenerationService {
         ingoing_traffic: 0,
         outgoing_traffic: 0,
         created: new Date().toISOString(),
-        priceEur: this.calculateServerPrice({ server_type: st })
+        priceEur: this.calculatePriceFromServerType(st)
       };
 
       return baseServer;

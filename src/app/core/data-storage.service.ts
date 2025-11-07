@@ -1,5 +1,17 @@
 import { Injectable, signal } from '@angular/core';
-import { Server, CACHE_KEYS } from './models';
+import { 
+  Server, 
+  CACHE_KEYS, 
+  ServerTemplate, 
+  Location, 
+  Datacenter, 
+  ServerImage, 
+  Firewall, 
+  Action, 
+  FloatingIP, 
+  LoadBalancer, 
+  Network 
+} from './models';
 
 /**
  * Unified data storage service for both mock and real API modes
@@ -118,7 +130,7 @@ export class DataStorageService {
   // =============================================================================
 
   /** Get server types from storage */
-  getServerTypes(): any[] {
+  getServerTypes(): ServerTemplate[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.SERVER_TYPES);
       return cached ? JSON.parse(cached) : [];
@@ -128,7 +140,7 @@ export class DataStorageService {
   }
 
   /** Save server types to storage */
-  saveServerTypes(serverTypes: any[]): void {
+  saveServerTypes(serverTypes: ServerTemplate[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.SERVER_TYPES, JSON.stringify(serverTypes));
     } catch (error) {
@@ -137,7 +149,7 @@ export class DataStorageService {
   }
 
   /** Get locations from storage */
-  getLocations(): any[] {
+  getLocations(): Location[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.LOCATIONS);
       return cached ? JSON.parse(cached) : [];
@@ -147,7 +159,7 @@ export class DataStorageService {
   }
 
   /** Save locations to storage */
-  saveLocations(locations: any[]): void {
+  saveLocations(locations: Location[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.LOCATIONS, JSON.stringify(locations));
     } catch (error) {
@@ -156,7 +168,7 @@ export class DataStorageService {
   }
 
   /** Get actions from storage */
-  getActions(): any[] {
+  getActions(): Action[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.ACTIONS);
       return cached ? JSON.parse(cached) : [];
@@ -166,7 +178,7 @@ export class DataStorageService {
   }
 
   /** Save actions to storage */
-  saveActions(actions: any[]): void {
+  saveActions(actions: Action[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.ACTIONS, JSON.stringify(actions));
     } catch (error) {
@@ -175,7 +187,7 @@ export class DataStorageService {
   }
 
   /** Get datacenters from storage */
-  getDatacenters(): any[] {
+  getDatacenters(): Datacenter[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.DATACENTERS);
       return cached ? JSON.parse(cached) : [];
@@ -185,7 +197,7 @@ export class DataStorageService {
   }
 
   /** Save datacenters to storage */
-  saveDatacenters(datacenters: any[]): void {
+  saveDatacenters(datacenters: Datacenter[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.DATACENTERS, JSON.stringify(datacenters));
     } catch (error) {
@@ -194,7 +206,7 @@ export class DataStorageService {
   }
 
   /** Get images from storage */
-  getImages(): any[] {
+  getImages(): ServerImage[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.IMAGES);
       return cached ? JSON.parse(cached) : [];
@@ -204,7 +216,7 @@ export class DataStorageService {
   }
 
   /** Save images to storage */
-  saveImages(images: any[]): void {
+  saveImages(images: ServerImage[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.IMAGES, JSON.stringify(images));
     } catch (error) {
@@ -213,7 +225,7 @@ export class DataStorageService {
   }
 
   /** Get firewalls from storage */
-  getFirewalls(): any[] {
+  getFirewalls(): Firewall[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.FIREWALLS);
       return cached ? JSON.parse(cached) : [];
@@ -223,7 +235,7 @@ export class DataStorageService {
   }
 
   /** Save firewalls to storage */
-  saveFirewalls(firewalls: any[]): void {
+  saveFirewalls(firewalls: Firewall[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.FIREWALLS, JSON.stringify(firewalls));
     } catch (error) {
@@ -232,7 +244,7 @@ export class DataStorageService {
   }
 
   /** Get floating IPs from storage */
-  getFloatingIps(): any[] {
+  getFloatingIps(): FloatingIP[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.FLOATING_IPS);
       return cached ? JSON.parse(cached) : [];
@@ -242,7 +254,7 @@ export class DataStorageService {
   }
 
   /** Save floating IPs to storage */
-  saveFloatingIps(floatingIps: any[]): void {
+  saveFloatingIps(floatingIps: FloatingIP[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.FLOATING_IPS, JSON.stringify(floatingIps));
     } catch (error) {
@@ -251,7 +263,7 @@ export class DataStorageService {
   }
 
   /** Get load balancers from storage */
-  getLoadBalancers(): any[] {
+  getLoadBalancers(): LoadBalancer[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.LOAD_BALANCERS);
       return cached ? JSON.parse(cached) : [];
@@ -261,7 +273,7 @@ export class DataStorageService {
   }
 
   /** Save load balancers to storage */
-  saveLoadBalancers(loadBalancers: any[]): void {
+  saveLoadBalancers(loadBalancers: LoadBalancer[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.LOAD_BALANCERS, JSON.stringify(loadBalancers));
     } catch (error) {
@@ -270,7 +282,7 @@ export class DataStorageService {
   }
 
   /** Get networks from storage */
-  getNetworks(): any[] {
+  getNetworks(): Network[] {
     try {
       const cached = sessionStorage.getItem(CACHE_KEYS.NETWORKS);
       return cached ? JSON.parse(cached) : [];
@@ -280,7 +292,7 @@ export class DataStorageService {
   }
 
   /** Save networks to storage */
-  saveNetworks(networks: any[]): void {
+  saveNetworks(networks: Network[]): void {
     try {
       sessionStorage.setItem(CACHE_KEYS.NETWORKS, JSON.stringify(networks));
     } catch (error) {

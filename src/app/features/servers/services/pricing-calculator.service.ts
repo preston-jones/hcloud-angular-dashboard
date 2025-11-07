@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { ServerTemplate } from '../../../core/models';
 
 /**
  * Service for handling all pricing calculations and cost computations
@@ -14,7 +15,7 @@ export class PricingCalculatorService {
   // PRICING CALCULATION METHODS
   // ============================================================================
   calculateServerPrice(
-    filteredServerTypes: any[], 
+    filteredServerTypes: ServerTemplate[], 
     selectedServerType: string, 
     selectedLocation: string
   ): string {
@@ -23,7 +24,7 @@ export class PricingCalculatorService {
     const server = filteredServerTypes.find(s => s.server_type?.name === selectedServerType);
     if (!server?.server_type?.prices?.length) return '0.00';
     
-    const locationPrice = server.server_type.prices.find((p: any) => 
+    const locationPrice = server.server_type.prices.find(p => 
       p.location === selectedLocation
     );
     const price = locationPrice || server.server_type.prices[0];
@@ -45,7 +46,7 @@ export class PricingCalculatorService {
   // ============================================================================
   // SERVER MEMORY EXTRACTION
   // ============================================================================
-  getSelectedServerMemory(filteredServerTypes: any[], selectedServerType: string): number {
+  getSelectedServerMemory(filteredServerTypes: ServerTemplate[], selectedServerType: string): number {
     const server = filteredServerTypes.find(s => s.server_type?.name === selectedServerType);
     return server?.server_type?.memory || 4;
   }

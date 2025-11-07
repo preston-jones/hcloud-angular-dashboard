@@ -142,7 +142,7 @@ export class HetznerApiService {
       : this.getEndpoint('servers');
 
     this.http.get(endpoint, this.createHttpOptions()).pipe(
-      map((response: HetznerApiResponse<Server> | any) => this.extractResponseData(response, 'servers')),
+      map((response: HetznerApiResponse<Server> | any) => this.extractResponseData<Server>(response, 'servers')),
       map(servers => servers.map((server: Server) => ({ ...server, priceEur: this.utils.getServerPrice(server) }))),
       catchError((err: HttpErrorResponse) => {
         this.logApiCall('servers', err, true);
@@ -202,7 +202,7 @@ export class HetznerApiService {
       : this.getEndpoint(resource);
 
     this.http.get(endpoint, this.createHttpOptions()).pipe(
-      map((response: HetznerApiResponse<T> | any) => this.extractResponseData(response, resource)),
+      map((response: HetznerApiResponse<T> | any) => this.extractResponseData<T>(response, resource)),
       catchError((err: HttpErrorResponse) => {
         this.logApiCall(resource, err, true);
         console.warn(`Failed to load ${resource}:`, err.message);
@@ -227,7 +227,7 @@ export class HetznerApiService {
   // SERVER OPERATIONS
   // =============================================================================
   /** Create server from type */
-  createServerFromType(serverType: Server, customName?: string, config?: ServerCreationConfig): void {
+  createServerFromType(serverType: ServerTemplate, customName?: string, config?: ServerCreationConfig): void {
     if (!this.checkWritePermission()) return;
 
     const newServer = this.serverGen.createServer(serverType, customName, config);
@@ -334,7 +334,7 @@ export class HetznerApiService {
   }
 
   /** Extract data from HTTP response based on mode */
-  private extractResponseData(response: HetznerApiResponse<any> | any, resourceKey: string): any[] {
+  private extractResponseData<T>(response: HetznerApiResponse<T> | any, resourceKey: string): T[] {
     if (this.mode() === 'mock') {
       return response?.[resourceKey] ?? [];
     }

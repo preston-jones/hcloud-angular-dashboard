@@ -147,6 +147,35 @@ export interface FirewallReference {
 }
 
 /**
+ * Private network reference
+ */
+export interface PrivateNetworkReference {
+  id: number;
+  ip: string;
+  alias_ips: string[];
+  mac_address: string;
+}
+
+/**
+ * Load balancer reference
+ */
+export interface LoadBalancerReference {
+  id: number;
+  name: string;
+  status: string;
+}
+
+/**
+ * Volume reference
+ */
+export interface VolumeReference {
+  id: number;
+  name: string;
+  size: number;
+  server?: number;
+}
+
+/**
  * Public network configuration
  */
 export interface PublicNetwork {
@@ -183,9 +212,9 @@ export interface Server {
   locked: boolean;
   placement_group?: any;
   public_net: PublicNetwork;
-  private_net: any[];
-  load_balancers: any[];
-  volumes: any[];
+  private_net: PrivateNetworkReference[];
+  load_balancers: LoadBalancerReference[];
+  volumes: VolumeReference[];
   included_traffic: number;
   ingoing_traffic: number;
   outgoing_traffic: number;

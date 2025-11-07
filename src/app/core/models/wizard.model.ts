@@ -1,3 +1,5 @@
+import { PrivateNetworkReference, LoadBalancerReference, VolumeReference } from './server.model';
+
 /**
  * Server creation wizard models and interfaces
  */
@@ -130,13 +132,13 @@ export interface ServerToCreate {
       id: number;
       status: string;
     }>;
-    floating_ips: any[];
+    floating_ips: [];
     ipv4: any | null;
     ipv6: any | null;
   };
-  private_net: any[];
-  load_balancers: any[];
-  volumes: any[];
+  private_net: PrivateNetworkReference[];
+  load_balancers: LoadBalancerReference[];
+  volumes: VolumeReference[];
   included_traffic: number;
   ingoing_traffic: number;
   outgoing_traffic: number;

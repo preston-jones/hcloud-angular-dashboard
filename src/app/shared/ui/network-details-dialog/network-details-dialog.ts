@@ -4,6 +4,14 @@ import { Server } from '../../../core/models';
 import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { DemoRestrictionDialogComponent } from '../demo-restriction-dialog/demo-restriction-dialog';
 
+interface FirewallRule {
+  direction: 'inbound' | 'outbound';
+  port: string;
+  protocol: 'tcp' | 'udp' | 'icmp';
+  source_ips: string[];
+  firewall_id: number;
+}
+
 @Component({
   selector: 'app-network-details-dialog',
   standalone: true,
@@ -98,9 +106,9 @@ import { DemoRestrictionDialogComponent } from '../demo-restriction-dialog/demo-
                       <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
                         <div class="text-lg">🔧</div>
                         <div class="flex-1">
-                          <div class="font-medium text-slate-900 dark:text-slate-100">{{ rule.direction }} - {{ rule.protocol?.toUpperCase() }}</div>
+                          <div class="font-medium text-slate-900 dark:text-slate-100">{{ rule.direction }} - {{ rule.protocol.toUpperCase() }}</div>
                           <div class="text-sm text-slate-500 dark:text-slate-400">
-                            Port {{ rule.port }} from {{ rule.source_ips?.join(', ') || 'any' }}
+                            Port {{ rule.port }} from {{ rule.source_ips.join(', ') || 'any' }}
                           </div>
                         </div>
                         <div class="flex items-center">
@@ -451,7 +459,7 @@ export class NetworkDetailsDialogComponent {
     return server.status === 'running' ? 3 : 0;
   }
 
-  getFirewallRules(): any[] {
+  getFirewallRules(): FirewallRule[] {
     const server = this.server();
     if (server.public_net?.firewalls && server.public_net.firewalls.length > 0) {
       // For now, return mock rules since we don't have the full firewall details
@@ -472,19 +480,22 @@ export class NetworkDetailsDialogComponent {
           direction: 'inbound',
           port: '22',
           protocol: 'tcp',
-          source_ips: ['0.0.0.0/0', '::/0']
+          source_ips: ['0.0.0.0/0', '::/0'],
+          firewall_id: 1
         },
         {
           direction: 'inbound',
           port: '80',
           protocol: 'tcp',
-          source_ips: ['0.0.0.0/0', '::/0']
+          source_ips: ['0.0.0.0/0', '::/0'],
+          firewall_id: 1
         },
         {
           direction: 'inbound',
           port: '443',
           protocol: 'tcp',
-          source_ips: ['0.0.0.0/0', '::/0']
+          source_ips: ['0.0.0.0/0', '::/0'],
+          firewall_id: 1
         }
       ];
     }
