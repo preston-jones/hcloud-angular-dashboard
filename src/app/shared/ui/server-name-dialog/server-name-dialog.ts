@@ -16,7 +16,7 @@ import { Server } from '../../../core/models';
           <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 mb-4">
             <h4 class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Server Configuration</h4>
             <div class="space-y-1 text-sm text-slate-600 dark:text-slate-300">
-              <div>Type: {{ selectedServer()!.server_type?.name || 'Unknown' }}</div>
+              <div>Type: {{ selectedServer()!.server_type.name || 'Unknown' }}</div>
               <div>CPU: {{ getCpuCount(selectedServer()!) }}</div>
               <div>RAM: {{ getRamSize(selectedServer()!) }}</div>
               <div>Storage: {{ getDiskSize(selectedServer()!) }}</div>
@@ -178,14 +178,14 @@ export class ServerNameDialogComponent {
   
   // Helper methods for server info display
   getCpuCount(server: Server): string {
-    return server.server_type?.cores ? `${server.server_type.cores} vCPU` : '1 vCPU';
+    return server.server_type.cores ? `${server.server_type.cores} vCPU` : '1 vCPU';
   }
   
   getRamSize(server: Server): string {
-    return server.server_type?.memory ? `${server.server_type.memory} GB` : '4 GB';
+    return server.server_type.memory ? `${server.server_type.memory} GB` : '4 GB';
   }
   
   getDiskSize(server: Server): string {
-    return server.server_type?.disk ? `${server.server_type.disk} GB SSD` : '20 GB SSD';
+    return server.server_type.disk ? `${server.server_type.disk} GB SSD` : '20 GB SSD';
   }
 }
