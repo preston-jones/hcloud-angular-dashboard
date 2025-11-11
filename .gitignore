@@ -37,6 +37,9 @@ yarn.lock
 !.vscode/extensions.json
 .history/*
 
+# Development tools and AI assistants
+.github/instructions
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
