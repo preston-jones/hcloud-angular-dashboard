@@ -115,20 +115,20 @@ import { ServerArchitecture, CpuArchitecture } from '../../../core/models';
 
           @for (server of filteredServerTypes(); track server.id; let i = $index) {
           @if (i < 6) { 
-          <div class="table-row" [class.selected]="selectedServerType() === server.server_type?.name"
-            [class.unavailable]="isServerTypeUnavailable(server.server_type?.name || '')"
-            (click)="selectServerType(server.server_type?.name || '')">
+          <div class="table-row" [class.selected]="selectedServerType() === server.server_type.name"
+            [class.unavailable]="isServerTypeUnavailable(server.server_type.name || '')"
+            (click)="selectServerType(server.server_type.name || '')">
             <div class="col-name">
-              <strong>{{ server.server_type?.name || 'Unknown' }}</strong>
-              @if (isServerTypeUnavailable(server.server_type?.name || '')) {
+              <strong>{{ server.server_type.name || 'Unknown' }}</strong>
+              @if (isServerTypeUnavailable(server.server_type.name || '')) {
               <span class="unavailable-badge">Ausverkauft</span>
               }
             </div>
-            <div class="col-vcpus">{{ server.server_type?.cores || 0 }}</div>
-            <div class="col-memory">{{ server.server_type?.memory || 0 }} GB</div>
-            <div class="col-disk">{{ server.server_type?.disk || 0 }} GB</div>
+            <div class="col-vcpus">{{ server.server_type.cores || 0 }}</div>
+            <div class="col-memory">{{ server.server_type.memory || 0 }} GB</div>
+            <div class="col-disk">{{ server.server_type.disk || 0 }} GB</div>
             <div class="col-transfer">20 TB</div>
-            <div class="col-price">€{{ formatPrice(server.server_type?.prices?.[0]?.price_monthly?.gross) }}</div>
+            <div class="col-price">€{{ formatPrice(server.server_type.prices[0].price_monthly.gross) }}</div>
           </div>
           }
           }
@@ -160,9 +160,9 @@ export class WizardStepArchitecture {
     }
 
     return servers.filter(server => {
-      const cpuType = server.server_type?.cpu_type;
-      const architecture = server.server_type?.architecture;
-      const category = server.server_type?.category;
+      const cpuType = server.server_type.cpu_type;
+      const architecture = server.server_type.architecture;
+      const category = server.server_type.category;
 
       if (!cpuType || !architecture || !category) return false;
 
@@ -223,7 +223,7 @@ export class WizardStepArchitecture {
 
   protected isServerTypeUnavailable(serverTypeName: string): boolean {
     const types = this.api.serverTypes();
-    const server = types?.find(s => s.server_type?.name === serverTypeName);
+    const server = types.find(s => s.server_type.name === serverTypeName);
     return server ? !this.api.isServerTypeAvailable(server) : false;
   }
 

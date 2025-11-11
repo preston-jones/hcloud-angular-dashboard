@@ -27,7 +27,7 @@ import { WizardStateService } from '../services';
           <div class="firewall-icon">🛡️</div>
           <div class="firewall-info">
             <div class="firewall-name">{{ firewall.name }}</div>
-            <div class="firewall-details">{{ firewall.rules?.length || 0 }} rules</div>
+            <div class="firewall-details">{{ firewall.rules.length || 0 }} rules</div>
           </div>
         </div>
         }

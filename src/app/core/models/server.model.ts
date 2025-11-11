@@ -8,18 +8,18 @@ export type ServerStatus = 'running' | 'stopped' | 'error' | 'available';
  */
 export interface ServerTypePricing {
   location: string;
-  price_hourly: { 
-    net: string; 
-    gross: string; 
+  price_hourly: {
+    net: string;
+    gross: string;
   };
-  price_monthly: { 
-    net: string; 
-    gross: string; 
+  price_monthly: {
+    net: string;
+    gross: string;
   };
   included_traffic?: number;
-  price_per_tb_traffic?: { 
-    net: string; 
-    gross: string; 
+  price_per_tb_traffic?: {
+    net: string;
+    gross: string;
   };
   available?: boolean; // Whether this server type is available in this location
 }
@@ -219,7 +219,7 @@ export interface Server {
   ingoing_traffic: number;
   outgoing_traffic: number;
   created: string;
-  
+
   // Computed properties for backward compatibility
   type?: string;
   location?: string;
