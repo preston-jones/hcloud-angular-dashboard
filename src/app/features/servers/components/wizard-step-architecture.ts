@@ -3,6 +3,8 @@ import { HetznerApiService } from '../../../core/hetzner-api.service';
 import { WizardStateService, DataMappingService } from '../services';
 import { ServerArchitecture, CpuArchitecture } from '../../../core/models';
 
+const MAX_DISPLAYED_SERVERS = 6;
+
 @Component({
   selector: 'wizard-step-architecture',
   standalone: true,
@@ -113,8 +115,7 @@ import { ServerArchitecture, CpuArchitecture } from '../../../core/models';
             <div class="col-price">Preis/Monat</div>
           </div>
 
-          @for (server of filteredServerTypes(); track server.id; let i = $index) {
-          @if (i < 6) { 
+          @for (server of limitedServerTypes(); track server.id) {
           <div class="table-row" [class.selected]="selectedServerType() === server.server_type.name"
             [class.unavailable]="isServerTypeUnavailable(server.server_type.name || '')"
             (click)="selectServerType(server.server_type.name || '')">
@@ -130,7 +131,6 @@ import { ServerArchitecture, CpuArchitecture } from '../../../core/models';
             <div class="col-transfer">20 TB</div>
             <div class="col-price">€{{ formatPrice(server.server_type.prices[0].price_monthly.gross) }}</div>
           </div>
-          }
           }
         </div>
       </div>
@@ -177,14 +177,14 @@ export class WizardStepArchitecture {
           return architecture === 'x86';
 
         case 'regular-performance':
-          return cpuType === 'shared' && 
-                 category === 'regular_purpose' && 
-                 architecture === 'x86';
+          return cpuType === 'shared' &&
+            category === 'regular_purpose' &&
+            architecture === 'x86';
 
         case 'general-purpose':
-          return cpuType === 'dedicated' && 
-                 category === 'general_purpose' && 
-                 architecture === 'x86';
+          return cpuType === 'dedicated' &&
+            category === 'general_purpose' &&
+            architecture === 'x86';
 
         default:
           return false;
@@ -192,11 +192,16 @@ export class WizardStepArchitecture {
     });
   });
 
+  // Limited server types for display
+  protected limitedServerTypes = computed(() =>
+    this.filteredServerTypes().slice(0, MAX_DISPLAYED_SERVERS)
+  );
+
   // Self-contained methods
   protected selectArchitecture(architecture: ServerArchitecture): void {
     this.wizardState.selectedArchitecture.set(architecture);
     this.wizardState.selectedServerType.set(''); // Reset server type when architecture changes
-    
+
     // Only auto-set CPU architecture if none is currently selected
     if (!this.wizardState.selectedCpuArchitecture()) {
       const autoArch = this.dataMapping.autoSetCpuArchitecture(architecture);
@@ -207,7 +212,7 @@ export class WizardStepArchitecture {
   protected selectCpuArchitecture(event: Event, cpuArch: CpuArchitecture): void {
     event.stopPropagation();
     this.wizardState.selectedCpuArchitecture.set(cpuArch);
-    
+
     // Also select the Cost-Optimized card when clicking CPU architecture buttons
     if (this.wizardState.selectedArchitecture() !== 'cost-optimized') {
       this.wizardState.selectedArchitecture.set('cost-optimized');
